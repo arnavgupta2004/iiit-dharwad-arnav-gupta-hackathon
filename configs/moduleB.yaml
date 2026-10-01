@@ -17,7 +17,27 @@ portfolio:
     derivative: 0.15            # notional-equivalent
     equity: 0.10
   transactions_source: computingvictor/transactions-fraud-datasets
+  transactions_zip: data/raw/_downloads/kaggle/transactions-fraud-datasets.zip
   counterparty_prefix: CP_
+  as_of: "2021-09-30"             # pricing date = start of the replay window
+  n_obligors: 120
+  min_obligors_per_sector: 3
+  min_merchant_months: 24         # need enough history for a flow-volatility estimate
+  # Target rating mix of the obligor book (assumption: an investment-grade-heavy wholesale book).
+  # Obligors are ranked by monthly-flow volatility (lower = better) and assigned buckets in order.
+  rating_mix: {AAA: 0.03, AA: 0.07, A: 0.20, BBB: 0.35, BB: 0.20, B: 0.12, CCC: 0.03}
+  lgd: {loan_secured: 0.25, loan_senior_unsecured: 0.45, bond_senior_unsecured: 0.45}  # assumptions
+  loan_tenor_years: [1, 7]
+  bond_tenor_years: [2, 15]
+  share_secured_loans: 0.4
+  share_revolvers: 0.35
+  n_ust_bonds: 6
+  n_irs: 24
+  n_fx_forwards: 15
+  n_equity_options: 12
+  n_equity_trs: 8
+  n_cds: 30
+  equity_vol_lookback_days: 252   # realised vol for option greeks, ending at as_of
 
 severity_multiplier:            # shock = analogue shock * m(impact)
   8: 0.6
