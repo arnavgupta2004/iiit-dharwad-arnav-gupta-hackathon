@@ -72,9 +72,12 @@ class FinBertScorer:
         import torch
 
         tok, model, order = self._model
+        # Length-sorted batches minimise padding; results are restored to input order.
+        idx = sorted(range(len(texts)), key=lambda k: len(texts[k]))
+        texts_sorted = [texts[k] for k in idx]
         out = []
-        for i in range(0, len(texts), self.batch_size):
-            batch = [t if t else " " for t in texts[i : i + self.batch_size]]
+        for i in range(0, len(texts_sorted), self.batch_size):
+            batch = [t if t else " " for t in texts_sorted[i : i + self.batch_size]]
             enc = tok(
                 batch,
                 return_tensors="pt",
@@ -85,7 +88,11 @@ class FinBertScorer:
             with torch.no_grad():
                 p = torch.softmax(model(**enc).logits, dim=-1).numpy()
             out.append(p[:, order])
-        return np.vstack(out) if out else np.zeros((0, 3))
+        if not out:
+            return np.zeros((0, 3))
+        res = np.empty((len(texts), 3))
+        res[idx] = np.vstack(out)
+        return res
 
     def score(self, texts: list[str]) -> list[SentimentResult]:
         p = self.probs(texts)
