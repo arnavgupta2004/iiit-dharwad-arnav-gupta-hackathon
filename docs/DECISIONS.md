@@ -2,6 +2,26 @@
 
 Newest first within each date. Each entry: decision, rationale, and status (accepted, or proposed pending Arnav's OK at a gate).
 
+## 2026-10-02 (pre-GATE C review by Arnav)
+
+### D-031 PD provenance, value by value
+Every PD in `data/market/default_rates_by_rating.csv` was re-extracted from the S&P PDF itself ("Default, Transition,
+and Recovery: 2024 Annual Global Corporate Default And Rating Transition Study", March 27, 2025), **Table 24 "Global
+corporate average cumulative default rates, 1981-2024"**, column Y1:
+
+| Rating | Y1 (%) | Table | Page |
+|---|---|---|---|
+| AAA | 0.00 | 24 | 55 |
+| AA | 0.02 | 24 | 55 |
+| A | 0.05 | 24 | 55 |
+| BBB | 0.14 | 24 | 56 (cont.) |
+| BB | 0.56 | 24 | 56 (cont.) |
+| B | 2.93 | 24 | 56 (cont.) |
+| CCC (CCC/C) | 26.12 | 24 | 56 (cont.) |
+
+Caution recorded during verification: page 56 also starts **Table 25 (U.S. region)**, whose AAA/AA/A rows read
+0.00/0.03/0.06. Those are *not* used. Only these seven values are stored; no table is copied into the repository.
+
 ## 2026-10-02 (Phases 3-7)
 
 ### D-030 Provisional event-classification results and how to read them
