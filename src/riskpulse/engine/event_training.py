@@ -13,6 +13,7 @@ Provisional evaluation (until Arnav's gold labels exist):
 from __future__ import annotations
 
 import gzip
+import hashlib
 import json
 
 import numpy as np
@@ -67,6 +68,12 @@ def sample_per_group(df: pd.DataFrame, col: str, k: int, seed: int) -> pd.DataFr
     return pd.concat(parts) if parts else df.iloc[0:0]
 
 
+def load_gold_texts() -> set[str]:
+    """Texts in the gold labelling file (excluded from all training data)."""
+    path = data_path("gold", "to_label.csv")
+    return set(pd.read_csv(path)["text"]) if path.exists() else set()
+
+
 def keyword_labels(texts: pd.Series, cap: int, seed: int) -> pd.DataFrame:
     kw = KeywordClassifier()
     rows = []
@@ -81,7 +88,8 @@ def keyword_labels(texts: pd.Series, cap: int, seed: int) -> pd.DataFrame:
 
 
 def zero_shot_labels(texts: pd.Series, min_conf: float) -> pd.DataFrame:
-    cache = data_path("processed", "cache", f"zeroshot_feed_{len(texts)}.parquet")
+    key = hashlib.sha1("\n".join(texts).encode()).hexdigest()[:16]
+    cache = data_path("processed", "cache", f"zeroshot_feed_{key}.parquet")
     if cache.exists():
         z = pd.read_parquet(cache)
     else:
@@ -133,12 +141,11 @@ def train_and_evaluate() -> dict:
         ]
     )
     feed = feed_headlines(int(cfg["feed_sample_for_keywords"]), seed)
+    feed = feed[~feed["text"].isin(load_gold_texts())]
     kw = keyword_labels(feed["text"], int(cfg["keyword_cap_per_class"]), seed)
-    zs_pool = (
-        feed["text"]
-        .drop(kw.index, errors="ignore")
-        .sample(int(cfg["zero_shot_sample"]), random_state=seed)
-    )
+    gold_texts = load_gold_texts()
+    pool = feed["text"][~feed["text"].isin(set(kw["text"]) | gold_texts)]
+    zs_pool = pool.sample(int(cfg["zero_shot_sample"]), random_state=seed)
     zs = zero_shot_labels(zs_pool.reset_index(drop=True), float(cfg["zero_shot_min_conf"]))
     weak = pd.concat([kw, zs], ignore_index=True).drop_duplicates("text")
     hold_mask = rng.random(len(weak)) < float(cfg["weak_holdout_frac"])
@@ -147,6 +154,15 @@ def train_and_evaluate() -> dict:
     train = pd.concat([hf_tr, seed_examples(), weak_train], ignore_index=True).drop_duplicates(
         "text"
     )
+    if train["label"].isna().any():
+        raise ValueError("Training rows without labels; check weak-label construction")
+    # The gold set is a TEST set: never train (or hold out weak labels) on its texts.
+    n_before = len(train)
+    train = train[~train["text"].isin(gold_texts)]
+    weak_hold = weak_hold[~weak_hold["text"].isin(gold_texts)]
+    log.info(f"Excluded {n_before - len(train)} gold texts from training")
+    assert not train["text"].isin(gold_texts).any(), "gold text leaked into training"
+    train.to_parquet(data_path("processed", "event_training_set.parquet"), index=False)
     by_src = train["source"].value_counts().to_dict()
     log.info(f"Event training set: {len(train)} rows; by source {by_src}")
 
