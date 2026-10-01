@@ -22,7 +22,11 @@ No proprietary or client data is used. Synthetic records are labelled synthetic 
 | 8 | Kaggle: computingvictor/transactions-fraud-datasets | Transactions | Apache 2.0 | Verified | Seeds the Module B synthetic wholesale book | Download script + derived synthetic portfolio |
 | 9 | NewsAPI (newsapi.org) Developer plan | News, live | Free dev plan, dev/testing use only | Terms verified; not called (no key) | Optional live feed | Code only |
 | 10 | Wikipedia "S&P 100" constituents table | Reference | CC BY-SA | Verified | Universe membership check | Not committed |
-| 11 | Human gold set (`data/gold/`) | Labels by Arnav | Own work | Pending (Phase 1 creates `to_label.csv`) | Event-class test set, sentiment spot check | Committed |
+| 11 | Human gold set (`data/gold/`) | Labels by Arnav | Own work | Template delivered (300 items); labels pending | Event-class test set, linking precision, sentiment spot check | Committed |
+| 12 | S&P Global Ratings, 2024 Annual Global Corporate Default and Rating Transition Study (public PDF via S&P Maalot) | Reference | S&P publication; 7 derived numbers cited | Verified (Table 24, pp. 55-56) | One-year PD by rating for the synthetic book | Derived values only (`data/market/default_rates_by_rating.csv`) |
+| 13 | FRED: ICE BofA US corporate OAS by rating; Moody's Baa/Aaa yields; 10-year Treasury | Market data | Third-party copyright (ICE, Moody's) via FRED | Verified (fetched in browser; FRED blocks scripted clients here) | Spread levels by rating; credit shocks per analogue window | Derived values only (`data/market/`, `data/scenarios/calibration.csv`) |
+| 14 | Loughran-McDonald sentiment word lists (2014 release, bundled in `pysentiment2`, MIT package) | Lexicon | LM: free for academic use | Verified (2,355 negative / 354 positive words) | Sentiment baseline | Not committed (installed package) |
+| 15 | Basel Framework CRE20 (bis.org) | Regulation | Public | Verified 2026-10-02 (CRE20.7, .42-.43, .57) | Risk weights for the CET1 view | Cited in DECISIONS D-024 |
 | - | Kaggle: thedevastator/tweet-sentiment-s-impact-on-stock-returns | Social | CC0 | Verified, **rejected** | - | No |
 | - | Kaggle: ankurzing/sentiment-analysis-for-financial-news (Financial PhraseBank) | Labelled sentiment | CC BY-NC-SA 4.0 | Metadata verified; **not used for FinBERT eval** | Optional only | No |
 | - | HF: Zihan1004/FNSPID | News | CC BY-NC 4.0 | Inspected via HTTP range reads; **not used** | - | No |
