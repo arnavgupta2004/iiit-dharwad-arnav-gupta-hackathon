@@ -136,9 +136,60 @@ def serve(
 @app.command()
 def demo(
     fast: bool = typer.Option(False, "--fast", help="Use precomputed signals; no model downloads."),
+    replay_start: str = typer.Option("2022-02-14", help="Full mode: replay window start."),
+    replay_end: str = typer.Option("2022-03-12", help="Full mode: replay window end (exclusive)."),
+    seconds_per_day: float = typer.Option(60.0, help="Full mode: wall seconds per market day."),
+    api_port: int = typer.Option(8000),
+    dashboard_port: int = typer.Option(8501),
 ) -> None:
-    """One-command demo: engine + API + dashboard."""
-    _not_yet("demo", 7)
+    """One-command demo: signal API + Streamlit dashboard (Ctrl+C stops both)."""
+    import os
+    import subprocess
+    import sys
+    import time
+
+    from riskpulse.common.config import repo_root
+
+    env = {**os.environ, "RISKPULSE_API": f"http://127.0.0.1:{api_port}"}
+    api_cmd = [sys.executable, "-m", "riskpulse", "serve", "--port", str(api_port)]
+    if not fast:
+        api_cmd += [
+            "--full",
+            "--replay-start",
+            replay_start,
+            "--replay-end",
+            replay_end,
+            "--seconds-per-day",
+            str(seconds_per_day),
+        ]
+    app_path = repo_root() / "src" / "riskpulse" / "dashboard" / "app.py"
+    dash_cmd = [
+        sys.executable,
+        "-m",
+        "streamlit",
+        "run",
+        str(app_path),
+        "--server.headless",
+        "true",
+        "--server.port",
+        str(dashboard_port),
+        "--theme.base",
+        "light",
+    ]
+    procs = [subprocess.Popen(api_cmd, env=env), subprocess.Popen(dash_cmd, env=env)]
+    typer.secho(
+        f"RiskPulse demo ({'fast: cached outputs' if fast else 'full: live models + replay'})\n"
+        f"  Dashboard: http://localhost:{dashboard_port}\n  API:       http://127.0.0.1:{api_port}/docs",
+        fg="green",
+    )
+    try:
+        while all(p.poll() is None for p in procs):
+            time.sleep(1)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        for p in procs:
+            p.terminate()
 
 
 @app.command(name="eval")

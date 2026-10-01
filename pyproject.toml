@@ -35,3 +35,7 @@ src = ["src", "tests", "scripts"]
 select = ["E", "F", "I", "B", "UP"]
 # B008: typer.Option/Argument defaults are the idiomatic typer pattern.
 ignore = ["B008"]
+
+[tool.ruff.lint.per-file-ignores]
+# Inline CSS/HTML snippets read better on one line.
+"src/riskpulse/dashboard/*.py" = ["E501"]
