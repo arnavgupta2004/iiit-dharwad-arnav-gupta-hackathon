@@ -13,7 +13,7 @@ No proprietary or client data is used. Synthetic records are labelled synthetic 
 | # | Source | Type | Licence / terms | Status (2026-10-01) | Role | In repo |
 |---|---|---|---|---|---|---|
 | 1 | GDELT DOC 2.0 API | News, live | Free, no key; GDELT open terms | Verified | Live feed (`live` mode) | Code only |
-| 2 | GDELT GKG 2.0 raw 15-min files | News, historical | Free; GDELT open terms | Verified | News for the replay window (2021-22) with themes, orgs and tone | Filtered sample (Phase 1) |
+| 2 | GDELT GKG 2.0 raw 15-min files | News, historical | Free; GDELT open terms | Verified; pilot passed (D-017) | News for the replay window (2021-22) with themes, orgs and tone | Script + derived replay feed |
 | 3 | Kaggle: equinxx/stock-tweets-for-sentiment-analysis-and-prediction | Social, historical | CC0 | Verified | Second (social) source; replay feed; Module A window | Cleaned sample for universe (Phase 1) |
 | 4 | Kaggle: miguelaenlle/massive-stock-news-analysis-db-for-nlpbacktests | News, historical | CC0 | Verified | Cross-sectional event study for impact v2 | Download script + derived features |
 | 5 | HF: zeroshot/twitter-financial-news-sentiment | Labelled sentiment | MIT | Verified | Sentiment evaluation (valid split = our test) | Download script |
@@ -54,6 +54,8 @@ No proprietary or client data is used. Synthetic records are labelled synthetic 
 - Tickers (rows): TSLA 37,422; TSM 11,034; AAPL 5,056; MSFT 4,089; PG 4,089; AMZN 4,089; NIO 3,021; META 2,751;
   AMD 2,227; NFLX 1,727; GOOG 1,291; PYPL 843; DIS 635; BA 399; COST 393; INTC 315; KO 310; CRM 233; XPEV 225;
   ENPH 216; ZS 193; VZ 123; BX 50; F 31; NOC 31.
+- **Defect:** the PG and MSFT sets (4,089 each) are exact copies of the AMZN set (mislabelled); see DECISIONS D-018.
+  About 20.7% of universe tweets are cashtag lists; see D-019 for the filters and yields.
 - `stock_yfinance_data.csv`: 6,300 rows of daily OHLCV for the same tickers (we use our own yfinance cache instead).
 
 ### 4. Benzinga news (miguelaenlle), CC0

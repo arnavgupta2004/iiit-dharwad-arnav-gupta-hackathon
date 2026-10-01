@@ -2,6 +2,55 @@
 
 Newest first within each date. Each entry: decision, rationale, and status (accepted, or proposed pending Arnav's OK at a gate).
 
+## 2026-10-02 (Phase 1)
+
+### D-017 GDELT GKG pilot result and sampling choice
+Pilot: trading week 2022-02-22 → 2022-02-28 plus FOMC days 2022-06-14 → 06-16, at 1/4 sampling (minute 00 of
+every hour on weekdays, every 6 h at weekends). Full numbers are in `reports/gkg_pilot.json` (`scripts/gkg_pilot.py`).
+- 200/200 files fetched, 0 failures; 99.9% of records carry a `<PAGE_TITLE>`, so headline text is usable.
+- Under the final (stricter) linking rules: mean **50.8** unique title-linked headlines per ticker per week (target
+  ≥ ~5); minimum 3 (PG, see D-019). All other tickers are ≥ 10.
+- MKT volume per day: 1,288 (Feb 23) → **3,140 (Feb 24)** → 3,304 (Feb 25). The FOMC decision day 2022-06-15 had
+  1,395 MKT items, 513 of them US-tagged (vs 177 the day before).
+- A US-session-only scheme (13–21 UTC) left COST at 4/week, so **all weekday hours are kept**.
+- Full stream: 6,680 files for 2021-09-30 → 2022-09-29, launched 2026-10-02 in the background. Raw files are never
+  written to disk (in-memory parse), with a disk guard at 3 GB free. Kept rows (a superset; see D-020) go to a gitignored
+  intermediate store and are reproducible via `python -m riskpulse ingest --source gdelt_gkg`.
+
+### D-018 Tweet dataset defect: PG and MSFT sets are copies of AMZN
+In equinxx `stock_tweets.csv`, the 4,089 tweets labelled PG and the 4,089 labelled MSFT are 100% identical to the AMZN
+set. Only 1% of "PG" tweets and 17% of "MSFT" tweets contain their own cashtag (vs 90% for AMZN). They are mislabelled
+AMZN tweets. The text-link filter (D-019) removes them, so **12** universe names have genuine tweets (AAPL, AMD, AMZN,
+BA, COST, DIS, GOOGL, INTC, KO, META, NFLX, TSLA), not 14. MSFT keeps the tweets that genuinely mention Microsoft. META
+tweets use the pre-rename cashtag `$FB`, which is in the alias list. The approved universe is unchanged. CRM (233) and
+VZ (123) have genuine tweets if a swap is ever wanted.
+
+### D-019 Tweet quality filters
+1. Universe tickers only.
+2. Drop cashtag lists (> 3 `$TICKER`s): 20.7% of universe tweets were watchlists or "earnings this week" lists.
+3. Keep a tweet only if its own text links to its labelled company.
+4. Exact and near-duplicate removal.
+
+Yield: 64,793 universe tweets → 51,349 → 40,608 → 38,505 after dedupe. TSLA is 75% of what remains (28,949).
+This is a known skew, handled by per-ticker normalisation in signals.
+
+### D-020 Entity-linking precision rules (after pilot inspection)
+Pilot samples showed incidental brand mentions ("... in latest Instagram post", "How to take a screenshot on iPhone")
+and a word collision ("The Tide News Online" → PG). Rules adopted:
+- Brands (and "Facebook", which post-rename usually means the platform) link only with business context words or a
+  corroborating company hit.
+- The context list excludes brand names and loose words (union, deal, fine, users, supply, plant, strike, production).
+- The PG brand "Tide" was removed.
+- Consumer how-to, shopping and entertainment-listing titles are not linked (`low_value_title_patterns`).
+The streamer keeps a superset of rows, and `gdelt_gkg.relink` re-applies the current rules, so tightening never needs a
+re-download. Residual errors seen in samples: "BAC review" (an arts venue), Coca-Cola HBC (a separate bottler), and
+consumer-ish Disney park stories. Linking precision will be measured on the gold set (an `entity_correct` column).
+
+### D-021 Near-duplicate detection
+rapidfuzz `token_set_ratio` ≥ 95 (punctuation stripped) within the same day and primary entity, only when token counts
+are within a 0.7 ratio. token_set_ratio is 100 for subset texts, so without that guard short tweets would be wrongly
+merged. Embedding-based near-dup (cosine ≥ 0.95) is applied later in story clustering (Phase 3).
+
 ## 2026-10-01 (GATE A review by Arnav)
 
 ### D-013 Scenario calibration only on pre-replay analogues; 2022 used as out-of-sample validation
