@@ -2,6 +2,23 @@
 
 Newest first within each date. Each entry: decision, rationale, and status (accepted, or proposed pending Arnav's OK at a gate).
 
+## 2026-10-02 (Phase 2: sentiment)
+
+### D-022 Sentiment evaluation outcome and label thresholds
+On HF valid (n = 2,388, never tuned on), FinBERT macro-F1 is 0.621 with the spec band (±0.15), 0.661 with the band
+tuned on HF train (±0.65), and 0.668 with argmax. Baselines: Loughran-McDonald 0.460, VADER 0.448 (each with its
+train-tuned band); majority class 0.264. Source: `reports/metrics.json` → `sentiment`.
+**Engine choice:** the continuous score s = P(pos) − P(neg) is what the modules consume. Label thresholds stay at the
+spec's ±0.15 for news, because the ±0.65 band was tuned on tweets and our news headlines are a different distribution.
+The tuned result is reported alongside. Entity-level scoring splits on clause connectives (while, but, although, ;)
+and is unit-tested ("JPMorgan beats ... while Bank of America misses" → JPM > 0 > BAC).
+
+### D-023 Loughran-McDonald source
+The official LM master dictionary link (Google Drive) returned "quota exceeded" on 2026-10-02. We use the LM word
+lists bundled in the MIT-licensed `pysentiment2` package (2014 LM release: 2,355 negative and 354 positive words),
+with our own tokenizer and polarity (P − N)/(P + N). The dictionary itself is not committed (LM terms: free for
+academic research).
+
 ## 2026-10-02 (Phase 1)
 
 ### D-017 GDELT GKG pilot result and sampling choice

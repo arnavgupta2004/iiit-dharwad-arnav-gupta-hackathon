@@ -1,0 +1,297 @@
+{
+  "sentiment": {
+    "dataset": "zeroshot/twitter-financial-news-sentiment",
+    "test_split": "valid",
+    "n_test": 2388,
+    "n_train_for_tuning": 9543,
+    "test_label_counts": {
+      "neutral": 1566,
+      "positive": 475,
+      "negative": 347
+    },
+    "results": {
+      "finbert": {
+        "default_band": 0.15,
+        "default": {
+          "accuracy": 0.6545,
+          "macro_f1": 0.621,
+          "f1_per_class": {
+            "negative": 0.5636,
+            "neutral": 0.7187,
+            "positive": 0.5806
+          },
+          "confusion_matrix": {
+            "labels": [
+              "negative",
+              "neutral",
+              "positive"
+            ],
+            "matrix": [
+              [
+                277,
+                51,
+                19
+              ],
+              [
+                306,
+                962,
+                298
+              ],
+              [
+                53,
+                98,
+                324
+              ]
+            ]
+          }
+        },
+        "train_tuned_band": 0.65,
+        "train_tuned": {
+          "accuracy": 0.7387,
+          "macro_f1": 0.6609,
+          "f1_per_class": {
+            "negative": 0.6111,
+            "neutral": 0.8156,
+            "positive": 0.5561
+          },
+          "confusion_matrix": {
+            "labels": [
+              "negative",
+              "neutral",
+              "positive"
+            ],
+            "matrix": [
+              [
+                231,
+                110,
+                6
+              ],
+              [
+                150,
+                1305,
+                111
+              ],
+              [
+                28,
+                219,
+                228
+              ]
+            ]
+          }
+        },
+        "argmax": {
+          "accuracy": 0.7253,
+          "macro_f1": 0.6682,
+          "f1_per_class": {
+            "negative": 0.5986,
+            "neutral": 0.8016,
+            "positive": 0.6043
+          },
+          "confusion_matrix": {
+            "labels": [
+              "negative",
+              "neutral",
+              "positive"
+            ],
+            "matrix": [
+              [
+                264,
+                71,
+                12
+              ],
+              [
+                213,
+                1184,
+                169
+              ],
+              [
+                58,
+                133,
+                284
+              ]
+            ]
+          }
+        }
+      },
+      "vader": {
+        "default_band": 0.05,
+        "default": {
+          "accuracy": 0.4941,
+          "macro_f1": 0.447,
+          "f1_per_class": {
+            "negative": 0.399,
+            "neutral": 0.5936,
+            "positive": 0.3483
+          },
+          "confusion_matrix": {
+            "labels": [
+              "negative",
+              "neutral",
+              "positive"
+            ],
+            "matrix": [
+              [
+                168,
+                95,
+                84
+              ],
+              [
+                286,
+                791,
+                489
+              ],
+              [
+                41,
+                213,
+                221
+              ]
+            ]
+          }
+        },
+        "train_tuned_band": 0.25,
+        "train_tuned": {
+          "accuracy": 0.5339,
+          "macro_f1": 0.4482,
+          "f1_per_class": {
+            "negative": 0.3456,
+            "neutral": 0.6503,
+            "positive": 0.3487
+          },
+          "confusion_matrix": {
+            "labels": [
+              "negative",
+              "neutral",
+              "positive"
+            ],
+            "matrix": [
+              [
+                122,
+                168,
+                57
+              ],
+              [
+                209,
+                956,
+                401
+              ],
+              [
+                28,
+                250,
+                197
+              ]
+            ]
+          }
+        }
+      },
+      "lm": {
+        "default_band": 0.0,
+        "default": {
+          "accuracy": 0.6013,
+          "macro_f1": 0.4604,
+          "f1_per_class": {
+            "negative": 0.4234,
+            "neutral": 0.725,
+            "positive": 0.2328
+          },
+          "confusion_matrix": {
+            "labels": [
+              "negative",
+              "neutral",
+              "positive"
+            ],
+            "matrix": [
+              [
+                174,
+                163,
+                10
+              ],
+              [
+                255,
+                1181,
+                130
+              ],
+              [
+                46,
+                348,
+                81
+              ]
+            ]
+          }
+        },
+        "train_tuned_band": 0.0,
+        "train_tuned": {
+          "accuracy": 0.6013,
+          "macro_f1": 0.4604,
+          "f1_per_class": {
+            "negative": 0.4234,
+            "neutral": 0.725,
+            "positive": 0.2328
+          },
+          "confusion_matrix": {
+            "labels": [
+              "negative",
+              "neutral",
+              "positive"
+            ],
+            "matrix": [
+              [
+                174,
+                163,
+                10
+              ],
+              [
+                255,
+                1181,
+                130
+              ],
+              [
+                46,
+                348,
+                81
+              ]
+            ]
+          }
+        }
+      },
+      "majority_class_neutral": {
+        "accuracy": 0.6558,
+        "macro_f1": 0.264,
+        "f1_per_class": {
+          "negative": 0.0,
+          "neutral": 0.7921,
+          "positive": 0.0
+        },
+        "confusion_matrix": {
+          "labels": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "matrix": [
+            [
+              0,
+              347,
+              0
+            ],
+            [
+              0,
+              1566,
+              0
+            ],
+            [
+              0,
+              475,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    "note": "Bands tuned on HF train only. FinBERT not evaluated on PhraseBank (leakage).",
+    "_provenance": {
+      "script": "riskpulse eval sentiment",
+      "generated_at": "2026-10-01T19:12:32+00:00",
+      "git_commit": "e93b1ac"
+    }
+  }
+}

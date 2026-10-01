@@ -107,7 +107,10 @@ def demo(
 @app.command(name="eval")
 def eval_(target: EvalTarget = typer.Argument(EvalTarget.all)) -> None:
     """Regenerate evaluation metrics into reports/."""
-    _not_yet(f"eval {target.value}", 2)
+    from riskpulse.eval import registry
+
+    ran = registry.run(target.value)
+    typer.echo(f"Updated reports/metrics.json sections: {', '.join(ran)}")
 
 
 @app.command()
