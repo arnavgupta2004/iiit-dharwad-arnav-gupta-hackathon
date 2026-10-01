@@ -42,3 +42,7 @@ models/
 
 # SetFit / HF Trainer default output
 checkpoints/
+
+# GDELT pilot output (verification only)
+data/processed/gdelt_gkg_pilot/
+data/processed/gdelt_gkg/

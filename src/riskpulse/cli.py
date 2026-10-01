@@ -54,12 +54,23 @@ def main(
 
 @app.command()
 def ingest(
-    source: str = typer.Option(
-        "all", help="Source adapter: gdelt, newsapi, kaggle_news, kaggle_tweets, all."
+    source: str = typer.Option("gdelt_gkg", help="Source adapter (currently: gdelt_gkg)."),
+    start: str = typer.Option(
+        "2021-09-30", help="Start date (UTC, inclusive) for historical pulls."
     ),
+    end: str = typer.Option("2022-09-30", help="End date (UTC, exclusive) for historical pulls."),
+    workers: int = typer.Option(None, help="Parallel download workers (default from config)."),
 ) -> None:
-    """Pull documents from a source into the document store."""
-    _not_yet("ingest", 1)
+    """Pull historical documents from a source into data/processed."""
+    from datetime import datetime
+
+    if source != "gdelt_gkg":
+        _not_yet(f"ingest --source {source}", 1)
+    from riskpulse.ingestion.gdelt_gkg import GKGStreamer, gkg_timestamps
+
+    ts = gkg_timestamps(datetime.fromisoformat(start), datetime.fromisoformat(end))
+    stats = GKGStreamer().run(ts, workers=workers)
+    typer.echo(stats)
 
 
 @app.command()

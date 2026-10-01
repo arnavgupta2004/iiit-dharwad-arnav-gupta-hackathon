@@ -44,3 +44,31 @@ clustering:
 
 dedupe:
   near_duplicate_cosine: 0.95
+
+gdelt_gkg:
+  url_template: http://data.gdeltproject.org/gdeltv2/{ts}.gkg.csv.zip
+  out_dir: data/processed/gdelt_gkg
+  workers: 4
+  min_free_gb: 3.0              # pause the stream if free disk drops below this (GATE A condition)
+  timeout_seconds: 120
+  max_retries: 4
+  # Sampling: which 15-minute files to pull. minute=0 -> 1 of 4 files per hour (1/4 sampling).
+  sampling:
+    minute: 0
+    weekday_hours_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    weekend_hours_utc: [0, 6, 12, 18]
+  # MKT items must have a macro/geo/credit title keyword AND one of these GKG theme prefixes
+  # (all prefixes checked to occur in a real 2022-02-24 GKG file).
+  mkt_theme_prefixes: [ECON_, EPU_, ARMEDCONFLICT, MILITARY, SANCTIONS, TAX_ECON_PRICE, WB_1104_MACROECONOMIC,
+    WB_442_INFLATION, WB_1234_BANKING_INSTITUTIONS, WB_2433_CONFLICT]
+
+kaggle_tweets:
+  zip: data/raw/_downloads/kaggle/stock-tweets-for-sentiment-analysis-and-prediction.zip
+  member: stock_tweets.csv
+  ticker_map: {GOOG: GOOGL}
+  max_cashtags: 3               # tweets with more cashtags are watchlists / spam lists -> dropped
+  require_text_link: true       # tweet must mention its company (cashtag/alias) in its own text
+
+kaggle_news:
+  zip: data/raw/_downloads/kaggle/massive-stock-news-analysis-db-for-nlpbacktests.zip
+  member: analyst_ratings_processed.csv

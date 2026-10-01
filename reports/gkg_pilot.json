@@ -1,0 +1,315 @@
+{
+  "pilot_week": [
+    "2022-02-22",
+    "2022-03-01"
+  ],
+  "fomc_days": [
+    "2022-06-14",
+    "2022-06-17"
+  ],
+  "sampling": "minute 00 of each hour (1/4 of 15-min files); weekends every 6 h",
+  "stream_stats": {
+    "files_ok": 200,
+    "files_missing": 0,
+    "files_failed": 0,
+    "records_raw": 279700,
+    "records_seen": 279334,
+    "records_kept": 34431
+  },
+  "rows_stored_at_stream_time": 34431,
+  "rows_kept_current_rules": 25394,
+  "week_title_linked_per_ticker_all_hours": {
+    "AAPL": {
+      "headlines": 34,
+      "unique_titles": 33
+    },
+    "MSFT": {
+      "headlines": 104,
+      "unique_titles": 96
+    },
+    "AMD": {
+      "headlines": 16,
+      "unique_titles": 14
+    },
+    "INTC": {
+      "headlines": 34,
+      "unique_titles": 11
+    },
+    "GOOGL": {
+      "headlines": 219,
+      "unique_titles": 193
+    },
+    "META": {
+      "headlines": 69,
+      "unique_titles": 33
+    },
+    "NFLX": {
+      "headlines": 231,
+      "unique_titles": 180
+    },
+    "DIS": {
+      "headlines": 175,
+      "unique_titles": 95
+    },
+    "AMZN": {
+      "headlines": 24,
+      "unique_titles": 14
+    },
+    "TSLA": {
+      "headlines": 134,
+      "unique_titles": 105
+    },
+    "KO": {
+      "headlines": 20,
+      "unique_titles": 16
+    },
+    "PG": {
+      "headlines": 3,
+      "unique_titles": 3
+    },
+    "COST": {
+      "headlines": 13,
+      "unique_titles": 12
+    },
+    "BA": {
+      "headlines": 45,
+      "unique_titles": 38
+    },
+    "JPM": {
+      "headlines": 66,
+      "unique_titles": 42
+    },
+    "BAC": {
+      "headlines": 23,
+      "unique_titles": 20
+    },
+    "GS": {
+      "headlines": 24,
+      "unique_titles": 23
+    },
+    "XOM": {
+      "headlines": 58,
+      "unique_titles": 28
+    },
+    "CVX": {
+      "headlines": 28,
+      "unique_titles": 24
+    },
+    "JNJ": {
+      "headlines": 139,
+      "unique_titles": 36
+    }
+  },
+  "week_title_linked_per_ticker_us_session_only": {
+    "AAPL": {
+      "headlines": 25,
+      "unique_titles": 24
+    },
+    "MSFT": {
+      "headlines": 42,
+      "unique_titles": 41
+    },
+    "AMD": {
+      "headlines": 7,
+      "unique_titles": 7
+    },
+    "INTC": {
+      "headlines": 7,
+      "unique_titles": 7
+    },
+    "GOOGL": {
+      "headlines": 106,
+      "unique_titles": 93
+    },
+    "META": {
+      "headlines": 41,
+      "unique_titles": 11
+    },
+    "NFLX": {
+      "headlines": 107,
+      "unique_titles": 85
+    },
+    "DIS": {
+      "headlines": 97,
+      "unique_titles": 50
+    },
+    "AMZN": {
+      "headlines": 7,
+      "unique_titles": 7
+    },
+    "TSLA": {
+      "headlines": 54,
+      "unique_titles": 47
+    },
+    "KO": {
+      "headlines": 7,
+      "unique_titles": 7
+    },
+    "PG": {
+      "headlines": 1,
+      "unique_titles": 1
+    },
+    "COST": {
+      "headlines": 4,
+      "unique_titles": 4
+    },
+    "BA": {
+      "headlines": 18,
+      "unique_titles": 16
+    },
+    "JPM": {
+      "headlines": 47,
+      "unique_titles": 24
+    },
+    "BAC": {
+      "headlines": 12,
+      "unique_titles": 9
+    },
+    "GS": {
+      "headlines": 11,
+      "unique_titles": 10
+    },
+    "XOM": {
+      "headlines": 32,
+      "unique_titles": 18
+    },
+    "CVX": {
+      "headlines": 19,
+      "unique_titles": 17
+    },
+    "JNJ": {
+      "headlines": 100,
+      "unique_titles": 25
+    }
+  },
+  "week_mean_headlines_per_ticker_all_hours": 72.95,
+  "week_mean_unique_titles_per_ticker_all_hours": 50.8,
+  "week_min_unique_titles_per_ticker_all_hours": 3,
+  "week_tickers_below_5_unique": [
+    "PG"
+  ],
+  "week_org_only_links": 3987,
+  "mkt_daily_week": {
+    "2022-02-22": {
+      "mkt": 1612,
+      "US": 226,
+      "RUSSIA_UKRAINE": 1209,
+      "JAPAN": 8,
+      "EM": 7,
+      "CHINA": 9,
+      "UK": 99,
+      "EUROPE": 153,
+      "INDIA": 11,
+      "MIDDLE_EAST": 16
+    },
+    "2022-02-23": {
+      "mkt": 1288,
+      "RUSSIA_UKRAINE": 831,
+      "US": 223,
+      "CHINA": 58,
+      "UK": 79,
+      "EUROPE": 73,
+      "MIDDLE_EAST": 62,
+      "JAPAN": 15,
+      "INDIA": 15,
+      "EM": 8
+    },
+    "2022-02-24": {
+      "mkt": 3140,
+      "RUSSIA_UKRAINE": 2611,
+      "US": 342,
+      "MIDDLE_EAST": 38,
+      "JAPAN": 6,
+      "EUROPE": 191,
+      "CHINA": 43,
+      "INDIA": 29,
+      "UK": 87,
+      "EM": 17
+    },
+    "2022-02-25": {
+      "mkt": 3304,
+      "RUSSIA_UKRAINE": 2835,
+      "CHINA": 107,
+      "JAPAN": 21,
+      "US": 415,
+      "EUROPE": 269,
+      "UK": 97,
+      "MIDDLE_EAST": 29,
+      "INDIA": 48,
+      "EM": 17
+    },
+    "2022-02-26": {
+      "mkt": 330,
+      "US": 70,
+      "EUROPE": 29,
+      "RUSSIA_UKRAINE": 269,
+      "CHINA": 6,
+      "UK": 33,
+      "INDIA": 8,
+      "JAPAN": 3,
+      "MIDDLE_EAST": 2
+    },
+    "2022-02-27": {
+      "mkt": 211,
+      "RUSSIA_UKRAINE": 184,
+      "US": 26,
+      "EUROPE": 16,
+      "UK": 10,
+      "CHINA": 1,
+      "MIDDLE_EAST": 2,
+      "INDIA": 2,
+      "EM": 1
+    },
+    "2022-02-28": {
+      "mkt": 2048,
+      "RUSSIA_UKRAINE": 1682,
+      "US": 258,
+      "EUROPE": 150,
+      "MIDDLE_EAST": 46,
+      "EM": 21,
+      "UK": 63,
+      "INDIA": 34,
+      "CHINA": 49,
+      "JAPAN": 19
+    }
+  },
+  "mkt_daily_fomc": {
+    "2022-06-14": {
+      "mkt": 1028,
+      "RUSSIA_UKRAINE": 206,
+      "UK": 58,
+      "US": 177,
+      "EUROPE": 87,
+      "EM": 19,
+      "INDIA": 22,
+      "CHINA": 41,
+      "MIDDLE_EAST": 14,
+      "JAPAN": 7
+    },
+    "2022-06-15": {
+      "mkt": 1395,
+      "US": 513,
+      "CHINA": 56,
+      "EUROPE": 94,
+      "RUSSIA_UKRAINE": 236,
+      "UK": 18,
+      "JAPAN": 18,
+      "INDIA": 10,
+      "EM": 7,
+      "MIDDLE_EAST": 15
+    },
+    "2022-06-16": {
+      "mkt": 1409,
+      "RUSSIA_UKRAINE": 217,
+      "INDIA": 20,
+      "EUROPE": 103,
+      "US": 391,
+      "CHINA": 20,
+      "MIDDLE_EAST": 46,
+      "UK": 40,
+      "EM": 9,
+      "JAPAN": 10
+    }
+  },
+  "generated_at": "2026-10-01T18:42:46.495038+00:00"
+}
