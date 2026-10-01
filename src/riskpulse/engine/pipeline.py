@@ -132,8 +132,9 @@ class SignalEngine:
         touched: dict[str, datetime] = {}
         for ds in sorted(scored, key=lambda x: x.doc.published_at):
             d, ts = ds.doc, ds.doc.published_at
-            novelty = self.clusterer.novelty(ds.embedding, ts, self.lookback)
-            event_id, _, _ = self.clusterer.assign(d.doc_id, ds.embedding, ts)
+            event_id, _, _, novelty = self.clusterer.observe(
+                d.doc_id, ds.embedding, ts, self.lookback
+            )
             outlet = outlet_of(d)
             for ticker, rel in ds.links.items():
                 # MKT velocity/breadth are tracked per primary region (first in config order).

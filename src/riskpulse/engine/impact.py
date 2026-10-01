@@ -99,32 +99,37 @@ def _sigmoid(x: float) -> float:
 
 
 class VelocityTracker:
-    """Per-entity mention velocity: z-score of the last-N-hours count vs trailing buckets."""
+    """Per-entity mention velocity: z-score of the last-N-hours count vs trailing buckets.
+
+    recent   = mentions in the sliding window (t - N h, t]          (exact, deque)
+    baseline = counts in the 28 aligned N-hour buckets before the current bucket (7 days for
+               N = 6), kept incrementally per key, so each observation is O(28).
+    """
 
     def __init__(self, cfg: dict | None = None) -> None:
         c = (cfg or load_config("impact"))["velocity"]
-        self.window = timedelta(hours=float(c["window_hours"]))
-        self.baseline = timedelta(days=float(c["baseline_days"]))
+        self.window = float(c["window_hours"]) * 3600
         self.scale = float(c["sigmoid_scale"])
         self.min_std = float(c["min_std"])
-        self.events: dict[str, deque[datetime]] = defaultdict(deque)
+        self.n_buckets = int(float(c["baseline_days"]) * 86400 // self.window)
+        self.recent: dict[str, deque[float]] = defaultdict(deque)
+        self.buckets: dict[str, dict[int, int]] = defaultdict(dict)
 
     def observe(self, entity: str, ts: datetime) -> tuple[float, float]:
         """Record a mention and return (V in (0,1), z). Times must be non-decreasing."""
-        q = self.events[entity]
-        q.append(ts)
-        horizon = ts - self.baseline - self.window
-        while q and q[0] < horizon:
+        t = ts.timestamp()
+        q = self.recent[entity]
+        q.append(t)
+        while q and q[0] <= t - self.window:
             q.popleft()
-        recent = sum(1 for t in q if t > ts - self.window)
-        n_buckets = int(self.baseline / self.window)
-        counts = np.zeros(n_buckets)
-        base_start = ts - self.window - self.baseline
-        for t in q:
-            if base_start <= t <= ts - self.window:
-                k = int((t - base_start) / self.window)
-                counts[min(k, n_buckets - 1)] += 1
-        z = (recent - counts.mean()) / max(counts.std(), self.min_std)
+        b = int(t // self.window)
+        bk = self.buckets[entity]
+        bk[b] = bk.get(b, 0) + 1
+        if len(bk) > 4 * self.n_buckets:  # drop buckets older than the baseline
+            for old in [k for k in bk if k < b - self.n_buckets]:
+                del bk[old]
+        counts = np.array([bk.get(k, 0) for k in range(b - self.n_buckets, b)], dtype=float)
+        z = (len(q) - counts.mean()) / max(counts.std(), self.min_std)
         return _sigmoid(z / self.scale), float(z)
 
 
