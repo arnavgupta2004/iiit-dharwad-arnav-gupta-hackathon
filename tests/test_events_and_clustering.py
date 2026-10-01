@@ -71,3 +71,14 @@ def test_novelty_sees_beyond_assignment_window() -> None:
     assert c.novelty(unit([1, 0, 0]), later, 72) == pytest.approx(0.0, abs=1e-9)
     _, _, new = c.assign("b" * 40, unit([1, 0, 0]), later)
     assert new
+
+
+def test_sample_per_group_keeps_label_column() -> None:
+    import pandas as pd
+
+    from riskpulse.engine.event_training import sample_per_group
+
+    df = pd.DataFrame({"text": list("abcdef"), "label": ["X", "X", "X", "Y", "Y", "Z"]})
+    out = sample_per_group(df, "label", 2, seed=0)
+    assert "label" in out.columns
+    assert out["label"].value_counts().to_dict() == {"X": 2, "Y": 2, "Z": 1}

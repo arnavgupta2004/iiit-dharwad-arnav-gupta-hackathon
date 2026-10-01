@@ -61,6 +61,12 @@ def feed_headlines(n: int, seed: int) -> pd.DataFrame:
     return pd.DataFrame({"text": s.sample(min(n, len(s)), random_state=seed).to_numpy()})
 
 
+def sample_per_group(df: pd.DataFrame, col: str, k: int, seed: int) -> pd.DataFrame:
+    """Up to k rows per group, keeping the group column (pandas 3 groupby.apply drops it)."""
+    parts = [g.sample(min(k, len(g)), random_state=seed) for _, g in df.groupby(col)]
+    return pd.concat(parts) if parts else df.iloc[0:0]
+
+
 def keyword_labels(texts: pd.Series, cap: int, seed: int) -> pd.DataFrame:
     kw = KeywordClassifier()
     rows = []
@@ -71,10 +77,7 @@ def keyword_labels(texts: pd.Series, cap: int, seed: int) -> pd.DataFrame:
             if c != "OTHER":
                 rows.append((t, c))
     df = pd.DataFrame(rows, columns=["text", "label"])
-    df = df.groupby("label", group_keys=False).apply(
-        lambda g: g.sample(min(cap, len(g)), random_state=seed)
-    )
-    return df.assign(source="kw")
+    return sample_per_group(df, "label", cap, seed).assign(source="kw")
 
 
 def zero_shot_labels(texts: pd.Series, min_conf: float) -> pd.DataFrame:
@@ -171,9 +174,7 @@ def train_and_evaluate() -> dict:
         }
     # Zero-shot is slow on CPU: scored on a stratified subsample of HF-topic valid.
     n_zs = int(cfg["zero_shot_eval_sample"])
-    sub = hf_va.groupby("label", group_keys=False).apply(
-        lambda g: g.sample(min(len(g), max(1, n_zs // len(hf_labels))), random_state=seed)
-    )
+    sub = sample_per_group(hf_va, "label", max(1, n_zs // len(hf_labels)), seed)
     zsc = ZeroShotClassifier()
     gold = sub["label"].tolist()
     results["hf_topic_valid_subsample"] = {
