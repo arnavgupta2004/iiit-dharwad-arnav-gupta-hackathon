@@ -20,7 +20,11 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
-filterwarnings = ["ignore:invalid escape sequence:DeprecationWarning", "ignore::SyntaxWarning"]
+filterwarnings = [
+    "ignore:invalid escape sequence:DeprecationWarning",
+    "ignore::SyntaxWarning",
+    "ignore:Using `httpx` with `starlette.testclient`",
+]
 
 [tool.ruff]
 line-length = 100

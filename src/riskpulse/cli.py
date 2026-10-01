@@ -112,9 +112,25 @@ def replay(
 def serve(
     host: str = typer.Option("127.0.0.1"),
     port: int = typer.Option(8000),
+    full: bool = typer.Option(False, "--full", help="Load models: enables /analyze and /inject."),
+    replay_start: str = typer.Option(None, help="With --full: replay the feed from this date."),
+    replay_end: str = typer.Option(None, help="With --full: replay end date (exclusive)."),
+    seconds_per_day: float = typer.Option(None, help="Replay pace (default from config)."),
 ) -> None:
     """Start the FastAPI signal server (REST + SSE)."""
-    _not_yet("serve", 4)
+    import uvicorn
+
+    from riskpulse.api.app import create_app
+
+    live, replay = None, None
+    if full:
+        from riskpulse.api.live import LiveEngine
+
+        live = LiveEngine()
+        if replay_start and replay_end:
+            replay = (replay_start, replay_end, seconds_per_day or 60.0)
+    application = create_app("full" if full else "fast", live=live, replay=replay)
+    uvicorn.run(application, host=host, port=port, log_level="info")
 
 
 @app.command()
