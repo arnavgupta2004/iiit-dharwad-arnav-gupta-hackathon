@@ -2,6 +2,37 @@
 
 Newest first within each date. Each entry: decision, rationale, and status (accepted, or proposed pending Arnav's OK at a gate).
 
+## 2026-10-02 (Phases 3-7)
+
+### D-025 Batch inference device
+The project runs on CPU (default). The one-off precompute over 203,363 documents ran at about 18 docs/s on a shared
+CPU, so `RISKPULSE_DEVICE=mps` (opt-in) was used for that batch only. On 512 tweets the MPS and CPU outputs agree to
+max |Δp| 5e-6, with 100% argmax agreement. No result depends on the accelerator; reviewers run on CPU.
+
+### D-026 Credit inputs for the synthetic book (data/market)
+- Spreads by rating: BBB anchored at 185 bp on 2021-09-30 (FRED `DBAA` − `DGS10`), other ratings scaled by the median
+  ICE BofA OAS-to-BBB ratios over 2023-10-02 → 2026-09-30. FRED publishes only three years of ICE data.
+- PDs: S&P 2024 annual default study, Table 24, year-1 column (verified in the PDF; a web-search summary had
+  different, wrong figures).
+- Spread shocks: Δ(Moody's Baa − 10y) over each window, scaled to ratings by the same ratios (proportional widening).
+- The PD stress multiplier is spread-implied: 1 + ΔS_BBB / S_BBB (credit triangle); ×1.5 for obligors in a region
+  named on the triggering event (assumption, config).
+
+### D-027 Loan losses via ΔEL, not mark-to-market
+Banking-book loans affect capital through provisions (ΔEL = (PD_s − PD)·LGD·EAD). Their spread-driven fair-value
+change is reported for information only and excluded from CET1, to avoid double counting credit risk. Bonds,
+derivatives and equity are marked to market.
+
+### D-028 Scenario construction
+Per event class, take the analogue set; per factor, the largest-magnitude measured move (sign kept); scale by
+m(impact) = {8: 0.6, 9: 0.8, 10: 1.0}; combine concurrent scenarios by max per factor. Where a sector ETF did not yet
+exist in an analogue window (XLC before 2018-06, XLRE before 2015-10), the market (SPY) move is used. Implied vol for
+option revaluation moves 1:1 with VIX points (assumption).
+
+### D-029 Event-signal emission
+Event signals are re-emitted when a story's impact **or** distinct-outlet count changes (outlets capped at 20).
+Emitting only on impact changes could leave the n_sources ≥ 2 trigger condition permanently unmet (bug found by test).
+
 ## 2026-10-02 (Phase 6: Module B)
 
 ### D-024 Corporate risk weights verified against BCBS CRE20
