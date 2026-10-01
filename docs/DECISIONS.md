@@ -4,6 +4,14 @@ Newest first within each date. Each entry: decision, rationale, and status (acce
 
 ## 2026-10-02 (Phases 3-7)
 
+### D-030 Provisional event-classification results and how to read them
+`reports/metrics.json → events` (provisional until the gold set is labelled). On the human-labelled HF topic valid
+split (7 classes) the primary embedding classifier reaches macro-F1 0.800 against 0.502 for the keyword baseline; on a
+595-item subsample, zero-shot NLI scores 0.662. On the *weak* holdout the keyword baseline scores higher (0.897 vs
+0.760), but that holdout's labels come mainly from the same keyword rules, so the comparison is circular and not used
+as evidence. The primary model trains on HF topic *train*, so the HF valid split is in-distribution for it. The gold
+set (our own GDELT/tweet items) is the fair final test.
+
 ### D-025 Batch inference device
 The project runs on CPU (default). The one-off precompute over 203,363 documents ran at about 18 docs/s on a shared
 CPU, so `RISKPULSE_DEVICE=mps` (opt-in) was used for that batch only. On 512 tweets the MPS and CPU outputs agree to
