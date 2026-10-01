@@ -31,8 +31,13 @@ dashboard:
 
 sentiment:
   model: ProsusAI/finbert
-  positive_threshold: 0.15
+  positive_threshold: 0.15          # spec default; eval also reports a band tuned on HF train only
   negative_threshold: -0.15
+  batch_size: 32
+  max_length: 128
+  # Clause boundaries for entity-level scoring ("JPM beats while BAC misses").
+  clause_split_regex: "(?:;|\\bwhile\\b|\\bwhereas\\b|\\bbut\\b|\\balthough\\b|\\bthough\\b|\\byet\\b|\\bmeanwhile\\b|(?<=[.!?])\\s+)"
+  lexicon_source: pysentiment2 bundled Loughran-McDonald word lists (2014 release)
 
 events:
   zero_shot_model: MoritzLaurer/deberta-v3-base-zeroshot-v2.0
