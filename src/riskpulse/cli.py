@@ -152,13 +152,41 @@ def eval_(target: EvalTarget = typer.Argument(EvalTarget.all)) -> None:
 
 @app.command()
 def backtest() -> None:
-    """Module A: historical daily backtest of the sentiment-tilted index."""
-    _not_yet("backtest", 5)
+    """Module A: daily backtest of the sentiment-tilted index -> reports/."""
+    from riskpulse.moduleA.run import run
+
+    perf = run()["performance"]
+    for name, p in perf.items():
+        typer.echo(f"{name:26s} cum {p['cumulative_return']:+.2%}  sharpe {p['sharpe_rf0']}")
 
 
 @app.command()
 def stress(
-    scenario: str = typer.Option(None, help="Scenario name from configs/scenarios.yaml."),
+    replay: bool = typer.Option(False, "--replay", help="Trigger from stored event signals."),
+    event_class: str = typer.Option(None, help="What-if: event class, e.g. CREDIT_EVENT."),
+    impact: int = typer.Option(9, help="What-if: impact score 8-10."),
+    build_portfolio: bool = typer.Option(False, "--build-portfolio", help="Regenerate the book."),
 ) -> None:
-    """Module B: run a stress test on the synthetic wholesale book."""
-    _not_yet("stress", 6)
+    """Module B: stress the synthetic wholesale book (trigger replay or what-if)."""
+    if build_portfolio:
+        from riskpulse.moduleB.portfolio import generate_portfolio
+
+        cps, pos = generate_portfolio()
+        typer.echo(f"Book: {len(cps)} counterparties, {len(pos)} positions")
+    if replay:
+        from riskpulse.moduleB.run import replay_triggers
+
+        summ = replay_triggers()
+        typer.echo(
+            f"{summ['n_triggers_fired']} triggers fired; {summ['n_stress_runs']} stress runs"
+        )
+    if event_class:
+        from riskpulse.moduleB.run import run_named
+
+        r = run_named(event_class, impact)
+        c = r["capital"]
+        typer.echo(
+            f"{r['scenario']['name']}: impact {r['total_impact'] / 1e6:,.1f}m USD "
+            f"({r['total_impact_pct']:.2%}); CET1 {c['cet1_ratio_before']:.1%} -> "
+            f"{c['cet1_ratio_after']:.2%}"
+        )
