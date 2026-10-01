@@ -1,0 +1,52 @@
+# Impact score configuration (spec §5.5).
+# v1 is a transparent heuristic; v2 (P1) is calibrated on an event study and must
+# beat v1 and |sentiment| on held-out Spearman rho before it replaces v1.
+
+version: v1
+
+# T: prior severity per event class, in [0, 1]. Initial values from the spec;
+# documented as assumptions, to be sanity-checked against the event study.
+type_prior:
+  CREDIT_EVENT: 0.90
+  GEOPOLITICAL: 0.80
+  MACROECONOMIC: 0.75
+  REGULATORY_LEGAL: 0.60
+  MERGER_ACQUISITION: 0.60
+  EARNINGS: 0.55
+  OPERATIONAL_ESG: 0.50
+  MANAGEMENT_CHANGE: 0.40
+  PRODUCT_LAUNCH: 0.30
+  OTHER: 0.10
+
+# raw = T * (w_S*S + w_V*V + w_B*B + w_N*N + w_C*C) * (rel_floor + (1 - rel_floor) * R)
+weights:
+  sentiment: 0.35
+  velocity: 0.25
+  breadth: 0.15
+  novelty: 0.15
+  credibility: 0.10
+relevance_floor: 0.5
+
+velocity:
+  window_hours: 6        # N in "mentions in last N hours"
+  baseline_days: 7       # trailing baseline for the z-score
+  sigmoid_scale: 1.0     # V = sigmoid(z / scale)
+
+novelty:
+  lookback_hours: 72
+
+# C: source credibility (news tier above social).
+credibility:
+  gdelt: 0.8
+  newsapi: 0.8
+  kaggle_news: 0.8
+  kaggle_tweets: 0.4
+  reddit: 0.3
+  synthetic_demo: 0.8
+
+# Mapping raw -> 1..10 uses quantile bins fitted on the historical batch;
+# bin edges are written to data/processed/impact_bins.json by the fitting step.
+binning:
+  method: quantile
+  n_bins: 10
+  bins_path: data/processed/impact_bins.json

@@ -1,0 +1,46 @@
+# Application-level settings: paths, run modes, API, dashboard.
+
+paths:
+  replay_feed: data/replay/feed.jsonl
+  signals_jsonl: data/signals/signals.jsonl
+  duckdb: data/processed/riskpulse.duckdb
+  prices_dir: data/prices
+  reports_dir: reports
+
+replay:
+  seconds_per_market_day: 60
+
+live:
+  poll_minutes: 15
+  gdelt:
+    base_url: https://api.gdeltproject.org/api/v2/doc/doc
+    min_seconds_between_requests: 6   # API asks for <= 1 request / 5 s (verified 2026-10-01)
+    backoff_seconds_on_429: 15
+    max_retries: 5
+    maxrecords: 250
+  newsapi:
+    enabled_if_key: true              # reads NEWSAPI_KEY from .env; 100 req/day on free plan
+
+api:
+  host: 127.0.0.1
+  port: 8000
+
+dashboard:
+  port: 8501
+
+sentiment:
+  model: ProsusAI/finbert
+  positive_threshold: 0.15
+  negative_threshold: -0.15
+
+events:
+  zero_shot_model: MoritzLaurer/deberta-v3-base-zeroshot-v2.0
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  min_confidence: 0.5                 # below -> OTHER (re-tuned after calibration)
+
+clustering:
+  window_hours: 48
+  cosine_threshold: 0.80
+
+dedupe:
+  near_duplicate_cosine: 0.95

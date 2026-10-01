@@ -1,0 +1,129 @@
+# Event taxonomy (spec §5.4). The first five classes are required by the brief.
+# `examples` are short illustrative sentences written for this config (synthetic, not
+# real news); they seed few-shot training and zero-shot label descriptions only and are
+# never used for evaluation. `hf_topic_map` lists labels from the HF dataset
+# zeroshot/twitter-financial-news-topic that map onto each class (weak labels).
+
+classes:
+  GEOPOLITICAL:
+    description: war, military conflict, sanctions, elections, coups, trade conflict and tariffs between countries
+    zero_shot_label: geopolitical conflict, war, sanctions, elections or trade disputes
+    keywords: [war, invasion, invade, military, missile, sanction, sanctions, embargo, tariff, tariffs, trade war, election, coup, nato, troops, border clash, geopolitical]
+    hf_topic_map: [Politics]
+    examples:
+      - Troops cross the border as the conflict escalates overnight
+      - Western governments announce new sanctions on the country's central bank
+      - Tariffs on imported steel raised to 25% in escalating trade dispute
+      - Snap election called after the coalition government collapses
+      - Shipping halted in the strait after missile strikes on tankers
+
+  MACROECONOMIC:
+    description: inflation, GDP, jobs, central-bank decisions, interest rates, recession, fiscal policy
+    zero_shot_label: macroeconomic data, inflation, interest rates or central bank policy
+    keywords: [inflation, cpi, ppi, gdp, recession, payrolls, unemployment, jobless, fed, fomc, ecb, central bank, rate hike, rate cut, basis points, yields, treasury, stimulus]
+    hf_topic_map: ["Fed | Central Banks", Macro, "Treasuries | Corporate Debt"]
+    examples:
+      - Central bank raises its policy rate by 75 basis points
+      - Consumer prices rise at the fastest annual pace in four decades
+      - Economy unexpectedly contracts in the second quarter
+      - Nonfarm payrolls beat forecasts as unemployment falls
+      - Ten-year yield jumps after hawkish minutes
+
+  CREDIT_EVENT:
+    description: default, missed payment, downgrade, bankruptcy, restructuring, covenant breach, bank run or liquidity crisis
+    zero_shot_label: credit event such as default, downgrade, bankruptcy or restructuring
+    keywords: [default, defaults, bankruptcy, chapter 11, insolvency, downgrade, downgraded, cut to junk, restructuring, missed payment, covenant, liquidity crisis, bank run, bailout, receivership, distressed]
+    hf_topic_map: []
+    examples:
+      - Rating agency downgrades the issuer to junk on rising leverage
+      - Developer misses a coupon payment on its offshore bonds
+      - Retailer files for Chapter 11 bankruptcy protection
+      - Regulators take the lender into receivership after deposit run
+      - Borrower breaches loan covenants and seeks waiver from banks
+
+  MERGER_ACQUISITION:
+    description: mergers, acquisitions, takeover bids, buyouts, divestitures and spin-offs
+    zero_shot_label: merger, acquisition, takeover or divestiture
+    keywords: [acquire, acquisition, merger, merge, takeover, buyout, bid for, to buy, deal to buy, divest, spin off, spinoff, stake in]
+    hf_topic_map: ["M&A | Investments"]
+    examples:
+      - Software maker agrees to acquire rival in all-cash deal
+      - Private equity firm launches takeover bid for retailer
+      - Conglomerate to spin off its healthcare unit
+      - Two regional lenders announce merger of equals
+      - Chipmaker raises offer after board rejects initial bid
+
+  PRODUCT_LAUNCH:
+    description: new products, services, models or features launched or announced
+    zero_shot_label: product launch or new product announcement
+    keywords: [launch, launches, unveil, unveils, introduces, new model, release, rollout, debut]
+    hf_topic_map: []
+    examples:
+      - Company unveils its next-generation smartphone lineup
+      - Automaker launches a lower-priced electric model
+      - Streaming service rolls out ad-supported tier
+      - Chip designer introduces new data-centre processor
+      - Drugmaker launches generic version in the US market
+
+  EARNINGS:
+    description: quarterly results, revenue, profit, guidance, beats and misses, dividends
+    zero_shot_label: earnings results, revenue or profit guidance
+    keywords: [earnings, eps, revenue, quarterly results, profit, guidance, beats estimates, misses estimates, outlook, forecast, dividend]
+    hf_topic_map: [Earnings, Dividend News]
+    examples:
+      - Company beats quarterly earnings estimates and raises guidance
+      - Revenue misses forecasts as demand slows
+      - Firm cuts full-year profit outlook
+      - Board raises quarterly dividend by 10%
+      - Margins compress on higher input costs, shares fall after hours
+
+  REGULATORY_LEGAL:
+    description: fines, lawsuits, investigations, regulatory approvals or rejections, antitrust
+    zero_shot_label: regulation, lawsuit, fine, investigation or regulatory approval
+    keywords: [lawsuit, sued, sues, fine, fined, penalty, probe, investigation, antitrust, regulator, sec, ftc, doj, settlement, approval, approved, fda]
+    hf_topic_map: ["Legal | Regulation"]
+    examples:
+      - Regulator fines the bank over compliance failures
+      - Antitrust authority opens probe into marketplace practices
+      - Health regulator approves the company's new treatment
+      - Class action lawsuit filed over data breach
+      - Company settles with securities regulator over disclosures
+
+  MANAGEMENT_CHANGE:
+    description: CEO/CFO/board appointments, resignations, departures and succession
+    zero_shot_label: management change such as CEO appointment or resignation
+    keywords: [ceo, cfo, chief executive, resigns, steps down, appointed, appoints, named, succession, board, chairman, departure]
+    hf_topic_map: [Personnel Change]
+    examples:
+      - Chief executive steps down effective immediately
+      - Board names new CFO from rival firm
+      - Company announces CEO succession plan
+      - Chairman resigns amid shareholder pressure
+      - Founder returns as chief executive
+
+  OPERATIONAL_ESG:
+    description: outages, cyberattacks, accidents, recalls, strikes, supply disruption, environmental or governance controversy
+    zero_shot_label: operational disruption, cyberattack, accident, recall or ESG controversy
+    keywords: [outage, cyberattack, hack, breach, ransomware, recall, accident, crash, explosion, spill, strike, walkout, supply chain, shortage, emissions, pollution, controversy]
+    hf_topic_map: []
+    examples:
+      - Cyberattack disrupts operations at the company's plants
+      - Automaker recalls vehicles over brake defect
+      - Workers walk out as union strike begins
+      - Oil spill at the refinery prompts environmental probe
+      - Global outage takes cloud services offline for hours
+
+  OTHER:
+    description: anything not covered above (opinion, general market commentary, analyst notes without a clear event)
+    zero_shot_label: general market commentary
+    keywords: []
+    hf_topic_map: [Analyst Update, "General News | Opinion", Markets, Stock Commentary, Stock Movement]
+    examples:
+      - Stocks drift higher in quiet trading
+      - Analyst reiterates neutral rating
+      - Five things to watch in markets this week
+      - Shares trade flat ahead of the long weekend
+      - Opinion on long-term investing strategies
+
+# HF topics deliberately left unmapped (ambiguous across our classes, so not used as weak labels):
+hf_topic_unmapped: ["Company or Product News", Currencies, "Energy | Oil", Financials, "Gold | Metals | Materials", IPO]

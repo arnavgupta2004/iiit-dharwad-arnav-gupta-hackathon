@@ -1,0 +1,31 @@
+# Module A: tactical sentiment-tilted index (spec §6).
+
+baseline: equal_weight          # w0 = 1/N; cap_weight optional later
+
+tilt:
+  kappa: 1.0                    # w~_i = w0_i * exp(kappa * s_i * c_i)
+  deadband: 0.10                # s_i -> 0 when |s_i| < deadband
+  scale_by_impact: false        # optional: kappa * impact / 5
+
+constraints:
+  w_min: 0.02
+  w_max: 0.12
+  max_iter: 50
+
+turnover:
+  tau_max: 0.20                 # lambda = min(1, tau_max / turnover)
+  cost_bps: 5
+
+signal:
+  half_life_hours: 6            # EWMA half-life for entity sentiment
+
+replay:
+  rebalance_every_minutes: 60   # simulated minutes between intraday rebalances
+
+backtest:
+  rebalance: daily              # close-to-close; weights from info at t applied to t+1
+  naive_sign_rule_step: 0.01    # naive baseline: +/- 1% weight per pos/neg headline
+
+robustness_grid:
+  kappa: [0.25, 0.5, 1.0, 2.0, 4.0]
+  half_life_hours: [2, 6, 24, 72]

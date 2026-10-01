@@ -1,0 +1,65 @@
+# Scenario library (spec §7.3). Each event class (optionally refined by region/sector
+# and sentiment direction) maps to an analogue episode whose risk-factor moves are
+# MEASURED from market proxies by scripts/calibrate_scenarios.py and written to
+# data/scenarios/calibration.csv. Shock magnitudes are therefore not typed in here.
+#
+# Window dates were checked against yfinance data on 2026-10-01 (see docs/DECISIONS.md).
+
+proxies:
+  equity_market: SPY
+  equity_sectors: configs/mcc_sector_map.yaml#sector_etf
+  rates_10y: ^TNX          # quoted in percent; x100 -> bp
+  rates_3m: ^IRX
+  hy_spread_proxy: [HYG, IEF]   # return spread HYG - IEF
+  ig_spread_proxy: [LQD, IEF]
+  oil: CL=F
+  usd_index: DX-Y.NYB
+  fx: [EURUSD=X, JPY=X, GBPUSD=X]
+  vol: ^VIX
+
+analogues:
+  lehman_2008:
+    window: ["2008-09-12", "2008-10-10"]
+    note: Lehman filed 2008-09-15; window covers acute phase. XLC/XLRE did not exist -> fall back to SPY.
+  covid_2020:
+    window: ["2020-02-19", "2020-03-23"]
+    note: SPY close peak 2020-02-19 to trough 2020-03-23 (spec had 02-20; corrected).
+  russia_ukraine_2022:
+    window: ["2022-02-23", "2022-03-08"]
+    note: Invasion 2022-02-24; oil-led shock, equity index move modest.
+  rates_2022:
+    window: ["2022-06-09", "2022-06-16"]
+    note: May CPI surprise (2022-06-10) and 75bp FOMC hike (2022-06-15); SPY trough 2022-06-16.
+  svb_2023:
+    window: ["2023-03-08", "2023-03-17"]
+    note: SVB capital raise announced 2023-03-08, closed by regulators 2023-03-10.
+
+# Event class -> analogue (refined by sub-scenario rules where listed).
+mapping:
+  CREDIT_EVENT:
+    default: svb_2023
+    severe: lehman_2008          # used when impact == 10
+  GEOPOLITICAL:
+    default: russia_ukraine_2022
+  MACROECONOMIC:
+    inflation_hawkish: rates_2022   # keywords: inflation, hike, hawkish, yields up
+    growth_scare: covid_2020        # keywords: recession, contraction, slowdown
+    default: rates_2022
+  OPERATIONAL_ESG:
+    default: covid_2020
+  REGULATORY_LEGAL:
+    default: null                # no market-wide stress by default
+  MERGER_ACQUISITION:
+    default: null
+  PRODUCT_LAUNCH:
+    default: null
+  EARNINGS:
+    default: null
+  MANAGEMENT_CHANGE:
+    default: null
+  OTHER:
+    default: null
+
+# PD multipliers by severity are derived in calibration (spread-implied); placeholder
+# structure only until Phase 6/8.
+pd_multiplier_method: spread_implied

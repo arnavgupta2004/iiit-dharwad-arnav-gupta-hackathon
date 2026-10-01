@@ -1,0 +1,129 @@
+# MCC (merchant category code) -> GICS sector, used to seed synthetic corporate obligors
+# for the Module B wholesale book from the Kaggle "Financial Transactions Dataset"
+# (computingvictor/transactions-fraud-datasets). All 109 MCCs present in that dataset's
+# mcc_codes.json are mapped. Mapping is Arnav's judgement call (see docs/ASSUMPTIONS.md).
+# Sector names match configs/universe.yaml and the SPDR sector ETF proxies (XL*).
+
+sector_etf:
+  Industrials: XLI
+  Materials: XLB
+  Information Technology: XLK
+  Communication Services: XLC
+  Consumer Discretionary: XLY
+  Consumer Staples: XLP
+  Health Care: XLV
+  Financials: XLF
+  Utilities: XLU
+  Energy: XLE
+  Real Estate: XLRE
+
+mcc_to_sector:
+  1711: Industrials            # Heating, plumbing, A/C contractors
+  3000: Materials              # Steelworks
+  3001: Materials              # Steel products manufacturing
+  3005: Materials              # Misc metal fabrication
+  3006: Materials              # Misc fabricated metal products
+  3007: Materials              # Coated and laminated products
+  3008: Materials              # Steel drums and barrels
+  3009: Materials              # Fabricated structural metal
+  3058: Industrials            # Tools, parts, supplies manufacturing
+  3066: Materials              # Misc metals
+  3075: Industrials            # Bolt, nut, screw, rivet manufacturing
+  3132: Consumer Discretionary # Leather goods
+  3144: Consumer Discretionary # Floor covering stores
+  3174: Consumer Discretionary # Upholstery and drapery stores
+  3256: Materials              # Brick, stone and related materials
+  3260: Materials              # Pottery and ceramics
+  3359: Materials              # Non-ferrous metal foundries
+  3387: Industrials            # Electroplating, plating, polishing
+  3389: Industrials            # Non-precious metal services
+  3390: Materials              # Misc metalwork
+  3393: Industrials            # Heat treating metal services
+  3395: Industrials            # Welding repair
+  3405: Materials              # Ironwork
+  3504: Consumer Discretionary # Gardening supplies
+  3509: Industrials            # Industrial equipment and supplies
+  3596: Industrials            # Misc machinery and parts manufacturing
+  3640: Industrials            # Lighting, fixtures, electrical supplies
+  3684: Information Technology # Semiconductors
+  3722: Industrials            # Passenger railways
+  3730: Industrials            # Ship chandlers
+  3771: Industrials            # Railroad passenger transport
+  3775: Industrials            # Railroad freight
+  3780: Information Technology # Computer network services
+  4111: Industrials            # Local/suburban commuter transport
+  4112: Industrials            # Passenger railways
+  4121: Industrials            # Taxicabs and limousines
+  4131: Industrials            # Bus lines
+  4214: Industrials            # Motor freight and trucking
+  4411: Consumer Discretionary # Cruise lines
+  4511: Industrials            # Airlines
+  4722: Consumer Discretionary # Travel agencies
+  4784: Industrials            # Tolls and bridge fees
+  4814: Communication Services # Telecommunication services
+  4829: Financials             # Money transfer
+  4899: Communication Services # Cable, satellite, pay TV
+  4900: Utilities              # Electric, gas, water, sanitary
+  5045: Information Technology # Computers and peripherals
+  5094: Materials              # Precious stones and metals
+  5192: Communication Services # Books, periodicals, newspapers
+  5193: Consumer Staples       # Florists supplies, nursery stock
+  5211: Consumer Discretionary # Lumber and building materials
+  5251: Consumer Discretionary # Hardware stores
+  5261: Consumer Discretionary # Lawn and garden supply
+  5300: Consumer Staples       # Wholesale clubs
+  5310: Consumer Discretionary # Discount stores
+  5311: Consumer Discretionary # Department stores
+  5411: Consumer Staples       # Grocery stores
+  5499: Consumer Staples       # Misc food stores
+  5533: Consumer Discretionary # Automotive parts stores
+  5541: Energy                 # Service stations
+  5621: Consumer Discretionary # Women's ready-to-wear
+  5651: Consumer Discretionary # Family clothing
+  5655: Consumer Discretionary # Sports apparel
+  5661: Consumer Discretionary # Shoe stores
+  5712: Consumer Discretionary # Furniture stores
+  5719: Consumer Discretionary # Misc home furnishing
+  5722: Consumer Discretionary # Household appliance stores
+  5732: Consumer Discretionary # Electronics stores
+  5733: Consumer Discretionary # Music stores
+  5812: Consumer Discretionary # Restaurants
+  5813: Consumer Discretionary # Drinking places
+  5814: Consumer Discretionary # Fast food
+  5815: Communication Services # Digital goods: media, books, apps
+  5816: Communication Services # Digital goods: games
+  5912: Consumer Staples       # Drug stores and pharmacies
+  5921: Consumer Staples       # Package stores (beer, wine, liquor)
+  5932: Consumer Discretionary # Antique shops
+  5941: Consumer Discretionary # Sporting goods
+  5942: Consumer Discretionary # Book stores
+  5947: Consumer Discretionary # Gift, card, novelty
+  5970: Consumer Discretionary # Artist supply, craft
+  5977: Consumer Staples       # Cosmetic stores
+  6300: Financials             # Insurance
+  7011: Consumer Discretionary # Hotels, motels, resorts
+  7210: Consumer Discretionary # Laundry services
+  7230: Consumer Discretionary # Beauty and barber
+  7276: Industrials            # Tax preparation services
+  7349: Industrials            # Cleaning and maintenance
+  7393: Industrials            # Detective and security services
+  7531: Consumer Discretionary # Auto body repair
+  7538: Consumer Discretionary # Auto service shops
+  7542: Consumer Discretionary # Car washes
+  7549: Consumer Discretionary # Towing
+  7801: Consumer Discretionary # Athletic fields, commercial sports
+  7802: Consumer Discretionary # Recreational sports clubs
+  7832: Communication Services # Motion picture theaters
+  7922: Communication Services # Theatrical producers
+  7995: Consumer Discretionary # Betting, casinos
+  7996: Consumer Discretionary # Amusement parks
+  8011: Health Care            # Doctors
+  8021: Health Care            # Dentists
+  8041: Health Care            # Chiropractors
+  8043: Health Care            # Optometrists
+  8049: Health Care            # Podiatrists
+  8062: Health Care            # Hospitals
+  8099: Health Care            # Medical services
+  8111: Industrials            # Legal services
+  8931: Industrials            # Accounting and auditing
+  9402: Industrials            # Postal services (government)

@@ -1,0 +1,40 @@
+# Module B: strategic stress testing of a synthetic wholesale-banking book (spec §7).
+
+trigger:
+  min_impact: 8                 # "Impact > 7" in the brief
+  min_event_confidence: 0.6
+  min_sources: 2
+  cooldown_hours: 24            # per (event_class, region)
+
+portfolio:
+  seed: 20261001
+  n_positions_target: 350
+  total_exposure_usd: 10.0e9
+  base_currency: USD
+  mix:                          # share of exposure by asset class
+    loan: 0.45
+    bond: 0.30
+    derivative: 0.15            # notional-equivalent
+    equity: 0.10
+  transactions_source: computingvictor/transactions-fraud-datasets
+  counterparty_prefix: CP_
+
+severity_multiplier:            # shock = analogue shock * m(impact)
+  8: 0.6
+  9: 0.8
+  10: 1.0
+combine_concurrent: max_severity   # or "cumulative"
+
+capital:
+  cet1_ratio_start: 0.13
+  # Corporate risk weights by rating bucket, Basel II standardised approach as
+  # recalled (AAA..AA- 20%, A 50%, BBB..BB 100%, below BB- 150%).
+  # [VERIFY against the BCBS text in Phase 6 before reporting CET1.]
+  risk_weights:
+    AAA: 0.20
+    AA: 0.20
+    A: 0.50
+    BBB: 1.00
+    BB: 1.00
+    B: 1.50
+    CCC: 1.50
