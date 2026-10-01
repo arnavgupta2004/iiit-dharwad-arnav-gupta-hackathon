@@ -1,13 +1,20 @@
-# Scenario library (spec §7.3). Each event class (optionally refined by region/sector
-# and sentiment direction) maps to an analogue episode whose risk-factor moves are
-# MEASURED from market proxies by scripts/calibrate_scenarios.py and written to
-# data/scenarios/calibration.csv. Shock magnitudes are therefore not typed in here.
+# Scenario library (spec §7.3, revised at GATE A, see docs/DECISIONS.md D-013).
 #
-# Window dates were checked against yfinance data on 2026-10-01 (see docs/DECISIONS.md).
+# Shock magnitudes are MEASURED from market proxies over historical analogue windows by
+# scripts/calibrate_scenarios.py and written to data/scenarios/calibration.csv; none are
+# typed in here. To avoid circularity, ONLY episodes that END BEFORE 2021-09-30 (the start
+# of the replay window) are used for calibration. 2022 episodes inside the replay window
+# are used purely as out-of-sample validation ("predicted vs realised").
+#
+# Window dates checked against yfinance data on 2026-10-01 (peak/trough dates noted).
+
+calibration_cutoff: "2021-09-29"
 
 proxies:
   equity_market: SPY
   equity_sectors: configs/mcc_sector_map.yaml#sector_etf
+  equity_europe: VGK
+  equity_china: FXI
   rates_10y: ^TNX          # quoted in percent; x100 -> bp
   rates_3m: ^IRX
   hy_spread_proxy: [HYG, IEF]   # return spread HYG - IEF
@@ -20,33 +27,57 @@ proxies:
 analogues:
   lehman_2008:
     window: ["2008-09-12", "2008-10-10"]
-    note: Lehman filed 2008-09-15; window covers acute phase. XLC/XLRE did not exist -> fall back to SPY.
+    note: Lehman filed 2008-09-15. XLC/XLRE did not exist (sector fallback to SPY).
+  us_downgrade_euro_2011:
+    window: ["2011-07-22", "2011-08-08"]
+    note: US debt-ceiling impasse, S&P downgrade of the US (2011-08-05), euro sovereign stress; SPY trough 2011-08-08.
+  taper_tantrum_2013:
+    window: ["2013-05-21", "2013-06-24"]
+    note: SPY close peak 2013-05-21 (Bernanke testimony 05-22); SPY trough in window 2013-06-24.
+  crimea_2014:
+    window: ["2014-02-26", "2014-03-14"]
+    note: Russian forces in Crimea from 2014-02-27; muted move in US/EU proxies (Russia ETFs unavailable on Yahoo).
+  china_deval_2015:
+    window: ["2015-08-17", "2015-08-25"]
+    note: CNY devaluation 2015-08-11 then global sell-off; SPY trough 2015-08-25.
+  hy_energy_2016:
+    window: ["2015-12-01", "2016-02-11"]
+    note: HY/energy default wave; SPY trough 2016-02-11.
+  brexit_2016:
+    window: ["2016-06-23", "2016-06-27"]
+    note: Referendum 2016-06-23; SPY trough 2016-06-27.
+  abqaiq_2019:
+    window: ["2019-09-13", "2019-09-17"]
+    note: Drone attack on Saudi Abqaiq facility 2019-09-14; oil-led geopolitical shock.
   covid_2020:
     window: ["2020-02-19", "2020-03-23"]
-    note: SPY close peak 2020-02-19 to trough 2020-03-23 (spec had 02-20; corrected).
-  russia_ukraine_2022:
-    window: ["2022-02-23", "2022-03-08"]
-    note: Invasion 2022-02-24; oil-led shock, equity index move modest.
-  rates_2022:
-    window: ["2022-06-09", "2022-06-16"]
-    note: May CPI surprise (2022-06-10) and 75bp FOMC hike (2022-06-15); SPY trough 2022-06-16.
-  svb_2023:
-    window: ["2023-03-08", "2023-03-17"]
-    note: SVB capital raise announced 2023-03-08, closed by regulators 2023-03-10.
+    note: SPY close peak 2020-02-19 to trough 2020-03-23.
 
-# Event class -> analogue (refined by sub-scenario rules where listed).
+# Out-of-sample validation episodes (inside the replay window; never used for calibration).
+validation_episodes:
+  russia_ukraine_2022:
+    event_date: "2022-02-24"
+    horizon_trading_days: 10
+  fomc_june_2022:
+    event_date: "2022-06-15"
+    horizon_trading_days: 10
+
+# Event class -> set of analogues. The class scenario takes, per risk factor, the move with
+# the largest magnitude across its analogue set (sign kept), so each factor's driver is
+# traceable to one episode. impact == 10 can switch to the `severe` set.
 mapping:
   CREDIT_EVENT:
-    default: svb_2023
-    severe: lehman_2008          # used when impact == 10
+    default: [hy_energy_2016, us_downgrade_euro_2011]
+    severe: [lehman_2008]
   GEOPOLITICAL:
-    default: russia_ukraine_2022
+    default: [crimea_2014, brexit_2016, abqaiq_2019]
   MACROECONOMIC:
-    inflation_hawkish: rates_2022   # keywords: inflation, hike, hawkish, yields up
-    growth_scare: covid_2020        # keywords: recession, contraction, slowdown
-    default: rates_2022
+    inflation_hawkish: [taper_tantrum_2013]   # keywords: inflation, hike, hawkish, yields up
+    growth_scare: [china_deval_2015]           # keywords: recession, contraction, slowdown
+    default: [taper_tantrum_2013]
   OPERATIONAL_ESG:
-    default: covid_2020
+    default: [covid_2020]
+    severe: [covid_2020]
   REGULATORY_LEGAL:
     default: null                # no market-wide stress by default
   MERGER_ACQUISITION:
@@ -60,6 +91,4 @@ mapping:
   OTHER:
     default: null
 
-# PD multipliers by severity are derived in calibration (spread-implied); placeholder
-# structure only until Phase 6/8.
 pd_multiplier_method: spread_implied

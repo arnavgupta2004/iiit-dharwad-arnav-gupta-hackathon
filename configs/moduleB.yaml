@@ -29,7 +29,7 @@ capital:
   cet1_ratio_start: 0.13
   # Corporate risk weights by rating bucket, Basel II standardised approach as
   # recalled (AAA..AA- 20%, A 50%, BBB..BB 100%, below BB- 150%).
-  # [VERIFY against the BCBS text in Phase 6 before reporting CET1.]
+  # [VERIFY against BCBS CRE20 (corporate exposures) before any CET1 number is reported; cite paragraph in DECISIONS.md.]
   risk_weights:
     AAA: 0.20
     AA: 0.20

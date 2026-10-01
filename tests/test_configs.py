@@ -47,8 +47,18 @@ def test_scenario_mapping_covers_all_classes_and_points_to_analogues() -> None:
     cfg = load_config("scenarios")
     assert set(cfg["mapping"]) == {c.value for c in EventClass}
     for rules in cfg["mapping"].values():
-        for target in rules.values():
-            assert target is None or target in cfg["analogues"]
+        for targets in rules.values():
+            assert targets is None or set(targets) <= set(cfg["analogues"])
+
+
+def test_calibration_analogues_end_before_replay_window() -> None:
+    """No calibration episode may overlap the replay window (avoids circular validation)."""
+    cfg = load_config("scenarios")
+    cutoff = cfg["calibration_cutoff"]
+    for name, spec in cfg["analogues"].items():
+        assert spec["window"][1] <= cutoff, name
+    for ep in cfg["validation_episodes"].values():
+        assert ep["event_date"] > cutoff
 
 
 def test_mcc_map_covers_dataset_codes() -> None:

@@ -2,6 +2,48 @@
 
 Newest first within each date. Each entry: decision, rationale, and status (accepted, or proposed pending Arnav's OK at a gate).
 
+## 2026-10-01 (GATE A review by Arnav)
+
+### D-013 Scenario calibration only on pre-replay analogues; 2022 used as out-of-sample validation
+Calibrating shocks on Russia–Ukraine 2022 or June 2022, which sit inside the replay window where the stress test fires,
+would be circular. **Decision (Arnav):** the shock library is calibrated only on analogue windows that end before
+2021-09-30 (`calibration_cutoff` in `configs/scenarios.yaml`, enforced by a test). Windows were checked against yfinance:
+- Lehman 2008-09-12 → 10-10
+- US downgrade / euro 2011-07-22 → 08-08 (SPY trough 08-08)
+- Taper tantrum 2013-05-21 → 06-24 (SPY peak 05-21, trough 06-24)
+- Crimea 2014-02-26 → 03-14
+- China devaluation 2015-08-17 → 08-25 (trough 08-25)
+- HY/energy 2015-12-01 → 2016-02-11 (trough 02-11)
+- Brexit 2016-06-23 → 06-27 (trough 06-27)
+- Abqaiq 2019-09-13 → 09-17
+- COVID 2020-02-19 → 03-23
+
+Each class maps to a *set* of analogues. Per risk factor, the scenario uses the largest-magnitude move across the set
+(sign kept), so every factor shock traces to one named episode. SVB 2023 was dropped (after the cutoff).
+
+**Finding:** pre-2021 geopolitical analogues moved US proxies very little (SPY about −0.1% in Crimea 2014 and
+Abqaiq 2019). Russia ETFs (RSX, ERUS) are no longer on Yahoo. Oil moved +8% in Abqaiq. We expect the Feb 2022
+out-of-sample check to show the model under-predicting the oil shock, and we will report this rather than tune it away.
+
+**Validation (new P1 item, right after impact v2):** when the stress test fires on the 2022-02-24 invasion news (and the
+2022-06-15 FOMC), compare predicted factor shocks with the realised moves of the same proxies over the next 10 trading days.
+Shown as "predicted vs realised" on the Module B page and in `reports/metrics.json`.
+Because P0 Module B needs shocks and we must not type in magnitudes, `scripts/calibrate_scenarios.py` is built in Phase 6.
+Only the out-of-sample validation remains in Phase 8.
+
+### D-014 Impact v2 split (Arnav)
+Benzinga event study: train on events dated ≤ 2018-12-31, validate on 2019-01-01 → 2020-06-11. The 2021-09 → 2022-09
+replay window (GDELT and tweets) is reported separately as an out-of-domain check.
+
+### D-015 Sentiment tuning discipline (Arnav)
+The HF `valid` split is the test set. No thresholds, model choices or calibration are tuned on it; any tuning uses
+`train` only.
+
+### D-016 Universe approved (Arnav), with an added check
+AMD, INTC, NFLX, PG and COST were re-checked against the S&P 100 constituents table: all present. All 20 universe
+sectors match the table. **Accepted.** D-006 (replay window and GDELT GKG news) was approved, conditional on a
+one-week pilot (results in D-017).
+
 ## 2026-10-01 (Phase 0)
 
 ### D-001 Packaging: `src/` layout installed via `-e .` inside requirements.txt
@@ -76,8 +118,10 @@ which even spaced requests fail. The adapter uses >= 6 s spacing, backoff on 429
 for older dates: see D-010.
 
 ### D-010 GDELT DOC lookback
-Probe of older dates is pending (the API was throttling). Not on the critical path, because historical news comes from
-GKG raw files (D-006) and the DOC API is only used for `live` mode. Result will be appended here.
+The DOC API returned results for 2026-03-01 (7 months back) and for 2022-02-24 (`Ukraine` query, 10 articles),
+but the 2022 query succeeded only on the 5th attempt because of 429 throttling. So the lookback reaches at least 2022,
+but the API is impractical for bulk history. Historical news therefore comes from GKG raw files (D-006); the DOC API
+is used for `live` mode only. **Accepted.**
 
 ### D-011 Transactions data: merchant-level only
 Only merchant_id, mcc, merchant_state/city, amount and date are used, to build synthetic obligors `CP_####`.
