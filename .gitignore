@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Environments and secrets
+.venv/
+venv/
+.env
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Jury prep notes (private to Arnav)
+prep/
+
+# Large raw downloads: fetched by scripts/download_*.py, never committed
+data/raw/_downloads/
+data/**/*.duckdb
+data/**/*.duckdb.wal
+
+# Model weights and caches
+models/
+*.bin
+*.safetensors
+*.pt
+*.onnx
+.cache/
+
+# Notebook checkpoints
+.ipynb_checkpoints/

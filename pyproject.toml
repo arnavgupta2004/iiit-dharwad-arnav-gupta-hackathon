@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "riskpulse"
+version = "0.1.0"
+description = "AI/NLP risk engine with a sentiment-driven index rebalancer and an event-driven stress tester"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+license = { text = "MIT" }
+authors = [{ name = "Arnav Gupta" }]
+
+[project.scripts]
+riskpulse = "riskpulse.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+# B008: typer.Option/Argument defaults are the idiomatic typer pattern.
+ignore = ["B008"]
