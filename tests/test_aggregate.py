@@ -73,7 +73,8 @@ def test_event_signal_vote_bonus_and_emission() -> None:
     assert agg.update(m(1, "MKT", -0.8, outlet="a.com", impact=7)) is None  # below min docs
     s2 = agg.update(m(2, "MKT", -0.6, outlet="b.com", impact=8))
     assert s2 is not None and s2.impact_score == 8 and s2.n_sources == 2
-    assert agg.update(m(3, "MKT", -0.7, outlet="b.com", impact=6)) is None  # impact unchanged
+    # same outlet, impact unchanged -> nothing new to say
+    assert agg.update(m(3, "MKT", -0.7, outlet="b.com", impact=6)) is None
     s4 = agg.update(m(4, "MKT", -0.9, outlet="c.com", impact=6))  # 3 outlets -> +1 bonus
     assert s4.impact_score == 9 and s4.event_class == "GEOPOLITICAL"
     assert s4.regions == ["RUSSIA_UKRAINE"] and len(s4.evidence) == 3
@@ -86,3 +87,12 @@ def test_event_class_is_confidence_weighted_majority() -> None:
     agg.update(m(2, "MKT", -0.5, cls="GEOPOLITICAL", conf=0.3))
     sig = agg.update(m(3, "MKT", -0.5, cls="GEOPOLITICAL", conf=0.3, impact=9))
     assert sig.event_class == "MACROECONOMIC"
+
+
+def test_event_reemitted_when_new_outlet_joins_even_if_impact_unchanged() -> None:
+    agg = EventAggregator(CFG)
+    agg.update(m(1, "MKT", -0.8, outlet="a.com", impact=9))
+    s2 = agg.update(m(2, "MKT", -0.8, outlet="a.com", impact=9))
+    assert s2.n_sources == 1
+    s3 = agg.update(m(3, "MKT", -0.8, outlet="b.com", impact=5))
+    assert s3 is not None and s3.n_sources == 2 and s3.impact_score == 9

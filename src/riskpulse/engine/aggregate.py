@@ -125,7 +125,7 @@ class EntityAggregator:
 class _Story:
     mentions: list[ScoredMention] = field(default_factory=list)
     outlets: set[str] = field(default_factory=set)
-    emitted_impact: int = 0
+    emitted_state: tuple[int, int] = (0, 0)
 
 
 class EventAggregator:
@@ -140,15 +140,18 @@ class EventAggregator:
         self.universe = load_config("universe")["tickers"]
 
     def update(self, m: ScoredMention) -> Signal | None:
-        """Add a mention; return a (refreshed) event signal when the story's impact changes."""
+        """Add a mention; return a refreshed event signal when the story's impact or its
+        distinct-outlet count changes (outlets capped at 20 to bound volume). Re-emitting on
+        outlet growth matters because the Module B trigger requires n_sources >= 2."""
         st = self.stories[m.event_id]
         st.mentions.append(m)
         st.outlets.add(m.outlet)
         if len(st.mentions) < self.min_docs:
             return None
         sig = self.signal(m.event_id, m.published_at)
-        if sig.impact_score != st.emitted_impact:
-            st.emitted_impact = sig.impact_score
+        state = (sig.impact_score, min(sig.n_sources, 20))
+        if state != st.emitted_state:
+            st.emitted_state = state
             return sig
         return None
 
