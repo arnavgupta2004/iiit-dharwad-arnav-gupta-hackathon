@@ -201,3 +201,30 @@ market_entity:
 
 benchmarks:
   market: SPY
+
+# Entity-linking settings (spec §5.2).
+linking:
+  # Bare uppercase tickers matched case-sensitively as words. Short or word-like tickers
+  # (KO, PG, BA, DIS, GS, COST, META) are excluded because they collide with ordinary text.
+  bare_tickers: [AAPL, MSFT, AMD, INTC, GOOGL, GOOG, NFLX, AMZN, TSLA, JPM, BAC, XOM, CVX, JNJ]
+  bare_ticker_map: {GOOG: GOOGL}
+  exec_weight: 0.5            # an exec-name hit counts as half a mention
+  title_weight: 2.0           # title hits weighted x2 (spec)
+  # Words that make an ambiguous alias (Apple, Amazon, Chase, Meta, ...) count as the company.
+  context_words: [shares, stock, stocks, investor, investors, earnings, revenue, sales, profit, quarter,
+    quarterly, ceo, cfo, analyst, analysts, inc, corp, company, nasdaq, nyse, "s&p", market, valuation,
+    billion, million, deal, acquire, acquisition, lawsuit, regulator, antitrust, layoffs, guidance,
+    dividend, buyback, iphone, ipad, mac, app store, aws, prime, alexa, instagram, whatsapp, facebook,
+    electric vehicle, ev, model y, model 3, gigafactory, bank, banking, loan, credit card, chatbot, ai]
+  # MKT pseudo-entity: macro / geopolitical / credit items without a universe company.
+  mkt_classes: [GEOPOLITICAL, MACROECONOMIC, CREDIT_EVENT]
+  regions:
+    US: ["united states", "u.s.", " us ", america, american, washington, "federal reserve", " fed ", fomc, wall street, treasury]
+    EUROPE: [europe, european, eurozone, "euro zone", ecb, germany, german, france, french, italy, italian, spain, brussels, "eu "]
+    UK: [britain, british, "u.k.", " uk ", england, london, "bank of england", boe]
+    RUSSIA_UKRAINE: [russia, russian, ukraine, ukrainian, kremlin, kyiv, kiev, moscow, putin, zelensky, donbas, crimea]
+    CHINA: [china, chinese, beijing, shanghai, hong kong, pboc, taiwan, xi jinping]
+    JAPAN: [japan, japanese, tokyo, "bank of japan", boj]
+    MIDDLE_EAST: [iran, iranian, israel, saudi, opec, gulf, iraq, syria, yemen]
+    INDIA: [india, indian, "new delhi", rbi]
+    EM: [emerging markets, brazil, turkey, argentina, mexico, south africa]
