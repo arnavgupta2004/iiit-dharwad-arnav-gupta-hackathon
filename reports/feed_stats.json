@@ -1,0 +1,74 @@
+{
+  "news_filter": {
+    "stored": 870142,
+    "dropped_org_only": 231637,
+    "dropped_by_current_rules": 280609,
+    "dropped_mkt_non_econ": 86275
+  },
+  "news_dedupe": {
+    "input": 271621,
+    "exact_dupes": 97352,
+    "near_dupes": 8487,
+    "kept": 165782
+  },
+  "social_filter": {
+    "raw": 80793,
+    "universe": 64793,
+    "after_cashtag_filter": 51349,
+    "after_text_link_filter": 39683
+  },
+  "social_dedupe": {
+    "input": 39683,
+    "exact_dupes": 1930,
+    "near_dupes": 172,
+    "kept": 37581
+  },
+  "feed_path": "data/replay/feed.jsonl.gz",
+  "n_docs": 203363,
+  "by_source": {
+    "gdelt": 165782,
+    "kaggle_tweets": 37581
+  },
+  "by_ticker": {
+    "AAPL": 5491,
+    "AMD": 2540,
+    "AMZN": 4790,
+    "BA": 2332,
+    "BAC": 1211,
+    "COST": 933,
+    "CVX": 665,
+    "DIS": 8051,
+    "GOOGL": 11824,
+    "GS": 1283,
+    "INTC": 693,
+    "JNJ": 1474,
+    "JPM": 1980,
+    "KO": 991,
+    "META": 4478,
+    "MKT": 101564,
+    "MSFT": 6713,
+    "NFLX": 11855,
+    "PG": 297,
+    "TSLA": 37853,
+    "XOM": 1144
+  },
+  "by_month": {
+    "2021-09": 625,
+    "2021-10": 16245,
+    "2021-11": 15044,
+    "2021-12": 13004,
+    "2022-01": 15644,
+    "2022-02": 17104,
+    "2022-03": 22547,
+    "2022-04": 21707,
+    "2022-05": 18995,
+    "2022-06": 16709,
+    "2022-07": 15983,
+    "2022-08": 15717,
+    "2022-09": 14039
+  },
+  "window": [
+    "2021-09-30",
+    "2022-09-30"
+  ]
+}
