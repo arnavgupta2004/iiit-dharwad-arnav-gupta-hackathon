@@ -11,6 +11,9 @@ AAA to AA– 20%, A+ to A– 50%, **BBB+ to BBB– 75%**, BB+ to BB– 100%, bel
 The earlier from-memory table (Basel II) had BBB at 100%. That was wrong for the current framework and is corrected in
 `configs/moduleB.yaml`. Simplifications (documented as assumptions): one table for all corporate credit exposures,
 no SME (CRE20.47) or specialised-lending treatment, and derivatives risk-weighted on a credit-equivalent exposure.
+Also verified on the same page: **CRE20.7 Table 1** for sovereigns (AAA to AA– 0%, A+ to A– 20%, BBB+ to BBB– 50%,
+BB+ to B– 100%, below B– 150%, unrated 100%) and **CRE20.57** for equity (250% for equity holdings; 400% only for
+speculative unlisted equity, which the book does not hold).
 
 ## 2026-10-02 (Phase 2: sentiment)
 

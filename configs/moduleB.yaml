@@ -41,3 +41,15 @@ capital:
     B: 1.50
     CCC: 1.50
     UNRATED: 1.00
+  # Sovereigns: CRE20.7 Table 1. AAA to AA- 0%, A+ to A- 20%, BBB+ to BBB- 50%, BB+ to B- 100%,
+  # below B- 150%, unrated 100%.
+  sovereign_risk_weights:
+    AAA: 0.0
+    AA: 0.0
+    A: 0.20
+    BBB: 0.50
+    BB: 1.00
+    B: 1.00
+    CCC: 1.50
+  # Listed equity holdings: CRE20.57 (250%; 400% applies only to speculative unlisted equity).
+  equity_risk_weight: 2.50
