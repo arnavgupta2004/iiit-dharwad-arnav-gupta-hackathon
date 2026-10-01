@@ -29,8 +29,13 @@ relevance_floor: 0.5
 
 velocity:
   window_hours: 6        # N in "mentions in last N hours"
-  baseline_days: 7       # trailing baseline for the z-score
+  baseline_days: 7       # trailing baseline for the z-score (counts per N-hour bucket)
   sigmoid_scale: 1.0     # V = sigmoid(z / scale)
+  min_std: 1.0           # floor on baseline std so a quiet entity's first mention is not z=inf
+
+breadth:
+  window_hours: 6
+  saturation_outlets: 20 # B = log(1+n) / log(1+saturation), capped at 1
 
 novelty:
   lookback_hours: 72
