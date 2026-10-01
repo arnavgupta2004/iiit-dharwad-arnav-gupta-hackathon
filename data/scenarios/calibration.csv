@@ -1,0 +1,217 @@
+analogue,start,end,factor,value
+lehman_2008,2008-09-12,2008-10-10,eq_SPY,-0.294058
+lehman_2008,2008-09-12,2008-10-10,eq_Industrials,-0.306108
+lehman_2008,2008-09-12,2008-10-10,eq_Materials,-0.321639
+lehman_2008,2008-09-12,2008-10-10,eq_Information Technology,-0.266458
+lehman_2008,2008-09-12,2008-10-10,eq_Communication Services,-0.294058
+lehman_2008,2008-09-12,2008-10-10,eq_Consumer Discretionary,-0.288206
+lehman_2008,2008-09-12,2008-10-10,eq_Consumer Staples,-0.184883
+lehman_2008,2008-09-12,2008-10-10,eq_Health Care,-0.251548
+lehman_2008,2008-09-12,2008-10-10,eq_Financials,-0.279208
+lehman_2008,2008-09-12,2008-10-10,eq_Utilities,-0.287612
+lehman_2008,2008-09-12,2008-10-10,eq_Energy,-0.368345
+lehman_2008,2008-09-12,2008-10-10,eq_Real Estate,-0.294058
+lehman_2008,2008-09-12,2008-10-10,eq_EUROPE,-0.2986
+lehman_2008,2008-09-12,2008-10-10,eq_CHINA,-0.267165
+lehman_2008,2008-09-12,2008-10-10,rates_10y_bp,13.100004
+lehman_2008,2008-09-12,2008-10-10,rates_3m_bp,-125.000004
+lehman_2008,2008-09-12,2008-10-10,oil,-0.232062
+lehman_2008,2008-09-12,2008-10-10,usd_index,0.051032
+lehman_2008,2008-09-12,2008-10-10,fx_EUR,-0.059125
+lehman_2008,2008-09-12,2008-10-10,fx_GBP,-0.049263
+lehman_2008,2008-09-12,2008-10-10,fx_JPY,0.067656
+lehman_2008,2008-09-12,2008-10-10,vol_vix_pts,44.289997
+lehman_2008,2008-09-12,2008-10-10,credit_bbb_bp,143.0
+lehman_2008,2008-09-12,2008-10-10,credit_aaa_bp,72.0
+us_downgrade_euro_2011,2011-07-22,2011-08-08,eq_SPY,-0.16585
+us_downgrade_euro_2011,2011-07-22,2011-08-08,eq_Industrials,-0.19848
+us_downgrade_euro_2011,2011-07-22,2011-08-08,eq_Materials,-0.203755
+us_downgrade_euro_2011,2011-07-22,2011-08-08,eq_Information Technology,-0.140718
+us_downgrade_euro_2011,2011-07-22,2011-08-08,eq_Communication Services,-0.16585
+us_downgrade_euro_2011,2011-07-22,2011-08-08,eq_Consumer Discretionary,-0.171087
+us_downgrade_euro_2011,2011-07-22,2011-08-08,eq_Consumer Staples,-0.093258
+us_downgrade_euro_2011,2011-07-22,2011-08-08,eq_Health Care,-0.152009
+us_downgrade_euro_2011,2011-07-22,2011-08-08,eq_Financials,-0.206267
+us_downgrade_euro_2011,2011-07-22,2011-08-08,eq_Utilities,-0.107037
+us_downgrade_euro_2011,2011-07-22,2011-08-08,eq_Energy,-0.218863
+us_downgrade_euro_2011,2011-07-22,2011-08-08,eq_Real Estate,-0.16585
+us_downgrade_euro_2011,2011-07-22,2011-08-08,eq_EUROPE,-0.194191
+us_downgrade_euro_2011,2011-07-22,2011-08-08,eq_CHINA,-0.151979
+us_downgrade_euro_2011,2011-07-22,2011-08-08,rates_10y_bp,-62.5
+us_downgrade_euro_2011,2011-07-22,2011-08-08,rates_3m_bp,-1.5
+us_downgrade_euro_2011,2011-07-22,2011-08-08,oil,-0.185842
+us_downgrade_euro_2011,2011-07-22,2011-08-08,usd_index,0.007952
+us_downgrade_euro_2011,2011-07-22,2011-08-08,fx_EUR,-0.008734
+us_downgrade_euro_2011,2011-07-22,2011-08-08,fx_GBP,0.005713
+us_downgrade_euro_2011,2011-07-22,2011-08-08,fx_JPY,0.004217
+us_downgrade_euro_2011,2011-07-22,2011-08-08,vol_vix_pts,30.48
+us_downgrade_euro_2011,2011-07-22,2011-08-08,credit_bbb_bp,13.0
+us_downgrade_euro_2011,2011-07-22,2011-08-08,credit_aaa_bp,4.0
+taper_tantrum_2013,2013-05-21,2013-06-24,eq_SPY,-0.055506
+taper_tantrum_2013,2013-05-21,2013-06-24,eq_Industrials,-0.057653
+taper_tantrum_2013,2013-05-21,2013-06-24,eq_Materials,-0.067582
+taper_tantrum_2013,2013-05-21,2013-06-24,eq_Information Technology,-0.056318
+taper_tantrum_2013,2013-05-21,2013-06-24,eq_Communication Services,-0.055506
+taper_tantrum_2013,2013-05-21,2013-06-24,eq_Consumer Discretionary,-0.05075
+taper_tantrum_2013,2013-05-21,2013-06-24,eq_Consumer Staples,-0.048705
+taper_tantrum_2013,2013-05-21,2013-06-24,eq_Health Care,-0.044384
+taper_tantrum_2013,2013-05-21,2013-06-24,eq_Financials,-0.059097
+taper_tantrum_2013,2013-05-21,2013-06-24,eq_Utilities,-0.08245
+taper_tantrum_2013,2013-05-21,2013-06-24,eq_Energy,-0.068956
+taper_tantrum_2013,2013-05-21,2013-06-24,eq_Real Estate,-0.055506
+taper_tantrum_2013,2013-05-21,2013-06-24,eq_EUROPE,-0.087745
+taper_tantrum_2013,2013-05-21,2013-06-24,eq_CHINA,-0.16212
+taper_tantrum_2013,2013-05-21,2013-06-24,rates_10y_bp,60.400009
+taper_tantrum_2013,2013-05-21,2013-06-24,rates_3m_bp,0.0
+taper_tantrum_2013,2013-05-21,2013-06-24,oil,-0.010191
+taper_tantrum_2013,2013-05-21,2013-06-24,usd_index,-0.017052
+taper_tantrum_2013,2013-05-21,2013-06-24,fx_EUR,0.016618
+taper_tantrum_2013,2013-05-21,2013-06-24,fx_GBP,0.00831
+taper_tantrum_2013,2013-05-21,2013-06-24,fx_JPY,0.03803
+taper_tantrum_2013,2013-05-21,2013-06-24,vol_vix_pts,6.740001
+taper_tantrum_2013,2013-05-21,2013-06-24,credit_bbb_bp,5.0
+taper_tantrum_2013,2013-05-21,2013-06-24,credit_aaa_bp,-9.0
+crimea_2014,2014-02-26,2014-03-14,eq_SPY,-0.001028
+crimea_2014,2014-02-26,2014-03-14,eq_Industrials,-0.006001
+crimea_2014,2014-02-26,2014-03-14,eq_Materials,0.007519
+crimea_2014,2014-02-26,2014-03-14,eq_Information Technology,-0.010828
+crimea_2014,2014-02-26,2014-03-14,eq_Communication Services,-0.001028
+crimea_2014,2014-02-26,2014-03-14,eq_Consumer Discretionary,-0.006787
+crimea_2014,2014-02-26,2014-03-14,eq_Consumer Staples,0.016958
+crimea_2014,2014-02-26,2014-03-14,eq_Health Care,-0.011168
+crimea_2014,2014-02-26,2014-03-14,eq_Financials,0.014898
+crimea_2014,2014-02-26,2014-03-14,eq_Utilities,0.015396
+crimea_2014,2014-02-26,2014-03-14,eq_Energy,-0.008494
+crimea_2014,2014-02-26,2014-03-14,eq_Real Estate,-0.001028
+crimea_2014,2014-02-26,2014-03-14,eq_EUROPE,-0.028638
+crimea_2014,2014-02-26,2014-03-14,eq_CHINA,-0.051407
+crimea_2014,2014-02-26,2014-03-14,rates_10y_bp,-2.800012
+crimea_2014,2014-02-26,2014-03-14,rates_3m_bp,0.0
+crimea_2014,2014-02-26,2014-03-14,oil,-0.036066
+crimea_2014,2014-02-26,2014-03-14,usd_index,-0.012063
+crimea_2014,2014-02-26,2014-03-14,fx_EUR,0.00868
+crimea_2014,2014-02-26,2014-03-14,fx_GBP,-0.003125
+crimea_2014,2014-02-26,2014-03-14,fx_JPY,0.003635
+crimea_2014,2014-02-26,2014-03-14,vol_vix_pts,3.469999
+crimea_2014,2014-02-26,2014-03-14,credit_bbb_bp,2.0
+crimea_2014,2014-02-26,2014-03-14,credit_aaa_bp,2.0
+china_deval_2015,2015-08-17,2015-08-25,eq_SPY,-0.110736
+china_deval_2015,2015-08-17,2015-08-25,eq_Industrials,-0.103751
+china_deval_2015,2015-08-17,2015-08-25,eq_Materials,-0.11418
+china_deval_2015,2015-08-17,2015-08-25,eq_Information Technology,-0.116268
+china_deval_2015,2015-08-17,2015-08-25,eq_Communication Services,-0.110736
+china_deval_2015,2015-08-17,2015-08-25,eq_Consumer Discretionary,-0.101251
+china_deval_2015,2015-08-17,2015-08-25,eq_Consumer Staples,-0.089822
+china_deval_2015,2015-08-17,2015-08-25,eq_Health Care,-0.107433
+china_deval_2015,2015-08-17,2015-08-25,eq_Financials,-0.117391
+china_deval_2015,2015-08-17,2015-08-25,eq_Utilities,-0.082114
+china_deval_2015,2015-08-17,2015-08-25,eq_Energy,-0.147791
+china_deval_2015,2015-08-17,2015-08-25,eq_Real Estate,-0.110736
+china_deval_2015,2015-08-17,2015-08-25,eq_EUROPE,-0.076431
+china_deval_2015,2015-08-17,2015-08-25,eq_CHINA,-0.128454
+china_deval_2015,2015-08-17,2015-08-25,rates_10y_bp,-1.70002
+china_deval_2015,2015-08-17,2015-08-25,rates_3m_bp,-0.7
+china_deval_2015,2015-08-17,2015-08-25,oil,-0.061142
+china_deval_2015,2015-08-17,2015-08-25,usd_index,-0.023652
+china_deval_2015,2015-08-17,2015-08-25,fx_EUR,0.044178
+china_deval_2015,2015-08-17,2015-08-25,fx_GBP,0.007093
+china_deval_2015,2015-08-17,2015-08-25,fx_JPY,0.045978
+china_deval_2015,2015-08-17,2015-08-25,vol_vix_pts,23.0
+china_deval_2015,2015-08-17,2015-08-25,credit_bbb_bp,20.0
+china_deval_2015,2015-08-17,2015-08-25,credit_aaa_bp,13.0
+hy_energy_2016,2015-12-01,2016-02-11,eq_SPY,-0.126883
+hy_energy_2016,2015-12-01,2016-02-11,eq_Industrials,-0.109352
+hy_energy_2016,2015-12-01,2016-02-11,eq_Materials,-0.151345
+hy_energy_2016,2015-12-01,2016-02-11,eq_Information Technology,-0.122333
+hy_energy_2016,2015-12-01,2016-02-11,eq_Communication Services,-0.126883
+hy_energy_2016,2015-12-01,2016-02-11,eq_Consumer Discretionary,-0.156801
+hy_energy_2016,2015-12-01,2016-02-11,eq_Consumer Staples,-0.002133
+hy_energy_2016,2015-12-01,2016-02-11,eq_Health Care,-0.117839
+hy_energy_2016,2015-12-01,2016-02-11,eq_Financials,-0.203255
+hy_energy_2016,2015-12-01,2016-02-11,eq_Utilities,0.069797
+hy_energy_2016,2015-12-01,2016-02-11,eq_Energy,-0.207295
+hy_energy_2016,2015-12-01,2016-02-11,eq_Real Estate,-0.119582
+hy_energy_2016,2015-12-01,2016-02-11,eq_EUROPE,-0.15065
+hy_energy_2016,2015-12-01,2016-02-11,eq_CHINA,-0.227672
+hy_energy_2016,2015-12-01,2016-02-11,rates_10y_bp,-51.099992
+hy_energy_2016,2015-12-01,2016-02-11,rates_3m_bp,7.000001
+hy_energy_2016,2015-12-01,2016-02-11,oil,-0.373716
+hy_energy_2016,2015-12-01,2016-02-11,usd_index,-0.042485
+hy_energy_2016,2015-12-01,2016-02-11,fx_EUR,0.066964
+hy_energy_2016,2015-12-01,2016-02-11,fx_GBP,-0.035299
+hy_energy_2016,2015-12-01,2016-02-11,fx_JPY,0.087928
+hy_energy_2016,2015-12-01,2016-02-11,vol_vix_pts,13.469999
+hy_energy_2016,2015-12-01,2016-02-11,credit_bbb_bp,42.0
+hy_energy_2016,2015-12-01,2016-02-11,credit_aaa_bp,49.0
+brexit_2016,2016-06-23,2016-06-27,eq_SPY,-0.053176
+brexit_2016,2016-06-23,2016-06-27,eq_Industrials,-0.063327
+brexit_2016,2016-06-23,2016-06-27,eq_Materials,-0.075853
+brexit_2016,2016-06-23,2016-06-27,eq_Information Technology,-0.057767
+brexit_2016,2016-06-23,2016-06-27,eq_Communication Services,-0.053176
+brexit_2016,2016-06-23,2016-06-27,eq_Consumer Discretionary,-0.05486
+brexit_2016,2016-06-23,2016-06-27,eq_Consumer Staples,-0.021241
+brexit_2016,2016-06-23,2016-06-27,eq_Health Care,-0.042028
+brexit_2016,2016-06-23,2016-06-27,eq_Financials,-0.080583
+brexit_2016,2016-06-23,2016-06-27,eq_Utilities,0.013908
+brexit_2016,2016-06-23,2016-06-27,eq_Energy,-0.063324
+brexit_2016,2016-06-23,2016-06-27,eq_Real Estate,-0.014123
+brexit_2016,2016-06-23,2016-06-27,eq_EUROPE,-0.136019
+brexit_2016,2016-06-23,2016-06-27,eq_CHINA,-0.063621
+brexit_2016,2016-06-23,2016-06-27,rates_10y_bp,-27.899992
+brexit_2016,2016-06-23,2016-06-27,rates_3m_bp,-4.000001
+brexit_2016,2016-06-23,2016-06-27,oil,-0.075434
+brexit_2016,2016-06-23,2016-06-27,usd_index,0.032182
+brexit_2016,2016-06-23,2016-06-27,fx_EUR,-0.025802
+brexit_2016,2016-06-23,2016-06-27,fx_GBP,-0.090498
+brexit_2016,2016-06-23,2016-06-27,fx_JPY,0.024705
+brexit_2016,2016-06-23,2016-06-27,vol_vix_pts,6.6
+brexit_2016,2016-06-23,2016-06-27,credit_bbb_bp,10.0
+brexit_2016,2016-06-23,2016-06-27,credit_aaa_bp,8.0
+abqaiq_2019,2019-09-13,2019-09-17,eq_SPY,-0.000564
+abqaiq_2019,2019-09-13,2019-09-17,eq_Industrials,-0.001386
+abqaiq_2019,2019-09-13,2019-09-17,eq_Materials,-0.008454
+abqaiq_2019,2019-09-13,2019-09-17,eq_Information Technology,0.001602
+abqaiq_2019,2019-09-13,2019-09-17,eq_Communication Services,-0.00273
+abqaiq_2019,2019-09-13,2019-09-17,eq_Consumer Discretionary,-0.006806
+abqaiq_2019,2019-09-13,2019-09-17,eq_Consumer Staples,-0.004259
+abqaiq_2019,2019-09-13,2019-09-17,eq_Health Care,-0.000656
+abqaiq_2019,2019-09-13,2019-09-17,eq_Financials,-0.002457
+abqaiq_2019,2019-09-13,2019-09-17,eq_Utilities,0.009533
+abqaiq_2019,2019-09-13,2019-09-17,eq_Energy,0.019155
+abqaiq_2019,2019-09-13,2019-09-17,eq_Real Estate,0.024618
+abqaiq_2019,2019-09-13,2019-09-17,eq_EUROPE,-0.005133
+abqaiq_2019,2019-09-13,2019-09-17,eq_CHINA,-0.015274
+abqaiq_2019,2019-09-13,2019-09-17,rates_10y_bp,-9.099996
+abqaiq_2019,2019-09-13,2019-09-17,rates_3m_bp,3.799999
+abqaiq_2019,2019-09-13,2019-09-17,oil,0.08186
+abqaiq_2019,2019-09-13,2019-09-17,usd_index,0.0
+abqaiq_2019,2019-09-13,2019-09-17,fx_EUR,-0.004732
+abqaiq_2019,2019-09-13,2019-09-17,fx_GBP,0.008041
+abqaiq_2019,2019-09-13,2019-09-17,fx_JPY,0.000139
+abqaiq_2019,2019-09-13,2019-09-17,vol_vix_pts,0.7
+abqaiq_2019,2019-09-13,2019-09-17,credit_bbb_bp,-0.0
+abqaiq_2019,2019-09-13,2019-09-17,credit_aaa_bp,-2.0
+covid_2020,2020-02-19,2020-03-23,eq_SPY,-0.337173
+covid_2020,2020-02-19,2020-03-23,eq_Industrials,-0.415801
+covid_2020,2020-02-19,2020-03-23,eq_Materials,-0.362091
+covid_2020,2020-02-19,2020-03-23,eq_Information Technology,-0.311532
+covid_2020,2020-02-19,2020-03-23,eq_Communication Services,-0.297784
+covid_2020,2020-02-19,2020-03-23,eq_Consumer Discretionary,-0.335037
+covid_2020,2020-02-19,2020-03-23,eq_Consumer Staples,-0.241611
+covid_2020,2020-02-19,2020-03-23,eq_Health Care,-0.279295
+covid_2020,2020-02-19,2020-03-23,eq_Financials,-0.427891
+covid_2020,2020-02-19,2020-03-23,eq_Utilities,-0.353656
+covid_2020,2020-02-19,2020-03-23,eq_Energy,-0.560667
+covid_2020,2020-02-19,2020-03-23,eq_Real Estate,-0.378163
+covid_2020,2020-02-19,2020-03-23,eq_EUROPE,-0.362609
+covid_2020,2020-02-19,2020-03-23,eq_CHINA,-0.189075
+covid_2020,2020-02-19,2020-03-23,rates_10y_bp,-80.600005
+covid_2020,2020-02-19,2020-03-23,rates_3m_bp,-158.299998
+covid_2020,2020-02-19,2020-03-23,oil,-0.561644
+covid_2020,2020-02-19,2020-03-23,usd_index,0.029016
+covid_2020,2020-02-19,2020-03-23,fx_EUR,-0.009357
+covid_2020,2020-02-19,2020-03-23,fx_GBP,-0.106072
+covid_2020,2020-02-19,2020-03-23,fx_JPY,-0.004916
+covid_2020,2020-02-19,2020-03-23,vol_vix_pts,47.21
+covid_2020,2020-02-19,2020-03-23,credit_bbb_bp,226.0
+covid_2020,2020-02-19,2020-03-23,credit_aaa_bp,158.0
