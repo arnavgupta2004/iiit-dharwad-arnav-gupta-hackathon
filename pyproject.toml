@@ -20,7 +20,7 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
-filterwarnings = ["ignore::DeprecationWarning:pysentiment2.*", "ignore::SyntaxWarning"]
+filterwarnings = ["ignore:invalid escape sequence:DeprecationWarning", "ignore::SyntaxWarning"]
 
 [tool.ruff]
 line-length = 100
