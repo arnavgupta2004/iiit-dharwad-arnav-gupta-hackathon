@@ -1,7 +1,8 @@
 # Application-level settings: paths, run modes, API, dashboard.
 
 paths:
-  replay_feed: data/replay/feed.jsonl
+  replay_feed: data/replay/feed.jsonl.gz
+  feed_stats: reports/feed_stats.json
   signals_jsonl: data/signals/signals.jsonl
   duckdb: data/processed/riskpulse.duckdb
   prices_dir: data/prices
@@ -80,3 +81,11 @@ prices:
   # Universe tickers (configs/universe.yaml) are added automatically.
   extra_symbols: [SPY, ^GSPC, ^VIX, ^TNX, ^IRX, HYG, LQD, IEF, CL=F, DX-Y.NYB, EURUSD=X, JPY=X, GBPUSD=X,
     VGK, FXI, XLF, XLK, XLE, XLV, XLY, XLP, XLI, XLU, XLB, XLRE, XLC]
+
+replay_feed:
+  start: "2021-09-30"
+  end: "2022-09-30"
+  include_org_only: false       # company only in article body orgs -> headline sentiment is not about it
+  # MKT rows must carry at least one economic theme (drops pure battlefield / crime stories).
+  mkt_econ_theme_prefixes: [ECON_, EPU_ECONOMY, TAX_ECON_PRICE, SANCTIONS, WB_1104_MACROECONOMIC,
+    WB_442_INFLATION, WB_1234_BANKING_INSTITUTIONS]
