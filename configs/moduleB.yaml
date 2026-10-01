@@ -38,6 +38,38 @@ portfolio:
   n_equity_trs: 8
   n_cds: 30
   equity_vol_lookback_days: 252   # realised vol for option greeks, ending at as_of
+  non_us_obligor_share: 0.2       # share of obligors drawn from non-US merchant geographies
+  # Merchant geography (US state code or country name) -> region tag used by scenarios.
+  # US state codes map to US; anything unlisted maps to EM.
+  region_map:
+    United Kingdom: UK
+    Germany: EUROPE
+    France: EUROPE
+    Italy: EUROPE
+    Spain: EUROPE
+    Netherlands: EUROPE
+    Switzerland: EUROPE
+    Greece: EUROPE
+    Ireland: EUROPE
+    Portugal: EUROPE
+    Belgium: EUROPE
+    Austria: EUROPE
+    Sweden: EUROPE
+    Norway: EUROPE
+    Denmark: EUROPE
+    Poland: EUROPE
+    Russia: RUSSIA_UKRAINE
+    Ukraine: RUSSIA_UKRAINE
+    China: CHINA
+    Taiwan: CHINA
+    Hong Kong: CHINA
+    Japan: JAPAN
+    India: INDIA
+    United Arab Emirates: MIDDLE_EAST
+    Israel: MIDDLE_EAST
+    Saudi Arabia: MIDDLE_EAST
+    Turkey: MIDDLE_EAST
+    Canada: US
 
 severity_multiplier:            # shock = analogue shock * m(impact)
   8: 0.6
@@ -73,3 +105,9 @@ capital:
     CCC: 1.50
   # Listed equity holdings: CRE20.57 (250%; 400% applies only to speculative unlisted equity).
   equity_risk_weight: 2.50
+
+stress:
+  # PD multiplier for obligors whose region is tagged on the triggering event (e.g. EUROPE for a
+  # European crisis), on top of the spread-implied multiplier. Assumption; shown in the explainer.
+  regional_pd_factor: 1.5
+  top_n_positions: 10
