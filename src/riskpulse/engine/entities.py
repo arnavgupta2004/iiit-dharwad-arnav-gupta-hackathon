@@ -51,8 +51,9 @@ class EntityMention:
 @dataclass
 class _TickerPatterns:
     ticker: str
-    strong: re.Pattern | None  # unambiguous aliases + brands (case-insensitive)
+    strong: re.Pattern | None  # unambiguous company aliases (case-insensitive)
     ambiguous: re.Pattern | None  # ambiguous aliases (case-sensitive, capitalised form)
+    brands: re.Pattern | None  # products/subsidiaries: need context like ambiguous aliases
     execs: re.Pattern | None
     cashtags: re.Pattern | None
     org_aliases: set[str] = field(default_factory=set)
@@ -81,8 +82,8 @@ class EntityLinker:
         out = []
         for t, spec in self.tickers.items():
             amb = set(spec.get("ambiguous", []))
-            names = spec["aliases"] + spec.get("brands", [])
-            strong = [n for n in names if n not in amb]
+            strong = [n for n in spec["aliases"] if n not in amb]
+            brands = [b for b in spec.get("brands", []) if b not in amb]
             orgs = {normalise(n).strip() for n in spec["aliases"]}
             orgs |= {f"{o} inc" for o in orgs} | {normalise(spec["name"]).strip()}
             out.append(
@@ -90,6 +91,7 @@ class EntityLinker:
                     ticker=t,
                     strong=_phrase_regex(strong),
                     ambiguous=_phrase_regex(sorted(amb), case_sensitive=True),
+                    brands=_phrase_regex(brands),
                     execs=_phrase_regex(spec.get("execs", [])),
                     cashtags=_phrase_regex(spec["cashtags"]),
                     org_aliases=orgs,
@@ -130,6 +132,7 @@ class EntityLinker:
                 (p.strong, 1.0, False),
                 (p.execs, float(self.cfg.get("exec_weight", 0.5)), False),
                 (p.ambiguous, 1.0, True),
+                (p.brands, 1.0, True),
             ):
                 if pat is None:
                     continue
@@ -155,6 +158,15 @@ class EntityLinker:
                     h.title_score += weight
                 h.terms.append(m.group(0))
                 h.ambiguous_only = False
+
+    @cached_property
+    def _low_value(self) -> list[str]:
+        return [p.lower() for p in self.cfg.get("low_value_title_patterns", [])]
+
+    def is_low_value(self, title: str) -> bool:
+        """True for consumer how-to / shopping / entertainment-listing titles."""
+        t = f" {title.lower()} "
+        return any(p in t for p in self._low_value)
 
     def regions_of(self, text: str) -> tuple[str, ...]:
         """Region tags detected from keyword lists (config `linking.regions`)."""

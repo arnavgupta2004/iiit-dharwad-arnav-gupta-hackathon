@@ -60,9 +60,9 @@ tickers:
   META:
     name: Meta Platforms, Inc.
     sector: Communication Services
-    aliases: [Meta Platforms, Meta, Facebook]
+    aliases: [Meta Platforms, Meta]
     cashtags: [$META, $FB]
-    brands: [Instagram, WhatsApp, Oculus, Threads]
+    brands: [Facebook, Instagram, WhatsApp, Oculus, Threads]
     execs: [Mark Zuckerberg]
     ambiguous: [Meta, Threads]
     in_tweet_dataset: true
@@ -116,7 +116,7 @@ tickers:
     sector: Consumer Staples
     aliases: [Procter & Gamble, Procter and Gamble, P&G]
     cashtags: [$PG]
-    brands: [Tide, Gillette, Pampers]
+    brands: [Gillette, Pampers]            # 'Tide' removed: common word (pilot false positives)
     execs: [Jon Moeller]
     ambiguous: []
     in_tweet_dataset: true
@@ -210,12 +210,20 @@ linking:
   bare_ticker_map: {GOOG: GOOGL}
   exec_weight: 0.5            # an exec-name hit counts as half a mention
   title_weight: 2.0           # title hits weighted x2 (spec)
-  # Words that make an ambiguous alias (Apple, Amazon, Chase, Meta, ...) count as the company.
-  context_words: [shares, stock, stocks, investor, investors, earnings, revenue, sales, profit, quarter,
-    quarterly, ceo, cfo, analyst, analysts, inc, corp, company, nasdaq, nyse, "s&p", market, valuation,
-    billion, million, deal, acquire, acquisition, lawsuit, regulator, antitrust, layoffs, guidance,
-    dividend, buyback, iphone, ipad, mac, app store, aws, prime, alexa, instagram, whatsapp, facebook,
-    electric vehicle, ev, model y, model 3, gigafactory, bank, banking, loan, credit card, chatbot, ai]
+  # Financial / business context. Ambiguous aliases (Apple, Amazon, Chase, Meta, ...) and ALL
+  # brands (iPhone, Instagram, Tide, Marvel, ...) only link when one of these words is present
+  # or another unambiguous company hit corroborates. Brand names are deliberately not listed
+  # here, so a brand cannot satisfy its own context requirement.
+  context_words: [shares, stock, stocks, investor, investors, earnings, revenue, revenues, sales, profit,
+    profits, quarter, quarterly, ceo, cfo, chief executive, analyst, analysts, inc, corp, nasdaq, nyse,
+    "s&p", "wall street", valuation, billion, acquire, acquires, acquisition, merger, lawsuit, sued,
+    regulator, regulators, antitrust, fined, probe, layoffs, job cuts, guidance, outlook, dividend,
+    buyback, ipo, bonds, downgrade, upgrade, price target, market cap, shareholders, subscribers,
+    advertisers, ad revenue, outage, recall, tariff, sanctions, factory, deliveries]
+  # Consumer how-to / shopping titles add no risk signal; company links are dropped for these.
+  low_value_title_patterns: ["how to ", "how do i", "step-by-step", "tips and tricks", "screenshot",
+    "wallpaper", "hands-on", "unboxing", "deal of the day", "best deals", "price cut", "coupon",
+    "giveaway", "record-low price", "where to watch", "where to stream", "release date", "trailer", "recap", "spoilers"]
   # MKT pseudo-entity: macro / geopolitical / credit items without a universe company.
   mkt_classes: [GEOPOLITICAL, MACROECONOMIC, CREDIT_EVENT]
   regions:

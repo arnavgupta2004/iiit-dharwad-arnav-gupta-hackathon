@@ -32,6 +32,13 @@ def tickers(mentions) -> list[str]:
         ("Exxon Mobil and Chevron lift dividends", ["XOM", "CVX"]),
         ("Coke prices rise at the movies", []),
         ("Coca-Cola raises prices as costs climb", ["KO"]),
+        # brands need business context (pilot false positives, 2026-10-02)
+        ("Hilary Duff looks like Jennifer Lopez in latest Instagram post", []),
+        ("Every Customary Marriage Must Be Followed By Cohabitation - The Tide News Online", []),
+        ("Aaron Pierre Joins the Cast of Marvel's Blade Reboot", []),
+        ("Instagram ad revenue growth slows as advertisers pull back", ["META"]),
+        ("Facebook denies responsibility for crypto scam ads, faces lawsuit", ["META"]),
+        ("iPhone sales slump in China, analysts say", ["AAPL"]),
     ],
 )
 def test_ambiguity_rules(linker: EntityLinker, text: str, expected: list[str]) -> None:
@@ -86,6 +93,12 @@ def test_market_wide_items_route_to_mkt_with_regions(linker: EntityLinker) -> No
 def test_company_takes_precedence_over_mkt(linker: EntityLinker) -> None:
     ms = linker.link("Goldman Sachs warns inflation will force more rate hikes")
     assert tickers(ms) == ["GS"]
+
+
+def test_low_value_titles_detected(linker: EntityLinker) -> None:
+    assert linker.is_low_value("How to take a screenshot with the iPhone 13")
+    assert linker.is_low_value("How to make a graph on Google Docs - Android Authority")
+    assert not linker.is_low_value("Apple shares fall on supply worries")
 
 
 def test_irrelevant_text_links_nothing(linker: EntityLinker) -> None:
