@@ -124,7 +124,9 @@ class Embedder:
     def _model(self):
         from sentence_transformers import SentenceTransformer
 
-        return SentenceTransformer(self.model_name, device="cpu")
+        from riskpulse.engine.sentiment import torch_device
+
+        return SentenceTransformer(self.model_name, device=torch_device())
 
     def encode(self, texts: list[str], batch_size: int = 64) -> np.ndarray:
         return self._model.encode(

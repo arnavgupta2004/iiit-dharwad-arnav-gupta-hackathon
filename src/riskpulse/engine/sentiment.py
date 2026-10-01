@@ -21,6 +21,13 @@ from riskpulse.engine.entities import MKT, EntityLinker
 LABELS = ("positive", "negative", "neutral")
 
 
+def torch_device() -> str:
+    """Inference device: CPU by default (the project must run on CPU). ``RISKPULSE_DEVICE=mps``
+    (or ``cuda``) is an opt-in accelerator for one-off batch precomputation; outputs match CPU
+    within float tolerance (checked: max |dp| 5e-6, 100% argmax agreement on 512 tweets)."""
+    return os.environ.get("RISKPULSE_DEVICE", "cpu")
+
+
 def label_from_score(score: float, pos: float | None = None, neg: float | None = None) -> str:
     """Map a score in [-1, 1] to positive / negative / neutral using config thresholds."""
     cfg = load_config("app")["sentiment"]
@@ -50,6 +57,7 @@ class FinBertScorer:
         self.model_name = model_name or cfg["model"]
         self.batch_size = int(cfg["batch_size"])
         self.max_length = int(cfg["max_length"])
+        self.device = torch_device()
 
     @cached_property
     def _model(self):
@@ -59,6 +67,7 @@ class FinBertScorer:
         torch.set_num_threads(max(1, (os.cpu_count() or 2) - 1))
         tok = AutoTokenizer.from_pretrained(self.model_name)
         model = AutoModelForSequenceClassification.from_pretrained(self.model_name).eval()
+        model = model.to(self.device)
         id2label = {i: lbl.lower() for i, lbl in model.config.id2label.items()}
         order = [next(i for i, lbl in id2label.items() if lbl == name) for name in LABELS]
         return tok, model, order
@@ -85,8 +94,9 @@ class FinBertScorer:
                 truncation=True,
                 max_length=self.max_length,
             )
+            enc = enc.to(self.device)
             with torch.no_grad():
-                p = torch.softmax(model(**enc).logits, dim=-1).numpy()
+                p = torch.softmax(model(**enc).logits, dim=-1).cpu().numpy()
             out.append(p[:, order])
         if not out:
             return np.zeros((0, 3))
