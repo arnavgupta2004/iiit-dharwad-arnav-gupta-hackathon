@@ -94,3 +94,12 @@ replay_feed:
   # MKT rows must carry at least one economic theme (drops pure battlefield / crime stories).
   mkt_econ_theme_prefixes: [ECON_, EPU_ECONOMY, TAX_ECON_PRICE, SANCTIONS, WB_1104_MACROECONOMIC,
     WB_442_INFLATION, WB_1234_BANKING_INSTITUTIONS]
+
+aggregation:
+  entity_half_life_hours: 6       # EWMA half-life H for entity sentiment (Module A input)
+  entity_confidence_w0: 3.0       # confidence = 1 - exp(-W / w0), W = decayed evidence weight
+  event_breadth_bonus:            # story impact = max doc impact + bonus by distinct outlets
+    - {min_sources: 5, bonus: 1}
+    - {min_sources: 15, bonus: 2}
+  event_emit_min_docs: 2          # emit/refresh an event signal once a story has this many docs
+  evidence_max: 5
