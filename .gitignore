@@ -39,3 +39,6 @@ models/
 
 # Notebook checkpoints
 .ipynb_checkpoints/
+
+# SetFit / HF Trainer default output
+checkpoints/
