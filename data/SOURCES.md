@@ -69,10 +69,14 @@ No proprietary or client data is used. Synthetic records are labelled synthetic 
 
 ### 5–6. HF Twitter financial news (zeroshot), MIT
 - Sentiment: `sent_train.csv` 9,543 rows, `sent_valid.csv` 2,388 rows; columns `text`, `label`;
-  label map **0 = bearish, 1 = bullish, 2 = neutral** (checked: meta counts bearish 1,789 = 1,442 + 347).
+  label map **0 = bearish, 1 = bullish, 2 = neutral** (checked against both the README `LABEL_` map and the meta counts:
+  bearish 1,789 = 1,442 + 347).
   No test split exists, so `valid` is our held-out test set.
-- Topic: `topic_train.csv` 16,990 rows, `topic_valid.csv` 4,117 rows; 20 labels 0..19 in the alphabetical order of
-  `topic_dataset_meta.txt` (0 = Analyst Update, checked 255 + 73 = 328).
+- Topic: `topic_train.csv` 16,990 rows, `topic_valid.csv` 4,117 rows; 20 labels 0..19. **The label order is the one in
+  the dataset README (`LABEL_0` Analyst Update, `LABEL_1` Fed | Central Banks, ... `LABEL_19` Stock Movement), not
+  alphabetical.** An earlier note here said alphabetical; it was wrong (only label 0 coincided) and was corrected on
+  2026-10-02 after the class counts disagreed with the meta file. Per-label counts match the README order exactly.
+  The map lives in `configs/taxonomy.yaml` (`hf_topic_labels`).
 
 ### 7. yfinance
 - All requested symbols download daily history from 2008-01-02 to 2026-09-29: SPY, ^GSPC, ^TNX, ^IRX, HYG, LQD, IEF,

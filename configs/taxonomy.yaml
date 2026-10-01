@@ -69,7 +69,7 @@ classes:
     description: quarterly results, revenue, profit, guidance, beats and misses, dividends
     zero_shot_label: earnings results, revenue or profit guidance
     keywords: [earnings, eps, revenue, quarterly results, profit, guidance, beats estimates, misses estimates, outlook, forecast, dividend]
-    hf_topic_map: [Earnings, Dividend News]
+    hf_topic_map: [Earnings, Dividend]
     examples:
       - Company beats quarterly earnings estimates and raises guidance
       - Revenue misses forecasts as demand slows
@@ -126,4 +126,28 @@ classes:
       - Opinion on long-term investing strategies
 
 # HF topics deliberately left unmapped (ambiguous across our classes, so not used as weak labels):
-hf_topic_unmapped: ["Company or Product News", Currencies, "Energy | Oil", Financials, "Gold | Metals | Materials", IPO]
+hf_topic_unmapped: ["Company | Product News", Currencies, "Energy | Oil", Financials, "Gold | Metals | Materials", IPO]
+
+# Official label ids of zeroshot/twitter-financial-news-topic, from the dataset README
+# (verified 2026-10-02; NOT alphabetical).
+hf_topic_labels:
+  0: Analyst Update
+  1: "Fed | Central Banks"
+  2: "Company | Product News"
+  3: "Treasuries | Corporate Debt"
+  4: Dividend
+  5: Earnings
+  6: "Energy | Oil"
+  7: Financials
+  8: Currencies
+  9: "General News | Opinion"
+  10: "Gold | Metals | Materials"
+  11: IPO
+  12: "Legal | Regulation"
+  13: "M&A | Investments"
+  14: Macro
+  15: Markets
+  16: Politics
+  17: Personnel Change
+  18: Stock Commentary
+  19: Stock Movement
