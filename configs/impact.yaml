@@ -55,3 +55,6 @@ binning:
   method: quantile
   n_bins: 10
   bins_path: data/processed/impact_bins.json
+  # Edges are fitted on a burn-in period at the start of the replay window and applied to the
+  # rest, so the Module B trigger threshold never uses future data.
+  burn_in: ["2021-09-30", "2022-01-01"]

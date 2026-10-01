@@ -159,7 +159,13 @@ class EmbeddingClassifier:
         return self.model.predict_proba(self.embedder.encode(texts))
 
     def predict(self, texts: list[str]) -> list[EventPrediction]:
-        p = self.predict_proba(texts)
+        return self.predict_from_proba(self.predict_proba(texts))
+
+    def predict_from_embeddings(self, x: np.ndarray) -> list[EventPrediction]:
+        """Classify precomputed embeddings (avoids re-encoding in the pipeline)."""
+        return self.predict_from_proba(self.model.predict_proba(x))
+
+    def predict_from_proba(self, p: np.ndarray) -> list[EventPrediction]:
         out = []
         for row in p:
             i = int(row.argmax())

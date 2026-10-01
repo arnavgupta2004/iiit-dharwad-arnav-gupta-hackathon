@@ -15,8 +15,15 @@ def _sentiment() -> None:
     run()
 
 
+def _events() -> None:
+    from riskpulse.engine.event_training import train_and_evaluate
+
+    train_and_evaluate()
+
+
 EVALS: dict[str, Callable[[], None]] = {
     "sentiment": _sentiment,
+    "events": _events,
 }
 
 

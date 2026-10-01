@@ -54,7 +54,9 @@ def main(
 
 @app.command()
 def ingest(
-    source: str = typer.Option("gdelt_gkg", help="Source adapter (currently: gdelt_gkg)."),
+    source: str = typer.Option(
+        "gdelt_gkg", help="gdelt_gkg (stream GKG files) or feed (build the replay feed)."
+    ),
     start: str = typer.Option(
         "2021-09-30", help="Start date (UTC, inclusive) for historical pulls."
     ),
@@ -64,6 +66,12 @@ def ingest(
     """Pull historical documents from a source into data/processed."""
     from datetime import datetime
 
+    if source == "feed":
+        from riskpulse.ingestion.replay import build_feed
+
+        stats = build_feed()
+        typer.echo(f"Replay feed: {stats['n_docs']} docs {stats['by_source']}")
+        return
     if source != "gdelt_gkg":
         _not_yet(f"ingest --source {source}", 1)
     from riskpulse.ingestion.gdelt_gkg import GKGStreamer, gkg_timestamps
@@ -74,9 +82,22 @@ def ingest(
 
 
 @app.command()
-def process(mode: RunMode = typer.Option(RunMode.batch, help="Run mode.")) -> None:
-    """Run the NLP engine over stored documents and emit signals."""
-    _not_yet("process", 4)
+def process(
+    mode: RunMode = typer.Option(RunMode.batch, help="Run mode."),
+    limit: int = typer.Option(None, help="Only the first N feed documents (smoke runs)."),
+) -> None:
+    """Run the NLP engine over the replay feed and write signals (JSONL + DuckDB)."""
+    if mode != RunMode.batch:
+        _not_yet(f"process --mode {mode.value}", 4)
+    from riskpulse.engine.batch import run_batch
+    from riskpulse.engine.pipeline import event_model_exists
+
+    if not event_model_exists():
+        typer.echo("Event model missing; training it first (riskpulse eval events).")
+        from riskpulse.engine.event_training import train_and_evaluate
+
+        train_and_evaluate()
+    typer.echo(run_batch(limit=limit))
 
 
 @app.command()

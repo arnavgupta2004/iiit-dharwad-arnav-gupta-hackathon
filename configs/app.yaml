@@ -103,3 +103,13 @@ aggregation:
     - {min_sources: 15, bonus: 2}
   event_emit_min_docs: 2          # emit/refresh an event signal once a story has this many docs
   evidence_max: 5
+
+event_training:
+  seed: 20261002
+  feed_sample_for_keywords: 60000   # feed headlines scanned for single-class keyword hits
+  keyword_cap_per_class: 1500
+  zero_shot_sample: 1200            # feed headlines labelled by zero-shot (kept if conf >= threshold)
+  zero_shot_min_conf: 0.9
+  zero_shot_eval_sample: 600        # HF-topic-valid rows scored by zero-shot for comparison
+  hf_other_cap: 3000
+  weak_holdout_frac: 0.2
