@@ -27,14 +27,17 @@ combine_concurrent: max_severity   # or "cumulative"
 
 capital:
   cet1_ratio_start: 0.13
-  # Corporate risk weights by rating bucket, Basel II standardised approach as
-  # recalled (AAA..AA- 20%, A 50%, BBB..BB 100%, below BB- 150%).
-  # [VERIFY against BCBS CRE20 (corporate exposures) before any CET1 number is reported; cite paragraph in DECISIONS.md.]
+  # Corporate "base" risk weights by external rating: Basel Framework CRE20.42-20.43,
+  # Table 10 (standardised approach, in force from 2023-01-01; verified 2026-10-02 on bis.org).
+  # AAA to AA- 20%, A+ to A- 50%, BBB+ to BBB- 75%, BB+ to BB- 100%, below BB- 150%, unrated 100%.
+  # (Simplification: applied to all corporate credit exposures; derivatives use the same table on
+  # their credit-equivalent exposure. No SME or specialised-lending treatment.)
   risk_weights:
     AAA: 0.20
     AA: 0.20
     A: 0.50
-    BBB: 1.00
+    BBB: 0.75
     BB: 1.00
     B: 1.50
     CCC: 1.50
+    UNRATED: 1.00

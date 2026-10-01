@@ -40,8 +40,9 @@ Items marked (proposed) await confirmation at a gate.
   Non-US regions, if needed for geopolitical scenarios, will be assigned synthetically and labelled so.
 - **A-23 Exposure size** is proportional to log(transaction volume); PD tilts with the volatility of monthly flows
   (details fixed in Phase 6).
-- **A-24 Capital.** Starting CET1 ratio is 13% (config). Risk weights follow Basel II standardised corporate weights
-  (to be verified against BCBS CRE20, standardised approach for corporate exposures, before any CET1 number is reported).
+- **A-24 Capital.** Starting CET1 ratio is 13% (config, an assumption). Risk weights follow the standardised approach for
+  rated corporates, Basel Framework CRE20.42–20.43 Table 10 (verified; DECISIONS D-024). RWA covers only the synthetic
+  book's credit risk (no market or operational risk RWA), so CET1 moves are illustrative of direction and scale.
 
 ## Market data
 

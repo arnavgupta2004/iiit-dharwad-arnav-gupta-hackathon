@@ -2,6 +2,16 @@
 
 Newest first within each date. Each entry: decision, rationale, and status (accepted, or proposed pending Arnav's OK at a gate).
 
+## 2026-10-02 (Phase 6: Module B)
+
+### D-024 Corporate risk weights verified against BCBS CRE20
+Basel Framework **CRE20.42** (rated corporate exposures receive the "base" risk weights of Table 10) and **CRE20.43**
+(unrated corporates 100%, Table 10), in the version in force from 2023-01-01, read on bis.org on 2026-10-02:
+AAA to AA– 20%, A+ to A– 50%, **BBB+ to BBB– 75%**, BB+ to BB– 100%, below BB– 150%, unrated 100%.
+The earlier from-memory table (Basel II) had BBB at 100%. That was wrong for the current framework and is corrected in
+`configs/moduleB.yaml`. Simplifications (documented as assumptions): one table for all corporate credit exposures,
+no SME (CRE20.47) or specialised-lending treatment, and derivatives risk-weighted on a credit-equivalent exposure.
+
 ## 2026-10-02 (Phase 2: sentiment)
 
 ### D-022 Sentiment evaluation outcome and label thresholds
