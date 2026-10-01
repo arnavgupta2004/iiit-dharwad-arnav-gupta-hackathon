@@ -72,3 +72,11 @@ kaggle_tweets:
 kaggle_news:
   zip: data/raw/_downloads/kaggle/massive-stock-news-analysis-db-for-nlpbacktests.zip
   member: analyst_ratings_processed.csv
+
+prices:
+  path: data/prices/daily.parquet
+  start: "2007-06-01"           # covers the event-study estimation window before 2009 news
+  end: "2026-09-30"
+  # Universe tickers (configs/universe.yaml) are added automatically.
+  extra_symbols: [SPY, ^GSPC, ^VIX, ^TNX, ^IRX, HYG, LQD, IEF, CL=F, DX-Y.NYB, EURUSD=X, JPY=X, GBPUSD=X,
+    VGK, FXI, XLF, XLK, XLE, XLV, XLY, XLP, XLI, XLU, XLB, XLRE, XLC]
