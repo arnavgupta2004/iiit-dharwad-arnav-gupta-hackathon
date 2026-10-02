@@ -215,7 +215,7 @@ st.header("Impact score")
 imp, v2 = m.get("impact"), m.get("impact_v2")
 SCORES = [
     ("impact_v2", "Impact v2 (learned on Benzinga ≤ 2018)", NAVY),
-    ("impact_v1", "Impact v1 (live, spec formula)", SERIES[0]),
+    ("impact_v1", "Impact v1 (spec formula; live for market-wide items)", SERIES[0]),
     ("abs_sent", "abs(sentiment) baseline", MUTED),
 ]
 if v2:

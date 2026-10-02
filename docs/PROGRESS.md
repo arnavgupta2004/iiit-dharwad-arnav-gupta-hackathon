@@ -31,23 +31,23 @@ Status legend: DONE · IN PROGRESS · NEXT · OPEN
 - **Fine-tune** (P1, item 6): DONE. Test macro-F1 0.844 vs bar 0.661, kept (D-043). Hub hosting prepared
   (model card from `scripts/make_model_card.py`, resolver Hub → local rebuild → base FinBERT).
 
-## P1 review (2026-10-02): decisions recorded (D-039 revision, D-041 to D-046); applied in ONE final rerun
-- Pre-registered before scoring the gold set: sentiment model choice per text type (D-041).
-- Ready and waiting for the rerun: market-wide impact check (D-042), cross-border GEOPOLITICAL (D-044; labelling guide
-  already updated), turnover cap 5% (D-045), stage-1 cache keyed on model fingerprints.
-- Drafts (placeholders, not final numbers): `docs/drafts/deck_content.md`, `docs/drafts/video_script.md`.
+## P1 review and final rerun (2026-10-02): DONE (D-041 to D-051)
+- Gold labels and entity check received from Arnav. Sentiment decision by pre-registered rule (D-048): fine-tuned model
+  everywhere (no gain on live text). Taxonomy fix (D-044), event classifier retrained and evaluated once on gold.
+- Impact v2 retrained and adopted for company mentions (validation check passed; D-039 revision, D-049).
+- Re-score, kappa recalibrated (10.98), τ = 5%, triggers (349 stress runs), 2022 check, all evals once, snapshot once.
+- Evaluation history: D-050. Final numbers: D-051 and the README results block.
+- Engineering: stage-1 caches split by model (D-047); impact v2 scored by a lightgbm-free JSON tree evaluator because
+  LightGBM and torch cannot share a process on macOS (D-049).
 
 ## Waiting on Arnav
-- Gold labels: `data/gold/to_label.csv` → `labels.csv` (final event-class evaluation, sentiment spot check).
-- Entity check: mark `data/gold/entity_check.csv` → `riskpulse eval linking`.
+- Upload the fine-tuned weights to `arnavguptas/riskpulse-finbert-tweets` (commands in the session notes). Until then
+  the engine logs a warning and uses the local copy.
 
-- Licence decision before the public Hub upload (D-043: base FinBERT weights trace to CC BY-NC-SA 3.0 data).
-- Hugging Face username for `configs/app.yaml → sentiment.finetuned.hub_repo`.
-
-## Next: final rerun (D-046), once the gold labels are in
-Order: sentiment decision → taxonomy fix + event retrain → v2 retrain (sentiment changed) + validation recheck →
-re-score → kappa recalibration (2-month window) → τ = 5% → triggers + 2022 check → all evals once → snapshot once →
-test-set look history in DECISIONS.md → README/deck numbers.
-
-## Then
-Phase 9 hardening (fresh-clone test in a new venv, README), Phase 10 deck and video script (GATE D).
+## Next
+- Phase 9 hardening: fresh-clone test in a new venv (`demo --fast`, `pytest -q`); re-measure the pipeline benchmark on an
+  idle machine (the D-051 figure was taken on a loaded machine).
+- Repo size: git history is about 90 MB (replay feed 32 MB plus three demo snapshot generations). Avoid further
+  snapshot refreshes; trimming history needs Arnav's explicit OK (it requires a force-push).
+- Phase 10 (GATE D): fill `docs/drafts/deck_content.md` and `docs/drafts/video_script.md` from metrics.json; Arnav
+  records the video and finalises the deck.

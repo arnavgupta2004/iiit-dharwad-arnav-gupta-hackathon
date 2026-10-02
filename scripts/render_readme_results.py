@@ -45,6 +45,25 @@ def build(m: dict) -> str:
             f"{r['majority_class_neutral']['accuracy']:.3f} |",
             "",
         ]
+    ft, sg = m.get("sentiment_finetune"), m.get("sentiment_gold")
+    if ft and sg:
+        n, t = sg["results"]["news_headlines"], sg["results"]["tweets"]
+        out += [
+            f"**Sentiment model in use: FinBERT fine-tuned on the tweet train split only** (D-043, D-048). In-domain test "
+            f"(same dataset as training): {ft['test_macro_f1']:.3f}. On live-feed text (Arnav's gold labels, rule "
+            "pre-registered before scoring):",
+            "",
+            "| Live-feed gold | n | FinBERT | Fine-tuned | Fine-tuned − FinBERT (95% CI) | VADER | LM |",
+            "|---|---|---|---|---|---|---|",
+            f"| News headlines | {n['n']} | {n['macro_f1']['finbert']:.3f} | {n['macro_f1']['finetuned']:.3f} | "
+            f"{n['diff_finetuned_minus_finbert']:+.3f} {n['diff_95ci']} | {n['macro_f1']['vader']:.3f} | {n['macro_f1']['lm']:.3f} |",
+            f"| Tweets | {t['n']} | {t['macro_f1']['finbert']:.3f} | {t['macro_f1']['finetuned']:.3f} | "
+            f"{t['diff_finetuned_minus_finbert']:+.3f} {t['diff_95ci']} | {t['macro_f1']['vader']:.3f} | {t['macro_f1']['lm']:.3f} |",
+            "",
+            "The in-domain gain does not transfer: on live text the two models are statistically indistinguishable "
+            "(point estimates favour FinBERT); the pre-registered rule therefore keeps the fine-tuned model.",
+            "",
+        ]
     e = m.get("events")
     if e:
         out += [
@@ -53,10 +72,34 @@ def build(m: dict) -> str:
             "| Evaluation set | Method | n | Macro-F1 |",
             "|---|---|---|---|",
         ]
+        g = e["results"].get("gold")
+        if g:
+            for sub in ("all", "news_headlines", "tweets"):
+                for meth, v in g[sub].items():
+                    if isinstance(v, dict) and "macro_f1" in v:
+                        out.append(
+                            f"| **gold: {sub.replace('_', ' ')}** | {meth} | {v['n']:,} | {v['macro_f1']:.3f} |"
+                        )
         for ds, res in e["results"].items():
+            if ds == "gold":
+                continue
             for meth, v in res.items():
-                out.append(f"| {ds} | {meth} | {v['n']:,} | {v['macro_f1']:.3f} |")
+                out.append(f"| reference: {ds} | {meth} | {v['n']:,} | {v['macro_f1']:.3f} |")
         out.append("")
+        if g:
+            out += [
+                f"On the gold set the trained classifier is not better than the keyword or zero-shot baselines (95% CI of "
+                f"primary − keyword {g['all']['primary_minus_keyword_95ci']}, primary − zero-shot "
+                f"{g['all']['primary_minus_zero_shot_95ci']}). GEOPOLITICAL is cross-border only (D-044).",
+                "",
+            ]
+    lk = m.get("entity_linking")
+    if lk and lk.get("precision") is not None:
+        out += [
+            f"**Entity linking:** precision {pct(lk['precision'])} on {lk['n_marked']} hand-checked headline links "
+            f"(95% Wilson CI {pct(lk['precision_95ci_wilson'][0])}–{pct(lk['precision_95ci_wilson'][1])}).",
+            "",
+        ]
     a = m.get("moduleA")
     if a:
         ic, cal, w = a["headline_information_coefficient"], a["calibration"], a["evaluation_window"]
@@ -71,14 +114,20 @@ def build(m: dict) -> str:
             "",
             "Returns (secondary; net of 5 bps costs; a sentiment-tilt demonstration, not an alpha claim):",
             "",
-            "| Strategy | Cumulative return | Sharpe (rf = 0) | Max drawdown | Avg daily turnover |",
-            "|---|---|---|---|---|",
+            "| Strategy | Gross return | Cost drag | Net return | Sharpe (rf = 0) | Max drawdown | Avg daily turnover |",
+            "|---|---|---|---|---|---|---|",
         ]
         for k, v in a["performance_secondary"].items():
             out.append(
-                f"| {k.replace('_', ' ')} | {pct(v['cumulative_return'])} | {v['sharpe_rf0']} | "
+                f"| {k.replace('_', ' ')} | {pct(v.get('cumulative_return_gross', float('nan')))} | "
+                f"{pct(v['total_cost_drag'], 2)} | {pct(v['cumulative_return'])} | {v['sharpe_rf0']} | "
                 f"{pct(v['max_drawdown'])} | {pct(v['avg_daily_one_way_turnover'], 2)} |"
             )
+        out.append("")
+        out.append(
+            f"Turnover cap {pct(a['config']['tau_max'], 0)} one-way per day, set by policy for operational realism "
+            "(D-045), not optimised on returns."
+        )
         out.append("")
     b = m.get("moduleB_triggers")
     if b:
@@ -114,11 +163,11 @@ def build(m: dict) -> str:
         car, vol = t["abs_car01"], t["abn_volume"]
         rows = [
             ("Impact v2 (learned on Benzinga ≤ 2018)", "impact_v2"),
-            ("Impact v1 (live, spec formula)", "impact_v1"),
+            ("Impact v1 (spec formula; live for market-wide items)", "impact_v1"),
             ("abs(sentiment) only (baseline)", "abs_sent"),
         ]
         out += [
-            f"**Impact score vs realised market reaction** (untouched 2021-22 test set: ticker-days after the burn-in, "
+            f"**Impact score vs realised market reaction** (2021-22 test set, every look at it listed in D-050: ticker-days after the burn-in, "
             f"n = {car['n']:,}; market-model abnormal returns, CAR[0,+1])",
             "",
             "| Score | Spearman vs abs(CAR) | Top-decile hit rate (10% by chance) | Spearman vs abnormal volume |",
@@ -132,8 +181,21 @@ def build(m: dict) -> str:
         out += [
             "",
             f"95% bootstrap CI of the Spearman difference: v2 − v1 {car['rho_diff_v2_minus_v1_95ci']}, "
-            f"v2 − abs(sentiment) {car['rho_diff_v2_minus_abs_sent_95ci']}. Pre-registered rule: {v2['adoption_rule']}. "
-            f"Adopted: {'yes' if v2['adopted'] else 'no'}; the live engine keeps v1 and this comparison is reported as is.",
+            f"v2 − abs(sentiment) {car['rho_diff_v2_minus_abs_sent_95ci']}. **Impact v2 is on par with abs(sentiment) for "
+            "predicting the market reaction and adds explainable drivers; it clearly beats the hand-set v1.** It scores "
+            "company mentions live; market-wide items keep v1. Adoption: the stricter rule written before the first test "
+            f"(beat both v1 and abs(sentiment)) was {'met' if v2.get('pre_registered_rule_met') else 'not met'}; the rule "
+            'was revised after that test to the spec\'s "beats v1" on validation and test (D-039), which '
+            f"{'is met' if v2.get('adopted') else 'is not met'}.",
+            "",
+        ]
+    mc = m.get("impact_market_check")
+    if mc:
+        out += [
+            f"**Market-wide impact (v1), descriptive check (D-042):** over {mc['n_days']} sessions the day's maximum "
+            f"market-wide impact has Spearman {mc['vs_abs_spy_return']['spearman_rho']:+.3f} with abs(SPY return) "
+            f"(CI {mc['vs_abs_spy_return']['ci95']}) and {mc['vs_abs_dvix']['spearman_rho']:+.3f} with abs(ΔVIX) "
+            f"(CI {mc['vs_abs_dvix']['ci95']}): no measurable relation.",
             "",
         ]
     elif imp:
