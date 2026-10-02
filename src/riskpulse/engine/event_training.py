@@ -79,10 +79,16 @@ def sample_per_group(df: pd.DataFrame, col: str, k: int, seed: int) -> pd.DataFr
     return pd.concat(parts) if parts else df.iloc[0:0]
 
 
-def load_gold_texts() -> set[str]:
-    """Texts in the gold labelling file (excluded from all training data)."""
-    path = data_path("gold", "to_label.csv")
-    return set(pd.read_csv(path)["text"]) if path.exists() else set()
+def load_gold_texts(include_gold1: bool = True) -> set[str]:
+    """Texts of the gold test files, excluded from all training data. Gold-2 (`to_label_2.csv`,
+    D-052) is always excluded. Gold-1 is excluded unless a round-2 candidate trains on it."""
+    files = ["to_label_2.csv", *(["to_label.csv"] if include_gold1 else [])]
+    out: set[str] = set()
+    for name in files:
+        path = data_path("gold", name)
+        if path.exists():
+            out |= set(pd.read_csv(path)["text"])
+    return out
 
 
 def keyword_labels(texts: pd.Series, cap: int, seed: int) -> pd.DataFrame:

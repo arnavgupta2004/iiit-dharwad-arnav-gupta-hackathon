@@ -47,7 +47,8 @@ Status legend: DONE · IN PROGRESS · NEXT · OPEN
 ## Next
 - Phase 9 hardening: DONE for the fresh-clone test (README install, `pytest -q`, `demo --fast`) and the idle benchmark
   (D-051). Baseline tagged `v1.0-baseline` (fallback submission).
-- Event classification round 2: plan proposed to Arnav; pre-registration in DECISIONS before gold-2 labelling.
+- Event classification round 2 (D-052): `data/gold/to_label_2.csv` generated and the protocol pre-registered. **Waiting on
+  Arnav's `labels_2.csv`.** Also waiting: the HF upload, then the empty-cache fresh-clone test.
 - Repo size: git history is about 90 MB (replay feed 32 MB plus three demo snapshot generations). Avoid further
   snapshot refreshes; trimming history needs Arnav's explicit OK (it requires a force-push).
 - Phase 10 (GATE D): fill `docs/drafts/deck_content.md` and `docs/drafts/video_script.md` from metrics.json; Arnav

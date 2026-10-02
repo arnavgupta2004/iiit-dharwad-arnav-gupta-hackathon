@@ -33,6 +33,14 @@ Fill the blank columns, save as `labels.csv` in this folder (same columns), and 
 Tips: label what the text *says*, not what you know happened later. A stock-price move with no stated cause is `OTHER`.
 Analyst rating changes are `OTHER` (there is no analyst class), unless the note is about a downgrade of *credit*.
 
+## Round 2: `to_label_2.csv` (the final event-classification test, D-052)
+200 new items (160 news, 40 tweets) from the same replay window. None are in gold-1 or near-duplicates of it, none
+come from the same story as a gold-1 item, and none were in the classifier's training data. Label them exactly as
+above (same columns, same class definitions, **GEOPOLITICAL cross-border only**), save as `labels_2.csv` in this
+folder, and tell me when it's done. Gold-1 (`labels.csv`) is now training/selection data. `labels_2.csv` is the test
+set: it is evaluated once and never trained on. Event class is the column that matters; please also fill sentiment
+and entity correctness (they're reported, not used for selection).
+
 ## Entity-linking precision check (`entity_check.csv`)
 100 random headline → ticker links from the news feed, 5 per ticker, excluding the texts above. For each row, fill
 `correct` with **y** if the headline is genuinely about that company (a subsidiary or its products count, e.g.

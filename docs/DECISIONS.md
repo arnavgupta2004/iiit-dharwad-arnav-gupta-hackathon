@@ -2,6 +2,47 @@
 
 Newest first within each date. Each entry: decision, rationale, and status (accepted, or proposed pending Arnav's OK at a gate).
 
+## 2026-10-02 (event classification round 2, approved by Arnav)
+
+### D-052 PRE-REGISTERED before gold-2 is labelled: round-2 protocol
+Recorded when `data/gold/to_label_2.csv` exists with blank labels and before any candidate is trained.
+1. **Gold-2 sampling** (`scripts/make_gold2.py`, seed 20261003). The pool is replay items of 25-280 characters with
+   unique text. It excludes: gold-1 doc ids and texts; near-duplicates of gold-1 (rapidfuzz token-set ratio >= 90);
+   items from the same story as a gold-1 item (MiniLM cosine >= 0.80); and any text in the classifier's training set.
+   192,906 items remain. Selection: 160 news + 40 tweets. First, at least 5 items per class *predicted by the keyword
+   baseline* and at least 5 per class *predicted by the deployed classifier* (all 10 classes reached 5 for both). The
+   rest are random within source x month strata, proportional to the pool. No two picks are near-duplicates or
+   same-story. Checked afterwards: max cosine to gold-1 0.797; max token-set ratio 83 (to gold-1) and 69 (within
+   gold-2). Predicted classes are kept out of the labelling file to avoid anchoring; they are in
+   `data/processed/gold2_sampling_meta.parquet` (gitignored).
+2. **Roles.** Gold-1 (`labels.csv`, 300) is training and selection data only. Gold-2 (`labels_2.csv`, 200) is the
+   final test, evaluated **once**, and is excluded from all training (`load_gold_texts`).
+3. **Candidates** (all must run on the full feed on CPU):
+   - **C1** - the current recipe (calibrated logistic regression on MiniLM embeddings) trained on the weak-label set
+     plus gold-1 training rows with sample weight 10 (fixed in advance).
+   - **C2** - the same data and weights, with features = MiniLM embedding concatenated with log(1 + keyword hits)
+     per class (10 extra columns), so the model learns when keywords are reliable.
+   - **C3** - C1, but when the keyword baseline hits exactly one non-OTHER class, that class is output.
+   - References scored in the same folds (not selectable): the current deployed model, the keyword baseline and
+     zero-shot (base). Not a candidate: `MoritzLaurer/deberta-v3-large-zeroshot-v2.0` (verified: MIT, 435M
+     parameters). Base zero-shot already takes ~1.2 s per item on CPU (~70 h for the 203k-item feed; large ~3x more).
+4. **Selection by cross-validation on gold-1 only.** StratifiedGroupKFold, 5 folds (stratified by label, grouped by
+   story id from the replay clustering), repeated 3 times (seeds 1, 2, 3). In each fold, candidates train on weak
+   labels + the 4 training folds and are scored on the held-out fold. Metric: macro-F1 over the 10 classes. Summary:
+   mean and standard error over the 15 folds. **Rule:** take the highest mean. If a simpler candidate is within one
+   SE of it, take the simpler (simplicity order C1, C3, C2). The chosen candidate must also have a higher CV mean
+   than the current deployed model; otherwise the current model stays. The final model is the chosen recipe trained
+   on weak labels + all of gold-1.
+5. **Gold-2 evaluation, once.** Chosen model, current model, keyword baseline, zero-shot base, and zero-shot large
+   (reference only). Macro-F1 overall, news and tweets; per-class F1; paired-bootstrap 95% CIs (2,000 resamples, seed
+   20261002) of the chosen model vs each other method. **The chosen model is deployed whatever gold-2 shows**;
+   gold-2 is reporting only. Gold-2 sentiment and entity labels are reported, not used for any decision.
+6. **Downstream, mechanical, once.** Re-predict feed event classes. Recompute the Benzinga class prior (v2 feature
+   T) with the new model and retrain v2 with the same split and parameters. Keep v2 for company signals only if the
+   validation CI of rho(v2) - rho(v1) is above 0, else v1 everywhere. Then re-score, re-run the impact evals,
+   triggers, Module B and the 2022 check, all logged in D-050 as another look at the 2021-22 data, plus one normal
+   snapshot refresh. Repo-size rule per Arnav: no single file over 50 MB; git history under ~150 MB.
+
 ## 2026-10-02 (final rerun, D-046): results
 
 ### D-051 Final rerun results (all from `reports/metrics.json`, `riskpulse eval all` run once)
