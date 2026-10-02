@@ -7,7 +7,8 @@ documents while its last document is within ``window_hours``; stories are retain
 Centroids are running means, re-normalised. Story ids: ``evt_`` + first 12 hex chars of the
 founding document id.
 
-Implementation: centroids, last-seen times and counts live in growable numpy arrays, and expiry
+Implementation (float64, numerically equivalent to the original loop version; regression-tested):
+centroids, last-seen times and counts live in growable numpy arrays, and expiry
 compaction runs at most once per ``compact_every`` of stream time, so each assignment is one
 matrix-vector product.
 """
@@ -49,14 +50,14 @@ class StoryClusterer:
     def _ensure(self, dim: int) -> None:
         if self._dim is None:
             self._dim = dim
-            self._c = np.zeros((256, dim), dtype=np.float32)
+            self._c = np.zeros((256, dim))
             self._last = np.zeros(256)
             self._n = np.zeros(256, dtype=int)
 
     def _append(self, event_id: str, emb: np.ndarray, t: float) -> None:
         if self._size == len(self._last):
             cap = 2 * len(self._last)
-            self._c = np.vstack([self._c, np.zeros((cap - len(self._c), self._dim), np.float32)])
+            self._c = np.vstack([self._c, np.zeros((cap - len(self._c), self._dim))])
             self._last = np.concatenate([self._last, np.zeros(cap - len(self._last))])
             self._n = np.concatenate([self._n, np.zeros(cap - len(self._n), dtype=int)])
         i = self._size
@@ -95,7 +96,7 @@ class StoryClusterer:
         if not self._size:
             return 1.0
         t = ts.timestamp()
-        sims = self._c[: self._size] @ embedding.astype(np.float32)
+        sims = self._c[: self._size] @ np.asarray(embedding, dtype=float)
         recent = t - self._last[: self._size] <= lookback_hours * 3600
         return float(max(0.0, 1.0 - sims[recent].max())) if recent.any() else 1.0
 
@@ -107,7 +108,7 @@ class StoryClusterer:
         Returns (event_id, similarity, is_new_story, novelty).
         """
         t = ts.timestamp()
-        emb = embedding.astype(np.float32)
+        emb = np.asarray(embedding, dtype=float)
         self._ensure(len(emb))
         self._compact(t)
         novelty = 1.0

@@ -1,3 +1,6 @@
+# VERBATIM SNAPSHOT of src/riskpulse/engine/impact.py at commit 74716fb^ (pre-optimisation), kept only as the
+# reference implementation for tests/test_stage2_regression.py. Do not edit.
+# ruff: noqa
 """Impact score (field 3), v1 heuristic (spec §5.5).
 
 raw = T * (w_S*S + w_V*V + w_B*B + w_N*N + w_C*C) * (f + (1 - f) * R)
@@ -11,12 +14,11 @@ bin edges fitted on the historical batch; every score carries per-driver contrib
 
 from __future__ import annotations
 
-import bisect
 import json
 import math
 from collections import defaultdict, deque
 from dataclasses import asdict, dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import numpy as np
@@ -99,53 +101,32 @@ def _sigmoid(x: float) -> float:
     return 1.0 / (1.0 + math.exp(-x))
 
 
-_EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
-_US = timedelta(microseconds=1)
-
-
-def _micros(ts: datetime) -> int:
-    """Exact integer microseconds since the epoch (no float rounding at bucket edges)."""
-    return (ts - _EPOCH) // _US
-
-
 class VelocityTracker:
-    """Per-entity mention velocity: z-score of the last-N-hours count vs trailing buckets.
-
-    recent   = mentions in (t - N h, t]
-    baseline = counts in the n = baseline_days / N consecutive N-hour buckets covering
-               [t - N h - baseline, t - N h] (relative to t; the last bucket includes its end).
-    Timestamps are kept per key as a sorted list of integer microseconds with a moving head; each
-    observation costs n + 2 binary searches instead of a scan of the whole baseline.
-    """
+    """Per-entity mention velocity: z-score of the last-N-hours count vs trailing buckets."""
 
     def __init__(self, cfg: dict | None = None) -> None:
         c = (cfg or load_config("impact"))["velocity"]
-        self.window = int(timedelta(hours=float(c["window_hours"])) // _US)
-        self.baseline = int(timedelta(days=float(c["baseline_days"])) // _US)
+        self.window = timedelta(hours=float(c["window_hours"]))
+        self.baseline = timedelta(days=float(c["baseline_days"]))
         self.scale = float(c["sigmoid_scale"])
         self.min_std = float(c["min_std"])
-        self.n_buckets = int(self.baseline // self.window)
-        self.times: dict[str, list[int]] = defaultdict(list)
-        self.head: dict[str, int] = defaultdict(int)
+        self.events: dict[str, deque[datetime]] = defaultdict(deque)
 
     def observe(self, entity: str, ts: datetime) -> tuple[float, float]:
         """Record a mention and return (V in (0,1), z). Times must be non-decreasing."""
-        t = _micros(ts)
-        q = self.times[entity]
-        q.append(t)
-        base_start = t - self.baseline - self.window
-        h = bisect.bisect_left(q, base_start, lo=self.head[entity])
-        if h > 4096 and h > len(q) // 2:  # occasional compaction of expired timestamps
-            del q[:h]
-            h = 0
-        self.head[entity] = h
-        cut = t - self.window
-        recent = len(q) - bisect.bisect_right(q, cut, lo=h)
-        edges = [
-            bisect.bisect_left(q, base_start + k * self.window, lo=h) for k in range(self.n_buckets)
-        ]
-        end = bisect.bisect_right(q, cut, lo=h)
-        counts = np.diff(np.array([*edges, end], dtype=float))
+        q = self.events[entity]
+        q.append(ts)
+        horizon = ts - self.baseline - self.window
+        while q and q[0] < horizon:
+            q.popleft()
+        recent = sum(1 for t in q if t > ts - self.window)
+        n_buckets = int(self.baseline / self.window)
+        counts = np.zeros(n_buckets)
+        base_start = ts - self.window - self.baseline
+        for t in q:
+            if base_start <= t <= ts - self.window:
+                k = int((t - base_start) / self.window)
+                counts[min(k, n_buckets - 1)] += 1
         z = (recent - counts.mean()) / max(counts.std(), self.min_std)
         return _sigmoid(z / self.scale), float(z)
 

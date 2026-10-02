@@ -22,6 +22,18 @@ corporate average cumulative default rates, 1981-2024"**, column Y1:
 Caution recorded during verification: page 56 also starts **Table 25 (U.S. region)**, whose AAA/AA/A rows read
 0.00/0.03/0.06. Those are *not* used. Only these seven values are stored; no table is copied into the repository.
 
+### D-032 Stage-2 optimisation verified against the original code (Arnav's item 3)
+The optimised velocity tracker and clusterer were rewritten to reproduce the original semantics exactly (velocity
+baseline buckets relative to each mention's time, integer-microsecond timestamps, float64 clustering), after a first
+optimisation had silently changed the baseline to aligned buckets. Verification:
+- `tests/test_stage2_regression.py` (committed): the verbatim pre-optimisation code (`tests/legacy/`, from commit
+  74716fb^) and the current code process the same 1,000 synthetic stage-1 documents. Story ids, impact scores, impact
+  raws, all drivers (to 1e-9) and the emitted event signals are identical.
+- `scripts/check_stage2_equivalence.py` on real cached stage-1 output (stage 1 not re-run), two 1,000-document slices
+  (first docs; from 2022-02-24 03:00 UTC): story ids, impact scores and event signals (137 and 196) identical. In each
+  slice exactly one mention differs, by one unit in the 4th stored decimal of its novelty driver (a rounding flip from
+  a ~1e-16 difference in a cosine sum), changing raw impact by 1e-6 and its 1-10 score not at all.
+
 ## 2026-10-02 (Phases 3-7)
 
 ### D-030 Provisional event-classification results and how to read them

@@ -47,3 +47,11 @@ checkpoints/
 data/processed/gdelt_gkg_pilot/
 data/processed/gdelt_gkg/
 data/processed/cache/
+
+# Batch outputs (regenerable; a compact copy for demo --fast lives in data/demo/)
+data/processed/mentions.parquet
+data/processed/event_training_set.parquet
+data/processed/moduleA/
+data/processed/moduleB/
+data/processed/models/
+data/signals/signals.jsonl
