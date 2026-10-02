@@ -1374,8 +1374,8 @@
     "note": "Sentiment-tilt demonstration on a 1-year window; not an alpha claim. rf = 0.",
     "_provenance": {
       "script": "riskpulse backtest",
-      "generated_at": "2026-10-02T04:00:48+00:00",
-      "git_commit": "be5efae"
+      "generated_at": "2026-10-02T04:08:39+00:00",
+      "git_commit": "b73ebf4"
     }
   },
   "moduleB_triggers": {
@@ -11138,6 +11138,27 @@
       "script": "riskpulse eval impact",
       "generated_at": "2026-10-02T04:07:38+00:00",
       "git_commit": "97f1b1e"
+    }
+  },
+  "pipeline": {
+    "device": "cpu",
+    "torch_threads": 9,
+    "cpu": "arm",
+    "n_cpu": 10,
+    "batch_docs": 1024,
+    "batch_docs_per_sec": 150.1,
+    "stage1_models_share_of_time": 0.992,
+    "single_doc_latency_ms_p50": 18.5,
+    "single_doc_latency_ms_p95": 20.7,
+    "dedup_rate_news": 0.3897,
+    "dedup_rate_social": 0.053,
+    "feed_docs": 203363,
+    "sample": "replay feed 2022-02-22..2022-03-01 (first docs)",
+    "batch_size": 32,
+    "_provenance": {
+      "script": "riskpulse eval pipeline",
+      "generated_at": "2026-10-02T04:14:04+00:00",
+      "git_commit": "4f81b50"
     }
   }
 }

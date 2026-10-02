@@ -1,44 +1,37 @@
 # Progress
 
-Status legend: DONE · IN PROGRESS · NEXT · BLOCKED · OPEN
+Status legend: DONE · IN PROGRESS · NEXT · OPEN
 
-## Phase 0: Setup (DONE; GATE A approved 2026-10-01)
-Scaffold, configs, CLI, docs, verification of every [VERIFY] item (data/SOURCES.md, DECISIONS D-001..D-016).
+## Phases 0-7 (P0): DONE, at GATE C
+- **Phase 0:** scaffold, configs, CLI, verification (GATE A approved 2026-10-01).
+- **Phase 1:** GDELT GKG stream (6,680 files), tweets (original-ticker rule, D-033), replay feed of 203,363 docs, entity
+  linker; GATE B files delivered: `data/gold/to_label.csv`, `data/gold/entity_check.csv`.
+- **Phase 2:** FinBERT doc/entity sentiment vs VADER and LM (`metrics.json → sentiment`).
+- **Phase 3:** event classifiers + story clustering (provisional metrics until the gold labels arrive).
+- **Phase 4:** impact v1 (severity scale per population, D-035), aggregation (hourly entity signals, D-034), JSONL +
+  DuckDB, FastAPI REST/SSE/`/analyze`/`/inject`; optimised stage 2 proven equal to the original code (D-032).
+- **Phase 5:** Module A rebalancer + backtest + IC + robustness grid (`metrics.json → moduleA`).
+- **Phase 6:** Module B synthetic book, CRE20 capital, pre-2021 analogue calibration, trigger replay
+  (`metrics.json → moduleB_triggers`).
+- **Phase 7:** four-page dashboard, `demo` and `demo --fast` (fresh-clone snapshot in `data/demo/`, 27 MB); every page
+  render-tested on batch and snapshot outputs; pipeline benchmark (`metrics.json → pipeline`).
+- **Impact evaluation (pre-GATE C item 5):** v1 vs |sentiment| against |CAR[0,+1]| (`metrics.json → impact`, D-036).
 
-## Phase 1: Ingestion and entity linking (DONE; GATE B file delivered)
-- DONE: rule-based entity linker with ambiguity rules, MKT routing and region tags (tests)
-- DONE: GDELT GKG pilot passed (D-017); full-year stream of 6,680 files (0 failures), in-memory only
-- DONE: tweets adapter with cashtag-list and text-link filters; PG/MSFT copy defect found (D-018/D-019)
-- DONE: Benzinga, GDELT DOC (live), NewsAPI (optional) adapters; normalisation; exact + near dedupe
-- DONE: replay feed of 203,363 documents (data/replay/feed.jsonl.gz, reports/feed_stats.json)
-- DONE: price cache for 46 symbols (data/prices/daily.parquet)
-- DONE: **GATE B**: `data/gold/to_label.csv` (300 stratified items) + `data/gold/README.md` instructions
+## Waiting on Arnav
+- Gold labels: `data/gold/to_label.csv` → `labels.csv` (final event-class evaluation, sentiment spot check).
+- Entity check: mark `data/gold/entity_check.csv` → `riskpulse eval linking`.
+- GATE C decisions: trigger values (D-035) and the next P1 order.
 
-## Phase 2: Sentiment (DONE)
-FinBERT doc- and entity-level (clause split), VADER and LM baselines; evaluation on the HF valid split with bands
-tuned on train only (reports/metrics.json → sentiment).
+## P1 order (after GATE C)
+1. Impact v2: Benzinga event study (train <= 2018, validate 2019 - mid-2020; 2021-22 out of domain); replaces v1 only
+   if it beats v1 and |sentiment| on held-out data.
+2. Predicted-vs-realised validation of the 2022 episodes (invasion, June FOMC) on the Module B page and in metrics.
+3. Fine-tune a small sentiment model on the HF tweet-sentiment TRAIN split only; 45-minute CPU budget; keep only if it
+   beats FinBERT's 0.661 macro-F1 on the same held-out split (Arnav's item 6).
+4. ΔEL and CET1 refinements (rating migration is P2).
+5. Module A: IC and robustness grid already reported; add the dashboard narrative.
+6. Module B trigger validation against VIX spikes / SPY drawdown days (precision).
+7. Final gold-set evaluation of event classification and entity-linking precision.
 
-## Phase 3: Event classification and clustering (DONE, provisional evaluation)
-Keyword baseline, zero-shot NLI, calibrated embedding LR (primary); online story clustering. Provisional metrics
-on the HF topic valid split and a weak holdout; the final gold-set evaluation waits for Arnav's labels.
-Gold texts are excluded from training (assertion; fix c706dcf).
-
-## Phase 4: Impact v1, aggregation, store, API (DONE)
-Impact v1 with velocity/breadth/novelty and burn-in quantile bins; entity and event aggregation; JSONL + DuckDB
-store; FastAPI with /signals, /events, /entities, /stream (SSE), /analyze, /inject; SignalSubscriber (SSE / store).
-
-## Phase 5: Module A (DONE: code; IN PROGRESS: run on batch outputs)
-Rebalancer, daily backtest (look-ahead tested), benchmarks, IC, robustness grid, dashboard page.
-
-## Phase 6: Module B (DONE: code; IN PROGRESS: trigger replay on batch outputs)
-Book of 121 synthetic obligors and 334 positions seeded from merchant data; CRE20 risk weights (D-024); S&P PDs
-and FRED-derived spreads (data/market); pre-2021 analogue calibration; valuation with sign tests; CET1; trigger.
-
-## Phase 7: Dashboard and demo (IN PROGRESS)
-Four pages written; `demo` and `demo --fast` commands; demo snapshot script. Running the batch, then smoke-testing
-the pages, then GATE C.
-
-## Open items
-- Gold labels from Arnav → final event-class evaluation (and entity-linking precision, sentiment spot check)
-- P1 (after GATE C): impact v2 event study; predicted-vs-realised validation of 2022 episodes; trigger validation;
-  pipeline benchmark
+## Then
+Phase 9 hardening (fresh-clone test in a new venv, README), Phase 10 deck and video script (GATE D).

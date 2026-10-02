@@ -134,7 +134,44 @@ All figures below are generated from `reports/metrics.json` by `scripts/render_r
 | hf_topic_valid_subsample | keyword_baseline | 595 | 0.485 |
 | hf_topic_valid_subsample | primary_embed_lr | 595 | 0.814 |
 
-**Impact score validation:** TBD (event study, P1).
+**Module A** (daily backtest 2021-09-30 to 2022-09-29, net of 5 bps costs; a sentiment-tilt demonstration, not an alpha claim)
+
+| Strategy | Cumulative return | Sharpe (rf = 0) | Max drawdown | Avg daily turnover |
+|---|---|---|---|---|
+| sentiment tilt | -17.5% | -0.642 | -27.2% | 4.22% |
+| equal weight buy hold | -15.8% | -0.616 | -25.3% | 0.00% |
+| equal weight rebalanced | -17.6% | -0.642 | -27.0% | 0.65% |
+| naive sign rule | -15.4% | -0.539 | -27.5% | 20.45% |
+
+Information coefficient (daily Spearman, s_t vs r_t+1): mean 0.0407, t-stat 2.77, hit rate 0.5657 over 251 days.
+
+**Module B** (replay 2021-09 to 2022-09): 6,828 high-impact candidates, 1110 triggers fired, 694 stress runs.
+
+| Trigger time (UTC) | Scenario | Impact | Sources | Total impact | CET1 after |
+|---|---|---|---|---|---|
+| 2021-09-30T03:00 | GEOPOLITICAL:default | 8 | 2 | -0.10% | 12.98% |
+| 2021-09-30T16:00 | MACROECONOMIC:default | 8 | 5 | -1.19% | 11.83% |
+| 2021-09-30T17:00 | GEOPOLITICAL:default | 8 | 2 | -0.10% | 12.98% |
+| 2021-10-01T05:00 | GEOPOLITICAL:default | 8 | 4 | -0.10% | 12.98% |
+| 2021-10-01T17:00 | MACROECONOMIC:default | 8 | 2 | -1.19% | 11.83% |
+| 2021-10-02T06:00 | GEOPOLITICAL:default | 8 | 14 | -0.10% | 12.98% |
+| 2021-10-04T14:00 | GEOPOLITICAL:default | 8 | 4 | -0.10% | 12.98% |
+| 2021-10-04T17:00 | OPERATIONAL_ESG:default | 8 | 2 | -3.77% | 9.50% |
+| 2021-10-05T01:00 | OPERATIONAL_ESG:default | 8 | 2 | -3.77% | 9.50% |
+| 2021-10-05T04:00 | OPERATIONAL_ESG:default | 8 | 2 | -3.77% | 9.50% |
+| 2021-10-05T16:00 | CREDIT_EVENT:default | 9 | 2 | -1.49% | 11.82% |
+| 2021-10-05T17:00 | OPERATIONAL_ESG:default | 9 | 5 | -4.95% | 8.27% |
+
+**Pipeline** (cpu, 10 cores): 150.1 docs/s batch; single-document latency p50 18.5 ms, p95 20.7 ms; dedup removed 39.0% of news and 5.3% of social items.
+
+**Impact score vs realised market reaction** (ticker-days after the burn-in, n = 3,538; market-model abnormal returns, CAR[0,+1])
+
+| Score | Spearman vs abs(CAR) | Top-decile hit rate (10% by chance) | Spearman vs abnormal volume |
+|---|---|---|---|
+| Impact v1 | 0.046 | 13.8% | 0.080 |
+| abs(sentiment) only (baseline) | 0.104 | 25.7% | 0.107 |
+
+Impact v1 is weaker than the sentiment-only baseline (95% CI of the Spearman difference [-0.0858, -0.0282]); impact v2, calibrated on the event study: TBD (Benzinga event study, time split train <= 2018 / validate 2019-2020).
 <!-- RESULTS:END -->
 
 **Domain impact.** For a credit or risk desk the platform shortens the path from headline to portfolio consequence:

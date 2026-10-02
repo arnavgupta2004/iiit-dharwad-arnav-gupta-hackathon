@@ -88,7 +88,9 @@ set (our own GDELT/tweet items) is the fair final test.
 ### D-025 Batch inference device
 The project runs on CPU (default). The one-off precompute over 203,363 documents ran at about 18 docs/s on a shared
 CPU, so `RISKPULSE_DEVICE=mps` (opt-in) was used for that batch only. On 512 tweets the MPS and CPU outputs agree to
-max |Δp| 5e-6, with 100% argmax agreement. No result depends on the accelerator; reviewers run on CPU.
+max |Δp| 5e-6, with 100% argmax agreement. No result depends on the accelerator; reviewers run on CPU. Note added after the pipeline benchmark: on an idle CPU the
+batch rate is 150 docs/s (`reports/metrics.json → pipeline`); the 18 docs/s seen earlier was CPU contention with a
+concurrent zero-shot job, not a CPU limit.
 
 ### D-026 Credit inputs for the synthetic book (data/market)
 - Spreads by rating: BBB anchored at 185 bp on 2021-09-30 (FRED `DBAA` − `DGS10`), other ratings scaled by the median

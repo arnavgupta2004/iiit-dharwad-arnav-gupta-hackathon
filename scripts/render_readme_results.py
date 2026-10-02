@@ -94,10 +94,23 @@ def build(m: dict) -> str:
             "",
         ]
     imp = m.get("impact")
-    out.append(
-        "**Impact score validation:** "
-        + ("see reports/metrics.json → impact." if imp else "TBD (event study, P1).")
-    )
+    if imp:
+        x = imp["replay_window_post_burn_in"]
+        car, vol = x["abs_car01"], x["abn_volume"]
+        v1, bs = car["impact_v1"], car["abs_sent"]
+        out += [
+            f"**Impact score vs realised market reaction** (ticker-days after the burn-in, n = {x['n_ticker_days']:,}; market-model abnormal returns, CAR[0,+1])",
+            "",
+            "| Score | Spearman vs abs(CAR) | Top-decile hit rate (10% by chance) | Spearman vs abnormal volume |",
+            "|---|---|---|---|",
+            f"| Impact v1 | {v1['spearman_rho']:.3f} | {pct(v1['top_decile_hit_rate'])} | {vol['impact_v1']['spearman_rho']:.3f} |",
+            f"| abs(sentiment) only (baseline) | {bs['spearman_rho']:.3f} | {pct(bs['top_decile_hit_rate'])} | {vol['abs_sent']['spearman_rho']:.3f} |",
+            "",
+            f"Impact v1 is weaker than the sentiment-only baseline (95% CI of the Spearman difference {car['rho_diff_v1_minus_abs_sent_95ci']}); "
+            f"impact v2, calibrated on the event study: {imp['v2_status']}.",
+        ]
+    else:
+        out.append("**Impact score validation:** TBD (event study, P1).")
     return "\n".join(out)
 
 
