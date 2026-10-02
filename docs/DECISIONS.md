@@ -2,6 +2,29 @@
 
 Newest first within each date. Each entry: decision, rationale, and status (accepted, or proposed pending Arnav's OK at a gate).
 
+## 2026-10-02 (GATE C decisions by Arnav)
+
+### D-039 Impact v2 trained, evaluated once, **not adopted** (Arnav's GATE C item 2)
+`reports/metrics.json → impact_v2`, `reports/figures/impact_v2_deciles.png`, `riskpulse eval impact_v2`.
+LightGBM on the impact drivers plus |sentiment| (S) and log mention count, monotone-increasing constraints, target =
+within-day rank of |CAR[0,+1]|. Trained on Benzinga ticker-days up to 2018-12-31 (124,436), validation 2019-01-01 →
+2020-07-31 (29,079) used only for early stopping (best iteration 546). 216 tickers have prices; 84 were dropped.
+Adoption rule fixed before the test: adopt only if the 95% paired-bootstrap CIs of ρ(v2)−ρ(|s|) and ρ(v2)−ρ(v1) are
+both above zero on the untouched 2021-22 test set (post-burn-in ticker-days, n = 3,538).
+
+| |CAR[0,+1]|, test | Spearman ρ | top-decile hit rate |
+|---|---|---|
+| impact v2 | 0.108 | 24.0% |
+| impact v1 | 0.046 | 13.8% |
+| abs(sentiment) | 0.104 | 25.7% |
+
+ρ(v2)−ρ(v1) CI [0.035, 0.089] (v2 beats v1). ρ(v2)−ρ(|s|) CI [−0.020, 0.030] (includes zero). On validation v2 was
+already slightly below |s| (CI [−0.023, −0.002]). **Outcome: not adopted. Per Arnav's rule, reported and stopped, with no
+iteration on the test set.** The live engine keeps v1 (the spec's interpretable formula) and reports the comparison
+openly. Gain importance is dominated by mention count and velocity; B, C and R have zero gain because they are
+constant in single-publisher Benzinga. Limitations: survivorship (delisted tickers excluded), single-publisher
+training data, and domain shift from Benzinga headlines to GDELT/tweets.
+
 ## 2026-10-02 (pre-GATE C review by Arnav)
 
 ### D-031 PD provenance, value by value

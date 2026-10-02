@@ -11160,5 +11160,289 @@
       "generated_at": "2026-10-02T04:14:04+00:00",
       "git_commit": "4f81b50"
     }
+  },
+  "impact_v2": {
+    "protocol": "Benzinga train <= 2018, valid 2019-2020-07 (early stopping only); test once on the 2021-22 replay ticker-days used for v1",
+    "adoption_rule": "adopt v2 only if 95% CIs of rho(v2)-rho(|s|) and rho(v2)-rho(v1) are both > 0",
+    "adopted": false,
+    "benzinga": {
+      "tickers": 216,
+      "tickers_dropped_no_prices": 84,
+      "train_ticker_days": 124436,
+      "valid_ticker_days": 29079,
+      "best_iteration": 546,
+      "feature_importance_gain": {
+        "S": 399.7,
+        "T": 137.5,
+        "V": 1740.6,
+        "B": 0.0,
+        "N": 158.0,
+        "C": 0.0,
+        "R": 0.0,
+        "log_n": 3881.1
+      },
+      "validation_abs_car01": {
+        "n": 29079,
+        "impact_v2": {
+          "spearman_rho": 0.1786,
+          "p_value": 4.6e-207,
+          "top_decile_hit_rate": 0.2459,
+          "decile_means": [
+            0.01906,
+            0.022104,
+            0.021285,
+            0.022624,
+            0.025254,
+            0.026329,
+            0.025855,
+            0.028448,
+            0.031404,
+            0.049393
+          ]
+        },
+        "impact_v1": {
+          "spearman_rho": 0.0463,
+          "p_value": 2.93e-15,
+          "top_decile_hit_rate": 0.1293,
+          "decile_means": [
+            0.020761,
+            0.023232,
+            0.029893,
+            0.029693,
+            0.027683,
+            0.027324,
+            0.022542,
+            0.027305,
+            0.031308,
+            0.032016
+          ]
+        },
+        "abs_sent": {
+          "spearman_rho": 0.1906,
+          "p_value": 5.86e-236,
+          "top_decile_hit_rate": 0.1891,
+          "decile_means": [
+            0.019146,
+            0.023317,
+            0.02235,
+            0.02006,
+            0.021271,
+            0.024779,
+            0.032908,
+            0.034569,
+            0.032398,
+            0.040957
+          ]
+        },
+        "rho_diff_v2_minus_abs_sent_95ci": [
+          -0.0225,
+          -0.0021
+        ],
+        "rho_diff_v2_minus_v1_95ci": [
+          0.1214,
+          0.1437
+        ]
+      }
+    },
+    "test_post_burn_in": {
+      "abs_car01": {
+        "n": 3538,
+        "impact_v2": {
+          "spearman_rho": 0.1083,
+          "p_value": 1.07e-10,
+          "top_decile_hit_rate": 0.2401,
+          "decile_means": [
+            0.015564,
+            0.016442,
+            0.016033,
+            0.017171,
+            0.016679,
+            0.015193,
+            0.018233,
+            0.019951,
+            0.021069,
+            0.03126
+          ]
+        },
+        "impact_v1": {
+          "spearman_rho": 0.0459,
+          "p_value": 0.00634,
+          "top_decile_hit_rate": 0.1384,
+          "decile_means": [
+            0.016687,
+            0.016021,
+            0.016852,
+            0.019083,
+            0.015696,
+            0.018215,
+            0.021108,
+            0.020496,
+            0.021048,
+            0.022401
+          ]
+        },
+        "abs_sent": {
+          "spearman_rho": 0.1042,
+          "p_value": 5.22e-10,
+          "top_decile_hit_rate": 0.2571,
+          "decile_means": [
+            0.014308,
+            0.016586,
+            0.016328,
+            0.017374,
+            0.018612,
+            0.018,
+            0.018196,
+            0.017495,
+            0.019423,
+            0.031273
+          ]
+        },
+        "rho_diff_v2_minus_abs_sent_95ci": [
+          -0.0197,
+          0.0303
+        ],
+        "rho_diff_v2_minus_v1_95ci": [
+          0.0348,
+          0.0894
+        ]
+      },
+      "abn_volume": {
+        "n": 3538,
+        "impact_v2": {
+          "spearman_rho": 0.0963,
+          "p_value": 9.66e-09,
+          "top_decile_hit_rate": 0.2599,
+          "decile_means": [
+            -0.059347,
+            -0.089882,
+            -0.061525,
+            -0.087174,
+            -0.051555,
+            -0.108298,
+            -0.072991,
+            -0.023477,
+            -0.011974,
+            0.178255
+          ]
+        },
+        "impact_v1": {
+          "spearman_rho": 0.0797,
+          "p_value": 2.04e-06,
+          "top_decile_hit_rate": 0.1412,
+          "decile_means": [
+            -0.053021,
+            -0.085491,
+            -0.09226,
+            -0.069836,
+            -0.085648,
+            -0.031795,
+            0.00097,
+            -0.020915,
+            0.008289,
+            0.041996
+          ]
+        },
+        "abs_sent": {
+          "spearman_rho": 0.1066,
+          "p_value": 2.06e-10,
+          "top_decile_hit_rate": 0.2373,
+          "decile_means": [
+            -0.083611,
+            -0.072093,
+            -0.072282,
+            -0.080056,
+            -0.104052,
+            -0.045992,
+            -0.043158,
+            -0.047444,
+            -0.018544,
+            0.17937
+          ]
+        },
+        "rho_diff_v2_minus_abs_sent_95ci": [
+          -0.0349,
+          0.0138
+        ],
+        "rho_diff_v2_minus_v1_95ci": [
+          -0.0126,
+          0.0475
+        ]
+      }
+    },
+    "test_full_window": {
+      "abs_car01": {
+        "n": 4755,
+        "impact_v2": {
+          "spearman_rho": 0.1101,
+          "p_value": 2.69e-14,
+          "top_decile_hit_rate": 0.2374,
+          "decile_means": [
+            0.015003,
+            0.015477,
+            0.01517,
+            0.016392,
+            0.015837,
+            0.015239,
+            0.01771,
+            0.019584,
+            0.020354,
+            0.029402
+          ]
+        },
+        "impact_v1": {
+          "spearman_rho": 0.054,
+          "p_value": 0.000194,
+          "top_decile_hit_rate": 0.145,
+          "decile_means": [
+            0.01565,
+            0.016019,
+            0.015881,
+            0.017595,
+            0.015047,
+            0.0177,
+            0.019668,
+            0.019366,
+            0.020928,
+            0.02233
+          ]
+        },
+        "abs_sent": {
+          "spearman_rho": 0.0982,
+          "p_value": 1.13e-11,
+          "top_decile_hit_rate": 0.2458,
+          "decile_means": [
+            0.013983,
+            0.016331,
+            0.015361,
+            0.016625,
+            0.016978,
+            0.017218,
+            0.017909,
+            0.0171,
+            0.019182,
+            0.029486
+          ]
+        },
+        "rho_diff_v2_minus_abs_sent_95ci": [
+          -0.0092,
+          0.0323
+        ],
+        "rho_diff_v2_minus_v1_95ci": [
+          0.0317,
+          0.0781
+        ]
+      }
+    },
+    "limitations": [
+      "survivorship: delisted Benzinga tickers have no yfinance prices and are excluded",
+      "Benzinga is single-publisher, so breadth is constant in training (no learned effect)",
+      "domain shift: Benzinga headlines (2009-2020) vs GDELT news + tweets (2021-22)"
+    ],
+    "_provenance": {
+      "script": "riskpulse eval impact_v2",
+      "generated_at": "2026-10-02T06:12:32+00:00",
+      "git_commit": "3209f73"
+    }
   }
 }
