@@ -49,3 +49,16 @@ def test_duckdb_store(tmp_path) -> None:
     path = write_duckdb([], [sig(1, "JPM", 9, EventClass.CREDIT_EVENT, 24)], tmp_path / "x.duckdb")
     with duckdb.connect(str(path), read_only=True) as con:
         assert con.execute("SELECT ticker, impact_score FROM signals").fetchall() == [("JPM", 9)]
+
+
+def test_gz_roundtrip_and_serving_fallback(tmp_path, monkeypatch) -> None:
+    import gzip
+
+    from riskpulse.store import signal_store as ss
+
+    gz = tmp_path / "s.jsonl.gz"
+    with gzip.open(gz, "wt", encoding="utf-8") as fh:
+        fh.write(sig(1, "JPM", 9, EventClass.CREDIT_EVENT, 24).model_dump_json() + "\n")
+    assert [s.signal_id for s in read_signals_jsonl(gz)] == ["sig_1"]
+    monkeypatch.setenv("RISKPULSE_FORCE_DEMO", "1")
+    assert ss.serving_signals_path().name == "signals.jsonl.gz"

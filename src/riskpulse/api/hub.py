@@ -24,10 +24,18 @@ class SignalHub:
     subscriber owns an asyncio.Queue fed via ``loop.call_soon_threadsafe``.
     """
 
-    def __init__(self, jsonl_path: Path | None = None, load_existing: bool = True) -> None:
+    def __init__(
+        self,
+        jsonl_path: Path | None = None,
+        load_existing: bool = True,
+        load_from: Path | None = None,
+    ) -> None:
+        """``jsonl_path``: where new signals are appended; ``load_from``: initial signals
+        (defaults to ``jsonl_path``; may be the gzipped demo snapshot)."""
         self._lock = threading.Lock()
         self.writer = JsonlSignalWriter(jsonl_path) if jsonl_path else None
-        self.signals: list[Signal] = read_signals_jsonl(jsonl_path) if load_existing else []
+        src = load_from or jsonl_path
+        self.signals: list[Signal] = read_signals_jsonl(src) if load_existing and src else []
         self._frame: pd.DataFrame | None = None
         self._subs: list[tuple[asyncio.AbstractEventLoop, asyncio.Queue]] = []
 

@@ -43,11 +43,29 @@ class JsonlSignalWriter:
 
 
 def read_signals_jsonl(path: Path | None = None) -> list[Signal]:
+    """Read signals from a .jsonl or .jsonl.gz file (empty list if missing)."""
+    import gzip
+
     path = path or default_paths()[0]
     if not path.exists():
         return []
-    with path.open(encoding="utf-8") as fh:
+    opener = gzip.open if path.suffix == ".gz" else open
+    with opener(path, "rt", encoding="utf-8") as fh:
         return [Signal.model_validate_json(line) for line in fh if line.strip()]
+
+
+def serving_signals_path() -> Path:
+    """Signals to serve: the batch output if present, else the committed demo snapshot.
+
+    ``RISKPULSE_FORCE_DEMO=1`` always uses the snapshot (fresh-clone behaviour).
+    """
+    import os
+
+    batch = default_paths()[0]
+    demo = repo_root() / "data" / "demo" / "signals.jsonl.gz"
+    if os.environ.get("RISKPULSE_FORCE_DEMO") == "1" or not batch.exists():
+        return demo
+    return batch
 
 
 def signals_frame(signals: list[Signal]) -> pd.DataFrame:
