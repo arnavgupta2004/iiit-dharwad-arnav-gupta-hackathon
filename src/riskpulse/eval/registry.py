@@ -16,9 +16,9 @@ def _sentiment() -> None:
 
 
 def _events() -> None:
-    from riskpulse.engine.event_training import train_and_evaluate
+    from riskpulse.engine.event_training import evaluate
 
-    train_and_evaluate()
+    evaluate()  # the saved model; training is `riskpulse train events`
 
 
 def _pipeline() -> None:
@@ -52,9 +52,9 @@ def _impact() -> None:
 
 
 def _impact_v2() -> None:
-    from riskpulse.eval.impact_v2 import run
+    from riskpulse.eval.impact_v2 import evaluate
 
-    run()
+    evaluate()  # the saved model; training is `riskpulse train impact_v2`
 
 
 def _pvr() -> None:

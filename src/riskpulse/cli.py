@@ -44,6 +44,11 @@ class EvalTarget(StrEnum):
     sentiment_gold = "sentiment_gold"
 
 
+class TrainTarget(StrEnum):
+    events = "events"
+    impact_v2 = "impact_v2"
+
+
 def _not_yet(what: str, phase: int) -> NoReturn:
     typer.secho(f"'{what}' is not implemented yet (planned for build phase {phase}).", fg="yellow")
     raise typer.Exit(code=2)
@@ -196,6 +201,21 @@ def demo(
     finally:
         for p in procs:
             p.terminate()
+
+
+@app.command()
+def train(target: TrainTarget = typer.Argument(...)) -> None:
+    """Train a model and save it (evaluation is separate: `riskpulse eval <target>`)."""
+    if target == TrainTarget.events:
+        from riskpulse.engine.event_training import train as train_events
+
+        clf = train_events()
+        typer.echo(f"event classifier saved ({clf.version})")
+    elif target == TrainTarget.impact_v2:
+        from riskpulse.eval.impact_v2 import train as train_v2
+
+        meta = train_v2()
+        typer.echo(f"impact v2 saved (best iteration {meta['best_iteration']})")
 
 
 @app.command(name="eval")

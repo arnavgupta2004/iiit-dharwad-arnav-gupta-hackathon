@@ -78,7 +78,8 @@ def _finbert_probs(scorer: FinBertScorer, texts: list[str], tag: str) -> tuple[n
 
 def run() -> dict:
     train, test = load_split("train"), load_split("valid")
-    fb = FinBertScorer()
+    # Base FinBERT baseline table (the fine-tuned model's one test score is `sentiment_finetune`).
+    fb = FinBertScorer(variant="finbert")
     p_train, _ = _finbert_probs(fb, train["text"].tolist(), "train")
     p_test, _ = _finbert_probs(fb, test["text"].tolist(), "valid")
     scores = {
