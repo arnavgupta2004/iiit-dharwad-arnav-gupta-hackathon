@@ -18,21 +18,18 @@ from riskpulse.common.schemas import Signal
 
 LIMIT_MB = 50
 DEMO = data_path("demo")
+# Only the columns the dashboard reads (repo-size budget): random-hash ids, outlets, drivers and
+# raw scores stay in the full batch output. event_id becomes a compact story number.
 MENTION_COLS = [
-    "doc_id",
     "source",
-    "outlet",
     "published_at",
     "title",
     "ticker",
-    "relevance",
     "sentiment",
     "event_class",
     "event_confidence",
     "event_id",
     "impact_score",
-    "impact_raw",
-    "regions",
 ]
 
 
@@ -40,7 +37,11 @@ def main() -> None:
     DEMO.mkdir(parents=True, exist_ok=True)
     m = pd.read_parquet(data_path("processed", "mentions.parquet"), columns=MENTION_COLS)
     m["title"] = m["title"].str.slice(0, 200)
-    m.to_parquet(DEMO / "mentions.parquet", index=False, compression="zstd")
+    m["event_id"] = pd.factorize(m["event_id"])[0].astype("int32")
+    m["sentiment"] = m["sentiment"].astype("float32")
+    m["event_confidence"] = m["event_confidence"].astype("float32")
+    m = m.sort_values("published_at", kind="stable")
+    m.to_parquet(DEMO / "mentions.parquet", index=False, compression="zstd", compression_level=19)
     # Signals: event signals with impact >= 6 (all stress candidates) and one entity snapshot per
     # ticker per day (the last of the day); evidence trimmed to 3 items.
     src = repo_root() / load_config("app")["paths"]["signals_jsonl"]
