@@ -60,3 +60,7 @@ def test_replay_triggers_runs_stress_once_per_cooldown(tmp_path, monkeypatch) ->
     assert r["scenario"].startswith("GEOPOLITICAL") and r["impact"] == 9
     assert r["cet1_after"] < 0.13
     assert summ["candidates_blocked_by"]["cooldown"] == 1
+    assert summ["candidates_blocked_by"]["too_few_sources"] == 1
+    assert summ["n_escalations"] == 1
+    assert summ["triggers_per_month"] == {"2022-02": 3}
+    assert summ["stress_runs_per_month"] == {"2022-02": 2}

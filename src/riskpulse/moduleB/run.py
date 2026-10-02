@@ -34,14 +34,18 @@ def replay_triggers(subscriber: SignalSubscriber | None = None, write: bool = Tr
     blocked: dict[str, int] = {}
     for d in trig.log:
         if not d.fired:
-            reason = d.reason.split(" ")[0] if "cooldown" not in d.reason else "cooldown"
+            reason = _blocked_reason(d.reason)
             blocked[reason] = blocked.get(reason, 0) + 1
+    fired = [d for d in trig.log if d.fired]
     summary = {
         "n_event_signals_seen": n_events,
         "n_high_impact_candidates": len(trig.log),
         "n_triggers_fired": sum(d.fired for d in trig.log),
         "n_stress_runs": len(runs),
         "candidates_blocked_by": blocked,
+        "n_escalations": sum(d.reason.startswith("escalation") for d in fired),
+        "triggers_per_month": _per_month(d.signal.as_of for d in fired),
+        "stress_runs_per_month": _per_month(r["trigger"]["as_of"] for r in runs),
         "runs": [
             {
                 "as_of": r["trigger"]["as_of"],
@@ -65,6 +69,24 @@ def replay_triggers(subscriber: SignalSubscriber | None = None, write: bool = Tr
                 fh.write(json.dumps(r, default=str) + "\n")
         update_metrics("moduleB_triggers", summary, script="riskpulse stress --replay")
     return summary
+
+
+def _blocked_reason(reason: str) -> str:
+    if "cooldown" in reason:
+        return "cooldown"
+    if reason.startswith("event confidence"):
+        return "low_event_confidence"
+    if reason.startswith("only"):
+        return "too_few_sources"
+    return reason.split(" ")[0]
+
+
+def _per_month(stamps) -> dict[str, int]:
+    out: dict[str, int] = {}
+    for t in stamps:
+        m = str(t)[:7]
+        out[m] = out.get(m, 0) + 1
+    return dict(sorted(out.items()))
 
 
 def run_named(event_class: str, impact: int, texts: list[str] | None = None, regions=None) -> dict:

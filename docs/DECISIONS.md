@@ -4,6 +4,24 @@ Newest first within each date. Each entry: decision, rationale, and status (acce
 
 ## 2026-10-02 (GATE C decisions by Arnav)
 
+### D-037 Stress trigger: macro-region cooldown, escalation, no breadth bonus (Arnav's GATE C item 1)
+Changes (Arnav's choice of options (c) and (d) from GATE C):
+- **Story breadth bonus removed** (`app.yaml → event_breadth_bonus: []`). Breadth already enters impact through B.
+- **Cooldown key = (event class, macro-region)**, 24 h. Engine region tags map to 5 macro-regions
+  (`moduleB.yaml → trigger.macro_regions`): US → Americas; EUROPE, UK, RUSSIA_UKRAINE → Europe; CHINA, JAPAN, INDIA →
+  Asia-Pacific; MIDDLE_EAST → Middle East & Africa. Events that span more than one macro-region, carry no region, or
+  carry only the cross-continent EM tag are keyed as Global (my implementation choice for the edge cases).
+- **Escalation:** within a cooldown a new event re-runs the stress test only if its impact is strictly higher than
+  the impact that fired it. An escalation resets the key's reference impact and cooldown clock.
+- min_sources stays at 2; min_impact 8 and event confidence 0.6 are unchanged.
+
+Replay result (`metrics.json → moduleB_triggers`): 4,279 high-impact candidates, **811 triggers fired** (60 of them
+escalations), **459 stress runs** (from 694; the rest are classes without a market-wide scenario, e.g. EARNINGS).
+Blocked: cooldown 2,111, low event confidence 1,196, a single source 161. Stress runs per month are 28-48 from Oct 2021
+on (monthly table in metrics.json). Still about 1.3 runs per day; class errors remain (e.g. US political news labelled
+GEOPOLITICAL). On 2022-06-15 (the FOMC hike) no MACROECONOMIC run fired; the nearest were the CPI-day runs on 06-10.
+**Nothing else is tuned on the 2022 window: it is the validation set.**
+
 ### D-039 Impact v2 trained, evaluated once, **not adopted** (Arnav's GATE C item 2)
 `reports/metrics.json → impact_v2`, `reports/figures/impact_v2_deciles.png`, `riskpulse eval impact_v2`.
 LightGBM on the impact drivers plus |sentiment| (S) and log mention count, monotone-increasing constraints, target =
