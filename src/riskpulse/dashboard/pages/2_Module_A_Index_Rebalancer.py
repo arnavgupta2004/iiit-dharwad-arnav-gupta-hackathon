@@ -88,6 +88,28 @@ for col, key in zip(k, names, strict=True):
         ),
         unsafe_allow_html=True,
     )
+st.dataframe(
+    pd.DataFrame(
+        [
+            {
+                "strategy": names[key],
+                "gross return": pct(perf[key]["cumulative_return_gross"])
+                if "cumulative_return_gross" in perf[key]
+                else "n/a",
+                "cost drag (sum of daily costs)": pct(perf[key]["total_cost_drag"], 2),
+                "net return": pct(perf[key]["cumulative_return"]),
+                "avg daily one-way turnover": pct(perf[key]["avg_daily_one_way_turnover"], 2),
+            }
+            for key in names
+        ]
+    ),
+    use_container_width=True,
+    hide_index=True,
+)
+st.caption(
+    f"Turnover cap: {met['config']['tau_max']:.0%} one-way per day, set by policy for "
+    f"operational realism (D-045), not optimised on returns; costs {met['config']['cost_bps']} bps."
+)
 
 # ---------- weights over time (stacked area) with event annotations ----------
 st.subheader("Weights over time")

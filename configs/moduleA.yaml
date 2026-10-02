@@ -13,7 +13,7 @@ constraints:
   max_iter: 50
 
 turnover:
-  tau_max: 0.20                 # lambda = min(1, tau_max / turnover)
+  tau_max: 0.05                 # lambda = min(1, tau_max / turnover); 5% one-way/day by policy (D-045)
   cost_bps: 5
 
 signal:

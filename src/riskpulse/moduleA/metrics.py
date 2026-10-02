@@ -20,8 +20,11 @@ def performance(res: BacktestResult) -> dict:
     r = res.returns
     vol = float(r.std(ddof=1) * np.sqrt(ANN))
     ann_ret = float((1 + r).prod() ** (ANN / len(r)) - 1)
+    # Costs are charged on the decision date and earned on the next return date (same position).
+    gross = r.to_numpy() + res.costs.to_numpy()
     return {
         "cumulative_return": round(float((1 + r).prod() - 1), 4),
+        "cumulative_return_gross": round(float(np.prod(1 + gross) - 1), 4),
         "annualised_return": round(ann_ret, 4),
         "annualised_vol": round(vol, 4),
         "sharpe_rf0": round(float(r.mean() / r.std(ddof=1) * np.sqrt(ANN)), 3)
