@@ -55,3 +55,6 @@ data/processed/moduleA/
 data/processed/moduleB/
 data/processed/models/
 data/signals/signals.jsonl
+
+# Round-2 gold sampling metadata holds model predictions; kept local to avoid anchoring (D-052).
+data/processed/gold2_sampling_meta.parquet

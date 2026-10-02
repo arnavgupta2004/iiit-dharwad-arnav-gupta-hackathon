@@ -95,13 +95,23 @@ python -m riskpulse eval all         # regenerates every metric in reports/
 pytest -q                            # tests
 ```
 
+**First live run downloads models.** `demo`, `serve --full` (and so the first `/analyze` call) need the fine-tuned
+sentiment model, which is fetched from the Hugging Face Hub ([`arnavguptas/riskpulse-finbert-tweets`](https://huggingface.co/arnavguptas/riskpulse-finbert-tweets)),
+plus a small sentence-embedding model. That's about 500 MB once, into the Hugging Face cache. Measured from a fresh
+clone with an empty cache: about 100 s to download and load the sentiment model, and the API ready about 45 s
+later. Models load at server start, so `/analyze` then answers in about 0.1 s. If the Hub is unreachable, the engine
+uses a locally rebuilt copy (`python scripts/build_finetuned_sentiment.py`, about 25 CPU minutes) or falls back to base
+FinBERT, and logs which one it used. Trained classifier and impact-v2 files are not in the repo: without them the
+engine logs a warning and uses the keyword event baseline and impact v1. `demo --fast` needs none of this.
+
 Rebuilding everything from raw sources (optional, about 2-3 hours, mostly downloads and model inference):
 
 ```bash
 python scripts/download_kaggle.py && python scripts/download_hf.py && python scripts/download_prices.py
 python -m riskpulse ingest --source gdelt_gkg      # streams GDELT files; stores only filtered rows
 python -m riskpulse ingest --source feed           # builds the replay feed
-python -m riskpulse eval events                    # trains the event classifier
+python -m riskpulse train events                   # trains the event classifier
+python -m riskpulse train impact_v2                # Benzinga event study -> impact v2 (scores headlines first)
 python -m riskpulse process                        # engine over the feed -> signals
 python -m riskpulse backtest                       # Module A
 python -m riskpulse stress --build-portfolio --replay   # Module B
