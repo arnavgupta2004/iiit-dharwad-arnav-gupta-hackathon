@@ -2,6 +2,66 @@
 
 Newest first within each date. Each entry: decision, rationale, and status (accepted, or proposed pending Arnav's OK at a gate).
 
+## 2026-10-02 (P1 review by Arnav). Decisions recorded now; applied together in one final rerun
+
+### D-041 PRE-REGISTERED before any gold label is scored: sentiment model choice on live-feed text
+Recorded before `data/gold/labels.csv` exists. The fine-tuned model scored macro-F1 0.844 on the HF test split
+(D-043), which is **in-domain text** (same dataset as its training data). The live feed is GDELT news headlines plus
+equinxx tweets, and only the gold spot check measures that.
+- **Items:** the 300 gold items with a `label_sentiment`, split by `source`: news headlines (`gdelt`, 237) and tweets
+  (`kaggle_tweets`, 63). The tweet subset is small, so its CIs will be wide; this is accepted in advance.
+- **Prediction, identical for both models:** the deployed rule. Entity-level score for the first ticker in
+  `linked_tickers` (clause-level `entity_sentiment`; doc-level for MKT), score = P(pos) − P(neg), label with the
+  configured ±0.15 band. Argmax labels are reported as a secondary view and play no part in the decision.
+- **Metric:** macro-F1 over {negative, neutral, positive}. Paired bootstrap of F1(fine-tuned) − F1(FinBERT), 2,000
+  resamples within each subset, seed 20261002, 95% percentile CI.
+- **Decision rule:** use the fine-tuned model everywhere, **unless** on news headlines the CI of the difference is
+  entirely below 0; then FinBERT for news and fine-tuned for tweets. Nothing else is decided from these labels.
+- **Reporting:** 0.844 is always shown next to the gold result, labelled "in-domain (HF test split)" vs "live-feed
+  text (gold)".
+
+### D-042 Pre-specified descriptive check of market-wide impact (v1), no tuning
+Market-wide (MKT) events keep impact v1 (v2 has no market-wide training target). Check, reported only:
+over trading days after the burn-in (from 2022-01-03), take the maximum impact of market-wide event signals assigned
+to each session (16:00 ET cutoff, as in Module A; after-close events count for the next session). Spearman of that
+maximum against |SPY close-to-close return| and against |ΔVIX| (close-to-close, points) on the same session, using
+days with at least one market-wide event. 95% bootstrap CI (2,000 resamples). Written to
+`metrics.json → impact_market_check`. No parameter is changed from the result.
+
+### D-043 Fine-tuned sentiment model: adopted (Arnav's item 4); hosting and licence
+`metrics.json → sentiment_finetune`: FinBERT fine-tuned on 90% of the HF tweet-sentiment train split (10% of train as
+dev for early stopping), 3 epochs, 23 CPU minutes. Test split touched once: **macro-F1 0.844** vs the 0.661 bar (FinBERT
+argmax 0.668). Leakage check after the run: 52 of 2,388 test texts (2.2%) share a 60-character prefix with a train
+text (39 exact after URL normalisation). That bounds the effect at about 2 F1 points, so it can't explain the gain. Not
+re-scored without them, to avoid another look at the test split.
+Adopted under the rule; the live-feed check is D-041. Hosting: Hugging Face Hub under Arnav's account (he uploads).
+Pipeline order: Hub → local rebuild (`scripts/build_finetuned_sentiment.py`) → base FinBERT, logging which was used.
+Licences checked 2026-10-02: training data `zeroshot/twitter-financial-news-sentiment` is **MIT** (redistribution
+allowed). Base model `ProsusAI/finbert`: the HF model card declares **no licence**; the code repo
+github.com/ProsusAI/finBERT is Apache-2.0. The base weights were fine-tuned on Financial PhraseBank, which is
+**CC BY-NC-SA 3.0**. **Open for Arnav** before uploading publicly: the card will declare cc-by-nc-sa-3.0 as the
+conservative choice for a non-commercial hackathon artefact, and state the provenance.
+
+### D-044 GEOPOLITICAL means cross-border only (Arnav's item 3)
+GEOPOLITICAL = war and military conflict, sanctions, trade conflict and tariffs between countries, international
+diplomacy. Domestic politics and election chatter with no cross-border or policy-shock dimension → OTHER. The gold
+labelling guide was updated *before labelling* so the gold set uses this definition. `taxonomy.yaml` (description,
+zero-shot label, keywords, HF `Politics` mapping), weak labels and the classifier change in the final rerun, followed
+by one evaluation on the gold set.
+
+### D-045 Module A turnover cap 5% one-way per day, set from policy (Arnav's item 2)
+A 19% average daily one-way turnover is not operationally realistic for an index product. The cap (partial rebalance
+λ = min(1, τ/turnover)) goes from τ = 20% to **τ = 5%**. This is a policy choice, not a return optimisation, and
+it was not chosen from the sensitivity grid. Results are reported as they come out. IC stays the headline. Returns
+are secondary and shown gross, with cost drag and net.
+
+### D-046 Final rerun protocol (Arnav's item 5)
+One combined rerun once the gold labels are in, in this order: sentiment model (D-041/D-043) → event classifier with
+D-044 → impact v2 retrained on Benzinga with the same split if sentiment changed, then v2 > v1 rechecked on
+validation → re-score → kappa recalibrated mechanically on the same 2-month window (1.5% rule, no returns) → τ = 5%
+→ triggers and 2022 predicted-vs-realised → **all** evals once → demo snapshot once. A list of every earlier look at
+the 2021-22 test set is added alongside the rerun.
+
 ## 2026-10-02 (GATE C decisions by Arnav)
 
 ### D-040 2022 predicted vs realised: one hit with partial agreement, one miss (GATE A item 3)
@@ -75,7 +135,14 @@ both above zero on the untouched 2021-22 test set (post-burn-in ticker-days, n =
 ρ(v2)−ρ(v1) CI [0.035, 0.089] (v2 beats v1). ρ(v2)−ρ(|s|) CI [−0.020, 0.030] (includes zero). On validation v2 was
 already slightly below |s| (CI [−0.023, −0.002]). **Outcome: not adopted. Per Arnav's rule, reported and stopped, with no
 iteration on the test set.** The live engine keeps v1 (the spec's interpretable formula) and reports the comparison
-openly. Gain importance is dominated by mention count and velocity; B, C and R have zero gain because they are
+openly.
+
+**Revised after the test was seen (Arnav, P1 review):** v2 is adopted for company-level signals in the final rerun.
+The stricter rule written before the test (beat both v1 and |sentiment|) **was not met**, and the adoption rule was
+changed after the test result was known. Justification: the spec's rule ("if v2 doesn't beat v1, ship v1") is met,
+v2 beats v1 on validation (CI [0.121, 0.144]) and on test (CI [0.035, 0.089]), and v1 is demonstrably worse than
+|sentiment| (D-036). Market-wide events keep v1 (D-042). Framing: v2 is on par with |sentiment| for predicting market
+reaction and adds explainable drivers. Gain importance is dominated by mention count and velocity; B, C and R have zero gain because they are
 constant in single-publisher Benzinga. Limitations: survivorship (delisted tickers excluded), single-publisher
 training data, and domain shift from Benzinga headlines to GDELT/tweets.
 

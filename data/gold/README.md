@@ -16,8 +16,10 @@ Fill the blank columns, save as `labels.csv` in this folder (same columns), and 
 | `label_impact_1_10` | 1–10 (optional) | Your gut feel for the potential market impact. Used only as a sanity check, never for training. |
 | `notes` | free text | Anything ambiguous. |
 
-## Event classes (from `configs/taxonomy.yaml`)
-- **GEOPOLITICAL**: war, military conflict, sanctions, elections, coups, trade conflict and tariffs between countries.
+## Event classes (definitions as of D-044; `configs/taxonomy.yaml` follows in the final rerun)
+- **GEOPOLITICAL** (cross-border only): war and military conflict, sanctions, trade conflict and tariffs between
+  countries, international diplomacy. Domestic politics and election chatter with no cross-border or policy-shock
+  dimension → `OTHER`.
 - **MACROECONOMIC**: inflation, GDP, jobs, central-bank decisions, interest rates, recession, fiscal policy.
 - **CREDIT_EVENT**: default, missed payment, downgrade, bankruptcy, restructuring, covenant breach, bank run, liquidity crisis.
 - **MERGER_ACQUISITION**: mergers, acquisitions, takeover bids, buyouts, divestitures, spin-offs.
