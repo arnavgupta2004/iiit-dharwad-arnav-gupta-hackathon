@@ -25,7 +25,12 @@ from riskpulse.common.schemas import Document, Signal
 from riskpulse.engine.aggregate import EntityAggregator, EventAggregator, ScoredMention
 from riskpulse.engine.clustering import StoryClusterer
 from riskpulse.engine.entities import MKT, EntityLinker
-from riskpulse.engine.events import Embedder, EmbeddingClassifier, EventPrediction
+from riskpulse.engine.events import (
+    Embedder,
+    EmbeddingClassifier,
+    EventPrediction,
+    KeywordClassifier,
+)
 from riskpulse.engine.impact import (
     BreadthTracker,
     ImpactBins,
@@ -120,10 +125,21 @@ class NLPScorer:
         return self._embedder or Embedder()
 
     @cached_property
-    def event_clf(self) -> EmbeddingClassifier:
-        return self._event_clf or EmbeddingClassifier.load(
-            repo_root() / EVENT_MODEL_PATH, embedder=self.embedder
-        )
+    def event_clf(self) -> EmbeddingClassifier | KeywordClassifier:
+        """The trained classifier, or the keyword baseline if it is not trained here (a fresh
+        clone: model files are not committed). Train it with `riskpulse train events`."""
+        if self._event_clf is not None:
+            return self._event_clf
+        path = repo_root() / EVENT_MODEL_PATH
+        if not path.exists():
+            from riskpulse.common.logging import get_logger
+
+            get_logger().warning(
+                "event classifier not trained here: using the keyword baseline for event classes "
+                "(train it with `riskpulse train events`)"
+            )
+            return KeywordClassifier()
+        return EmbeddingClassifier.load(path, embedder=self.embedder)
 
     @cached_property
     def _tweet_original(self) -> dict[str, str]:
@@ -169,7 +185,12 @@ class NLPScorer:
         linked = [self.link(d) for d in docs]
         sent = self.sentiments(texts, [lk for lk, _ in linked])
         emb = self.embedder.encode(texts)
-        events = self.event_clf.predict_from_embeddings(emb)
+        clf = self.event_clf
+        events = (
+            clf.predict(texts)
+            if isinstance(clf, KeywordClassifier)
+            else clf.predict_from_embeddings(emb)
+        )
         return [
             DocScore(d, links, regions, s, ent, e, x)
             for d, (links, regions), (s, ent), e, x in zip(
