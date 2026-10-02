@@ -57,7 +57,21 @@ def _impact_v2() -> None:
     run()
 
 
+def _pvr() -> None:
+    from riskpulse.eval.predicted_vs_realised import run
+
+    run()
+
+
+def _finetune() -> None:
+    from riskpulse.eval.finetune_sentiment import run
+
+    run()
+
+
 EVALS: dict[str, Callable[[], None]] = {
+    "predicted_vs_realised": _pvr,
+    "finetune": _finetune,
     "impact_v2": _impact_v2,
     "impact": _impact,
     "linking": _linking,
@@ -69,8 +83,23 @@ EVALS: dict[str, Callable[[], None]] = {
 }
 
 
+# Dependency order for `eval all`. The fine-tune is a one-off, time-boxed experiment and is run
+# explicitly (`riskpulse eval finetune`), not as part of `all`.
+ALL_ORDER = [
+    "sentiment",
+    "events",
+    "linking",
+    "impact",
+    "impact_v2",
+    "moduleA",
+    "moduleB",
+    "predicted_vs_realised",
+    "pipeline",
+]
+
+
 def run(target: str) -> list[str]:
-    names = list(EVALS) if target == "all" else [target]
+    names = ALL_ORDER if target == "all" else [target]
     ran = []
     for n in names:
         if n not in EVALS:

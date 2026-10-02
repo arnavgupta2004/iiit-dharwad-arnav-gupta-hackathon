@@ -38,6 +38,8 @@ class EvalTarget(StrEnum):
     moduleB = "moduleB"
     linking = "linking"
     impact_v2 = "impact_v2"
+    predicted_vs_realised = "predicted_vs_realised"
+    finetune = "finetune"
 
 
 def _not_yet(what: str, phase: int) -> NoReturn:
