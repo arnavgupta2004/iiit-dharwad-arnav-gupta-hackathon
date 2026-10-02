@@ -126,3 +126,44 @@ def run() -> dict:
     }
     update_metrics("sentiment_gold", payload, script="riskpulse eval sentiment_gold")
     return payload
+
+
+def run_news_pooled() -> dict:
+    """D-057: pooled gold-1 + gold-2 news check, computed once (refuses a second run)."""
+    import json
+
+    from riskpulse.common.config import reports_path
+
+    out_path = reports_path("sentiment_news_pooled.json")
+    if out_path.exists():
+        raise RuntimeError("D-057 check already computed; it is run once")
+    parts = []
+    for name in ("labels.csv", "labels_2.csv"):
+        g = pd.read_csv(data_path("gold", name))
+        parts.append(g[g["source"] == "gdelt"].assign(gold_file=name))
+    df = pd.concat(parts, ignore_index=True)
+    df["tickers"] = df["linked_tickers"].astype(str).str.split(",")
+    gold = df["label_sentiment"].str.strip().str.lower().to_numpy()
+    preds = {}
+    for v in ("finetuned", "finbert"):
+        s, _ = model_scores(df, v)
+        preds[v] = np.array([label_from_score(x) for x in s])
+    ci = paired_ci(gold, preds["finetuned"], preds["finbert"])
+    below = bool(ci[1] < 0)
+    payload = {
+        "protocol": "pre-registered in DECISIONS.md D-057 (commit 251a8e7) before computing",
+        "n": int(len(df)),
+        "n_by_file": df["gold_file"].value_counts().to_dict(),
+        "macro_f1": {k: round(macro_f1(gold, p), 4) for k, p in preds.items()},
+        "diff_finetuned_minus_finbert": round(
+            macro_f1(gold, preds["finetuned"]) - macro_f1(gold, preds["finbert"]), 4
+        ),
+        "diff_95ci": ci,
+        "ci_entirely_below_zero": below,
+        "decision": {"news": "finbert", "tweets": "finetuned"}
+        if below
+        else {"news": "finetuned", "tweets": "finetuned"},
+    }
+    out_path.write_text(json.dumps(payload, indent=2))
+    update_metrics("sentiment_news_pooled", payload, script="riskpulse eval sentiment_news_pooled")
+    return payload

@@ -75,6 +75,12 @@ def _sentiment_gold() -> None:
     run()
 
 
+def _sentiment_news_pooled() -> None:
+    from riskpulse.eval.sentiment_gold import run_news_pooled
+
+    run_news_pooled()
+
+
 def _finetune() -> None:
     from riskpulse.eval.finetune_sentiment import run
 
@@ -85,6 +91,7 @@ EVALS: dict[str, Callable[[], None]] = {
     "predicted_vs_realised": _pvr,
     "finetune": _finetune,
     "sentiment_gold": _sentiment_gold,
+    "sentiment_news_pooled": _sentiment_news_pooled,
     "impact_market_check": _impact_market,
     "impact_v2": _impact_v2,
     "impact": _impact,

@@ -4,6 +4,15 @@ Newest first within each date. Each entry: decision, rationale, and status (acce
 
 ## 2026-10-02 (event classification round 2, approved by Arnav)
 
+### D-058 Sentiment by source: FinBERT for news, fine-tuned for tweets (D-057 rule met; post-hoc revision)
+`reports/sentiment_news_pooled.json`, computed once. On 397 pooled news items: macro-F1 fine-tuned 0.488 vs FinBERT
+0.576, difference −0.088, **95% CI [−0.146, −0.030], entirely below 0**. D-041's alternative branch therefore applies:
+**FinBERT for news (and every non-social source, including the Benzinga event study), the fine-tuned model for
+tweets.** This is a **post-hoc revision prompted by new evidence**: the pooled test was defined after gold-2 sentiment
+had been seen (D-055), and it overturns D-048's "fine-tuned everywhere". It follows the rule pre-registered in D-057.
+Consequence for reporting: the 0.844 in-domain result stays a fine-tuning result on tweet text; the live engine uses
+it only for tweets. Downstream items are recomputed in the single mechanical rerun.
+
 ### D-057 PRE-REGISTERED before computing: pooled news check of the sentiment model (Arnav)
 Prompted by new evidence: on gold-2 news, which D-055 reported only, the fine-tuned model scored 0.383 against 0.553 for
 FinBERT. Recorded and committed before the pooled statistic is computed.

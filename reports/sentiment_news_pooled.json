@@ -1,0 +1,22 @@
+{
+  "protocol": "pre-registered in DECISIONS.md D-057 (commit 251a8e7) before computing",
+  "n": 397,
+  "n_by_file": {
+    "labels.csv": 237,
+    "labels_2.csv": 160
+  },
+  "macro_f1": {
+    "finetuned": 0.4879,
+    "finbert": 0.5759
+  },
+  "diff_finetuned_minus_finbert": -0.088,
+  "diff_95ci": [
+    -0.1455,
+    -0.0299
+  ],
+  "ci_entirely_below_zero": true,
+  "decision": {
+    "news": "finbert",
+    "tweets": "finetuned"
+  }
+}
