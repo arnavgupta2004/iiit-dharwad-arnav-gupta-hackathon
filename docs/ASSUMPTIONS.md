@@ -22,8 +22,12 @@ Items marked (proposed) await confirmation at a gate.
   growth-heavy, and 2022 (a growth drawdown year) will dominate backtest returns. Results are reported relative to the
   same-universe equal-weight benchmark, so the tilt is held constant across the comparison. Utilities, Materials and
   Real Estate are not represented.
-- **A-09 Tweet coverage is uneven.** TSLA has 37,422 tweets while KO has 310, and 6 universe names have none
-  (JPM, BAC, GS, XOM, CVX, JNJ). For those names, social sentiment is absent and signals come from news only.
+- **A-09 Tweet coverage and the original-ticker rule.** Each tweet links only to its original ticker (D-033). The
+  dataset's PG and MSFT sets are copies of the AMZN set, so PG and MSFT have no tweets of their own; AMZN tweets never
+  move PG or MSFT. Original tweets per universe name range from TSLA 35,565 to KO 173 (before quality filters); JPM,
+  BAC, GS, XOM, CVX, JNJ, PG and MSFT have news only. PG's news coverage is also thin (297 feed items in the year),
+  so its decayed sentiment usually sits inside the ±0.10 deadband and its weight stays near the 5% baseline. This is
+  intended behaviour: no signal means no tilt.
 - **A-06 GDELT GKG sampling** (proposed): about 25% of US-session news (one 15-min file per hour). Signal velocity and
   breadth computed from sampled news are therefore relative measures, not absolute article counts.
 - **A-07 Sentiment labels.** HF label map: 0 = bearish → negative, 1 = bullish → positive, 2 = neutral.

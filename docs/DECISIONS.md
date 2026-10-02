@@ -22,6 +22,22 @@ corporate average cumulative default rates, 1981-2024"**, column Y1:
 Caution recorded during verification: page 56 also starts **Table 25 (U.S. region)**, whose AAA/AA/A rows read
 0.00/0.03/0.06. Those are *not* used. Only these seven values are stored; no table is copied into the repository.
 
+### D-033 Tweets link only to their original ticker (Arnav's item 1)
+Identical tweet texts scraped under several tickers are kept once and linked only to their original ticker. Copy sets
+are detected from the data: a label whose texts are ≥ 95% contained in another label's set and that has a lower
+own-cashtag rate is a copy. The result is MSFT → AMZN and PG → MSFT (itself a copy), so MSFT and PG have **zero**
+original tweets. Among genuine labels, the first-mentioned cashtag decides; a tweet whose original is outside the
+universe (e.g. TSM) links to nothing. The rule is applied in the tweet loader (future feed builds), in the live
+linker, and between stage 1 and stage 2 for the cached batch (no model re-run), using the committed map
+`data/replay/tweet_original_ticker.csv` (63,686 distinct texts). News never links PG unless the headline names P&G
+(context rules, D-020). PG stays in the universe; with a sparse signal its sentiment is mostly inside the ±0.10
+deadband, so it stays near its baseline weight.
+
+### D-034 Entity signals on a stream-time cadence
+Batch mode called the engine once, so entity signals were emitted only at the end (20 for the whole year). Entity
+signals are now emitted every 60 minutes of stream time for tickers touched since the last emission (config
+`aggregation.entity_emit_every_minutes`), plus at the end of each call. Event-signal emission is unchanged (D-029).
+
 ### D-032 Stage-2 optimisation verified against the original code (Arnav's item 3)
 The optimised velocity tracker and clusterer were rewritten to reproduce the original semantics exactly (velocity
 baseline buckets relative to each mention's time, integer-microsecond timestamps, float64 clustering), after a first

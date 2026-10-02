@@ -102,6 +102,7 @@ aggregation:
     - {min_sources: 5, bonus: 1}
     - {min_sources: 15, bonus: 2}
   event_emit_min_docs: 2          # emit/refresh an event signal once a story has this many docs
+  entity_emit_every_minutes: 60   # stream-time cadence for entity signals (touched tickers only)
   evidence_max: 5
 
 event_training:

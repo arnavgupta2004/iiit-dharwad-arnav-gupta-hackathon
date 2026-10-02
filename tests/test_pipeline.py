@@ -79,3 +79,19 @@ def test_engine_end_to_end_produces_entity_and_event_signals() -> None:
     # first-in-story items are novel; later ones are not
     first, later = mentions[0], mentions[2]
     assert first.drivers["novelty"] == 1.0 and later.drivers["novelty"] < 0.1
+
+
+def test_tweet_links_only_to_original_ticker() -> None:
+    """D-033: a PG-labelled copy of an AMZN tweet must never move PG."""
+    from riskpulse.engine.pipeline import social_links
+    from riskpulse.ingestion.normalize import dedupe_key
+
+    universe = {"AMZN", "PG", "MSFT", "TSLA"}
+    copy = Document.build(Source.KAGGLE_TWEETS, "$AMZN and $PG both up today", T0)
+    original = {dedupe_key(copy.text): "AMZN"}
+    assert social_links(copy, {"PG": 1.0, "AMZN": 0.5}, original, universe) == {"AMZN": 0.5}
+    assert social_links(copy, {"PG": 1.0}, original, universe) == {"AMZN": 0.3}
+    off_universe = {dedupe_key(copy.text): "TSM"}
+    assert social_links(copy, {"PG": 1.0}, off_universe, universe) == {}
+    live = Document.build(Source.KAGGLE_TWEETS, "a brand new post about $TSLA", T0)
+    assert social_links(live, {"TSLA": 0.9}, original, universe) == {"TSLA": 0.9}

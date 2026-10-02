@@ -21,6 +21,14 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+st.markdown(
+    '<p class="rp-note"><b>Signal coverage.</b> Each tweet links only to its original ticker: the tweet dataset\'s '
+    "PG and MSFT sets are copies of the AMZN set, so AMZN posts never move PG or MSFT. PG has thin news coverage "
+    "and no tweets of its own; its sentiment usually stays inside the ±0.10 deadband, so it holds close to its 5% "
+    "baseline weight. That is intended: no signal, no tilt.</p>",
+    unsafe_allow_html=True,
+)
+
 out = data.module_a_outputs()
 met = data.metrics().get("moduleA", {})
 if not out or not met:

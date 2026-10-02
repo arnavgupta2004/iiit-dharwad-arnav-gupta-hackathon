@@ -19,7 +19,13 @@ from riskpulse.common.logging import get_logger
 from riskpulse.common.schemas import Document
 from riskpulse.engine.events import EventPrediction
 from riskpulse.engine.impact import ImpactBins
-from riskpulse.engine.pipeline import DocScore, NLPScorer, SignalEngine, stamp_versions
+from riskpulse.engine.pipeline import (
+    DocScore,
+    NLPScorer,
+    SignalEngine,
+    apply_social_link_policy,
+    stamp_versions,
+)
 from riskpulse.ingestion.replay import iter_feed
 from riskpulse.store.signal_store import JsonlSignalWriter, mentions_frame, write_duckdb
 
@@ -106,6 +112,8 @@ def fit_bins(scored: list[DocScore]) -> ImpactBins:
 def run_batch(limit: int | None = None) -> dict:
     """Full batch run: stage 1, bin fitting, stage 2, persistence. Returns summary stats."""
     scored = run_stage1(limit=limit)
+    scored, policy = apply_social_link_policy(scored)
+    log.info(f"Original-ticker rule for tweets: {policy}")
     bins = fit_bins(scored)
     engine = SignalEngine(bins=bins)
     mentions, signals = engine.process(scored)
@@ -126,6 +134,7 @@ def run_batch(limit: int | None = None) -> dict:
         "n_entity_signals": sum(s.signal_type == "entity" for s in signals),
         "n_event_signals": sum(s.signal_type == "event" for s in signals),
         "impact_bins": bins.edges,
+        "tweet_original_ticker_rule": policy,
     }
     log.info(f"Batch done: {summary}")
     return summary

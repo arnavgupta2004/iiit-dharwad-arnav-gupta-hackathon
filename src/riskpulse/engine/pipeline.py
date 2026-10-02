@@ -14,7 +14,8 @@ The same code path serves batch (whole feed), replay (paced feed) and the live `
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
+from functools import cached_property
 from pathlib import Path
 
 import numpy as np
@@ -56,6 +57,45 @@ def outlet_of(doc: Document) -> str:
     return doc.source.value
 
 
+def social_links(
+    doc: Document, links: dict[str, float], original: dict[str, str], universe: set[str]
+) -> dict[str, float]:
+    """Original-ticker rule for tweets (D-033): a tweet links only to the ticker it was
+    originally scraped for; copies and cross-ticker duplicates never move other names."""
+    from riskpulse.ingestion.normalize import dedupe_key
+
+    orig = original.get(dedupe_key(doc.text))
+    if orig is None:  # not from the Kaggle corpus (e.g. a live social post): keep first link
+        orig = next(iter(links), None)
+    if orig is None or orig not in universe:
+        return {}
+    return {orig: links.get(orig, 0.3)}
+
+
+def apply_social_link_policy(scored: list[DocScore]) -> tuple[list[DocScore], dict[str, int]]:
+    """Apply the original-ticker rule to cached stage-1 scores (no model re-run)."""
+    from riskpulse.ingestion.kaggle_tweets import original_ticker_lookup
+
+    original = original_ticker_lookup()
+    universe = set(load_config("universe")["tickers"])
+    out, stats = [], {"social_docs": 0, "relinked": 0, "dropped": 0}
+    for ds in scored:
+        if ds.doc.source_type != "social":
+            out.append(ds)
+            continue
+        stats["social_docs"] += 1
+        new = social_links(ds.doc, ds.links, original, universe)
+        if not new:
+            stats["dropped"] += 1
+            continue
+        if set(new) != set(ds.links):
+            stats["relinked"] += 1
+        (t,) = new
+        ent = {t: ds.entity_sentiment.get(t, ds.doc_sentiment)}
+        out.append(DocScore(ds.doc, new, ds.regions, ds.doc_sentiment, ent, ds.event, ds.embedding))
+    return out, stats
+
+
 class NLPScorer:
     """Stage 1: models (FinBERT, MiniLM, event classifier) + entity linking."""
 
@@ -73,6 +113,12 @@ class NLPScorer:
             repo_root() / EVENT_MODEL_PATH, embedder=self.embedder
         )
 
+    @cached_property
+    def _tweet_original(self) -> dict[str, str]:
+        from riskpulse.ingestion.kaggle_tweets import original_ticker_lookup
+
+        return original_ticker_lookup()
+
     def link(self, doc: Document) -> tuple[dict[str, float], list[str]]:
         meta_tickers = list(doc.meta.get("tickers") or [])
         prior = meta_tickers[0] if doc.source_type == "social" and meta_tickers else None
@@ -84,6 +130,8 @@ class NLPScorer:
             links.setdefault(t, 0.3)
         if len(links) > 1:
             links.pop(MKT, None)
+        if doc.source_type == "social":
+            links = social_links(doc, links, self._tweet_original, set(self.linker.tickers))
         regions = list(
             doc.meta.get("regions") or self.linker.regions_of(f"{doc.title or ''} {doc.text}")
         )
@@ -124,14 +172,32 @@ class SignalEngine:
         self.lookback = float(self.impact_cfg["novelty"]["lookback_hours"])
         self.cred = self.impact_cfg["credibility"]
         self.priors = self.impact_cfg["type_prior"]
+        every = load_config("app")["aggregation"]["entity_emit_every_minutes"]
+        self.emit_every = timedelta(minutes=float(every))
+        self._next_emit: datetime | None = None
+        self._touched: dict[str, datetime] = {}
+
+    def _emit_entities(self, as_of: datetime) -> list[Signal]:
+        out = []
+        for ticker in sorted(self._touched):
+            sig = self.entities.signal(ticker, as_of)
+            if sig is not None:
+                out.append(sig)
+        self._touched.clear()
+        return out
 
     def process(self, scored: list[DocScore]) -> tuple[list[ScoredMention], list[Signal]]:
         """Consume stage-1 scores in time order; return mentions and emitted signals."""
         mentions: list[ScoredMention] = []
         signals: list[Signal] = []
-        touched: dict[str, datetime] = {}
         for ds in sorted(scored, key=lambda x: x.doc.published_at):
             d, ts = ds.doc, ds.doc.published_at
+            if self._next_emit is None:
+                self._next_emit = ts + self.emit_every
+            elif ts >= self._next_emit:  # stream-time cadence for entity signals
+                signals.extend(self._emit_entities(self._next_emit))
+                while self._next_emit <= ts:
+                    self._next_emit += self.emit_every
             event_id, _, _, novelty = self.clusterer.observe(
                 d.doc_id, ds.embedding, ts, self.lookback
             )
@@ -178,11 +244,10 @@ class SignalEngine:
                 if ev is not None:
                     signals.append(ev)
                 if ticker != MKT:
-                    touched[ticker] = ts
-        for ticker, ts in touched.items():
-            sig = self.entities.signal(ticker, ts)
-            if sig is not None:
-                signals.append(sig)
+                    self._touched[ticker] = ts
+        if self._touched and scored:
+            last = max(x.doc.published_at for x in scored)
+            signals.extend(self._emit_entities(last))
         return mentions, signals
 
 
