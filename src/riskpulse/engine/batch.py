@@ -103,7 +103,13 @@ def fit_bins(scored: list[DocScore]) -> ImpactBins:
     lo, hi = (pd.Timestamp(x, tz="UTC") for x in cfg["burn_in"])
     burn = [s for s in scored if lo <= pd.Timestamp(s.doc.published_at) < hi]
     mentions, _ = SignalEngine(bins=ImpactBins(None)).process(burn)
-    bins = ImpactBins.fit(np.array([m.impact_raw for m in mentions]), int(cfg["n_bins"]))
+    groups = np.array(["market" if m.ticker == "MKT" else "company" for m in mentions])
+    bins = ImpactBins.fit(
+        np.array([m.impact_raw for m in mentions]),
+        int(cfg["n_bins"]),
+        cfg.get("edge_quantiles"),
+        groups if cfg.get("by_population") else None,
+    )
     bins.save()
     log.info(f"Impact bins fitted on {len(mentions)} burn-in mentions: {bins.edges}")
     return bins

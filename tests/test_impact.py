@@ -95,3 +95,15 @@ def test_breadth_counts_distinct_outlets_in_window() -> None:
     assert n == 2 and 0 < val < 1
     _, n_late = b.observe("evt", "c.com", T0 + timedelta(hours=9))
     assert n_late == 1
+
+
+def test_tail_weighted_and_per_population_bins() -> None:
+    q = [0.15, 0.30, 0.45, 0.60, 0.72, 0.84, 0.95, 0.99, 0.998]
+    raws = np.r_[np.linspace(0, 1, 1000), np.linspace(0, 0.5, 1000)]
+    groups = np.r_[["market"] * 1000, ["company"] * 1000]
+    bins = ImpactBins.fit(raws, 10, q, groups)
+    company = [bins.score(x, "company") for x in np.linspace(0, 0.5, 1000)]
+    assert np.mean(np.array(company) >= 8) == pytest.approx(0.05, abs=0.01)
+    assert bins.score(0.5, "market") <= 6 < bins.score(0.5, "company")
+    with pytest.raises(ValueError):
+        ImpactBins.fit(raws, 10, [0.5, 0.4, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 0.99])

@@ -54,6 +54,12 @@ credibility:
 binning:
   method: quantile
   n_bins: 10
+  # Severity scale (D-035): edges at burn-in quantiles, so 8 = top 5%, 9 = top 1%, 10 = top 0.2%.
+  # Plain deciles made "impact >= 8" mean "top 30% of all items" and fired Module B ~7x/day.
+  edge_quantiles: [0.15, 0.30, 0.45, 0.60, 0.72, 0.84, 0.95, 0.99, 0.998]
+  # Company mentions and market-wide (MKT) items are different populations (MKT items carry
+  # relevance 1 and high class priors), so each gets its own edges.
+  by_population: true
   bins_path: data/processed/impact_bins.json
   # Edges are fitted on a burn-in period at the start of the replay window and applied to the
   # rest, so the Module B trigger threshold never uses future data.

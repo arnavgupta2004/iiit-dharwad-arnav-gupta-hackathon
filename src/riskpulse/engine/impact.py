@@ -62,20 +62,45 @@ def raw_impact(f: ImpactFeatures, cfg: dict | None = None) -> tuple[float, dict[
 
 
 class ImpactBins:
-    """Quantile bin edges mapping raw impact to 1..10."""
+    """Quantile edges mapping raw impact to 1..10, optionally per population.
 
-    def __init__(self, edges: list[float] | None = None) -> None:
-        self.edges = edges  # n_bins - 1 interior edges, ascending
+    ``edges`` is either one ascending list (shared) or ``{"company": [...], "market": [...]}``.
+    """
+
+    def __init__(self, edges: list[float] | dict[str, list[float]] | None = None) -> None:
+        self.edges = edges
+
+    @staticmethod
+    def _quantiles(n_bins: int, edge_quantiles: list[float] | None) -> np.ndarray:
+        if edge_quantiles is not None:
+            q = np.asarray(edge_quantiles, dtype=float)
+            if len(q) != n_bins - 1 or np.any(np.diff(q) <= 0):
+                raise ValueError("edge_quantiles must be n_bins - 1 strictly increasing values")
+            return q
+        return np.linspace(0, 1, n_bins + 1)[1:-1]
 
     @classmethod
-    def fit(cls, raws: np.ndarray, n_bins: int = 10) -> ImpactBins:
-        qs = np.linspace(0, 1, n_bins + 1)[1:-1]
-        return cls([float(x) for x in np.quantile(np.asarray(raws, dtype=float), qs)])
+    def fit(
+        cls,
+        raws: np.ndarray,
+        n_bins: int = 10,
+        edge_quantiles: list[float] | None = None,
+        groups: np.ndarray | None = None,
+    ) -> ImpactBins:
+        qs = cls._quantiles(n_bins, edge_quantiles)
+        raws = np.asarray(raws, dtype=float)
+        if groups is None:
+            return cls([float(x) for x in np.quantile(raws, qs)])
+        groups = np.asarray(groups)
+        return cls(
+            {g: [float(x) for x in np.quantile(raws[groups == g], qs)] for g in np.unique(groups)}
+        )
 
-    def score(self, raw: float) -> int:
+    def score(self, raw: float, group: str = "company") -> int:
         if self.edges is None:  # unfitted fallback: linear
             return int(min(10, max(1, math.ceil(raw * 10))))
-        return int(np.searchsorted(self.edges, raw, side="right")) + 1
+        edges = self.edges[group] if isinstance(self.edges, dict) else self.edges
+        return int(np.searchsorted(edges, raw, side="right")) + 1
 
     def save(self, path: Path | None = None) -> Path:
         path = path or repo_root() / load_config("impact")["binning"]["bins_path"]
@@ -89,10 +114,12 @@ class ImpactBins:
         return cls(json.loads(path.read_text())["edges"]) if path.exists() else cls(None)
 
 
-def score_impact(f: ImpactFeatures, bins: ImpactBins, cfg: dict | None = None) -> ImpactScore:
+def score_impact(
+    f: ImpactFeatures, bins: ImpactBins, cfg: dict | None = None, group: str = "company"
+) -> ImpactScore:
     raw, contrib = raw_impact(f, cfg)
     drivers = {k: round(v, 4) for k, v in asdict(f).items()}
-    return ImpactScore(round(raw, 6), bins.score(raw), drivers, contrib)
+    return ImpactScore(round(raw, 6), bins.score(raw, group), drivers, contrib)
 
 
 def _sigmoid(x: float) -> float:

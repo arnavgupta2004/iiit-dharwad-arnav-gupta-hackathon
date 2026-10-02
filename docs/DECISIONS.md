@@ -22,6 +22,21 @@ corporate average cumulative default rates, 1981-2024"**, column Y1:
 Caution recorded during verification: page 56 also starts **Table 25 (U.S. region)**, whose AAA/AA/A rows read
 0.00/0.03/0.06. Those are *not* used. Only these seven values are stored; no table is copied into the repository.
 
+### D-035 Impact 1-10 as a severity scale, per population (deviation from plain deciles; for Arnav at GATE C)
+With decile bins, "impact >= 8" meant the top 30% of all items: 70.7% of market-wide (MKT) mentions scored >= 8
+against 5.3% of company mentions (MKT items carry relevance 1 and high class priors), and the Module B trigger fired
+2,574 times in the year. Changed, still quantile binning on the burn-in as the spec requires:
+- Edges at burn-in quantiles [0.15, 0.30, 0.45, 0.60, 0.72, 0.84, 0.95, 0.99, 0.998], so 8 = top 5%, 9 = top 1% and
+  10 = top 0.2% (chosen on design grounds, not tuned on outcomes).
+- Separate edges for company mentions and MKT items.
+
+Result: 694 stress runs per year (from 2,150; 1,110 triggers fired, of which stress classes 694). That is still about
+2 per day. Remaining drivers are spec-set values: the story breadth bonus (+1 at 5 outlets, +2 at 15) on top of the B
+driver, 24 h cooldown per (class x region) (~40 keys), and n_sources >= 2, which is trivial for GDELT. Fired triggers
+include the real events (2022-02-24 sanctions at impact 8-10 with 12-19 outlets; CPI 8.6% on 2022-06-10; the 75 bp hike;
+Russia default fears; Kaisa and Revlon). They also include event-class errors, e.g. US election chatter labelled
+GEOPOLITICAL. **Open for Arnav:** whether to tighten any spec-set trigger values (see GATE C options).
+
 ### D-033 Tweets link only to their original ticker (Arnav's item 1)
 Identical tweet texts scraped under several tickers are kept once and linked only to their original ticker. Copy sets
 are detected from the data: a label whose texts are ≥ 95% contained in another label's set and that has a lower

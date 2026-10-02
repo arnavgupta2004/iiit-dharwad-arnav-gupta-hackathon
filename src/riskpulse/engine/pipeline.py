@@ -219,7 +219,8 @@ class SignalEngine:
                     credibility=float(self.cred.get(d.source.value, 0.5)),
                     relevance=float(rel),
                 )
-                imp = score_impact(feats, self.bins, self.impact_cfg)
+                group = "market" if ticker == MKT else "company"
+                imp = score_impact(feats, self.bins, self.impact_cfg, group)
                 m = ScoredMention(
                     doc_id=d.doc_id,
                     source=d.source.value,
