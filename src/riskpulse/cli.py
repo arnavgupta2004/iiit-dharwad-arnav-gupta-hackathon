@@ -37,6 +37,7 @@ class EvalTarget(StrEnum):
     moduleA = "moduleA"
     moduleB = "moduleB"
     linking = "linking"
+    impact_v2 = "impact_v2"
 
 
 def _not_yet(what: str, phase: int) -> NoReturn:

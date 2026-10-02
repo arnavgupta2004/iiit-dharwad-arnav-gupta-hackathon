@@ -51,7 +51,14 @@ def _impact() -> None:
     run()
 
 
+def _impact_v2() -> None:
+    from riskpulse.eval.impact_v2 import run
+
+    run()
+
+
 EVALS: dict[str, Callable[[], None]] = {
+    "impact_v2": _impact_v2,
     "impact": _impact,
     "linking": _linking,
     "sentiment": _sentiment,
