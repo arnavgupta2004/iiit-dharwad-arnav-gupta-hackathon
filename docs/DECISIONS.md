@@ -36,7 +36,7 @@ Changes (Arnav's choice of options (c) and (d) from GATE C):
 - min_sources stays at 2; min_impact 8 and event confidence 0.6 are unchanged.
 
 Replay result (`metrics.json → moduleB_triggers`): 4,279 high-impact candidates, **811 triggers fired** (60 of them
-escalations), **459 stress runs** (from 694; the rest are classes without a market-wide scenario, e.g. EARNINGS).
+escalations), **459 stress runs** (previously 694). The other 352 fired triggers are classes without a market-wide scenario, e.g. EARNINGS.
 Blocked: cooldown 2,111, low event confidence 1,196, a single source 161. Stress runs per month are 28-48 from Oct 2021
 on (monthly table in metrics.json). Still about 1.3 runs per day; class errors remain (e.g. US political news labelled
 GEOPOLITICAL). On 2022-06-15 (the FOMC hike) no MACROECONOMIC run fired; the nearest were the CPI-day runs on 06-10.
@@ -121,7 +121,7 @@ Result: 694 stress runs per year (from 2,150; 1,110 triggers fired, of which str
 driver, 24 h cooldown per (class x region) (~40 keys), and n_sources >= 2, which is trivial for GDELT. Fired triggers
 include the real events (2022-02-24 sanctions at impact 8-10 with 12-19 outlets; CPI 8.6% on 2022-06-10; the 75 bp hike;
 Russia default fears; Kaisa and Revlon). They also include event-class errors, e.g. US election chatter labelled
-GEOPOLITICAL. **Open for Arnav:** whether to tighten any spec-set trigger values (see GATE C options).
+GEOPOLITICAL. **Resolved at GATE C:** see D-037.
 
 ### D-033 Tweets link only to their original ticker (Arnav's item 1)
 Identical tweet texts scraped under several tickers are kept once and linked only to their original ticker. Copy sets

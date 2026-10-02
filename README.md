@@ -134,44 +134,55 @@ All figures below are generated from `reports/metrics.json` by `scripts/render_r
 | hf_topic_valid_subsample | keyword_baseline | 595 | 0.485 |
 | hf_topic_valid_subsample | primary_embed_lr | 595 | 0.814 |
 
-**Module A** (daily backtest 2021-09-30 to 2022-09-29, net of 5 bps costs; a sentiment-tilt demonstration, not an alpha claim)
+**Module A, headline: information coefficient** (evaluation 2021-11-30 to 2022-09-29): mean daily IC +0.0376, t-stat 2.31, IC > 0 on 56.5% of 209 days (daily Spearman of decayed sentiment vs next-day return).
+
+Tilt strength κ = 7.47, frozen by a risk budget (median absolute active weight 1.5%) computed from signals only over 2021-09-30 to 2021-11-29; returns were never used to set it.
+
+Returns (secondary; net of 5 bps costs; a sentiment-tilt demonstration, not an alpha claim):
 
 | Strategy | Cumulative return | Sharpe (rf = 0) | Max drawdown | Avg daily turnover |
 |---|---|---|---|---|
-| sentiment tilt | -17.5% | -0.642 | -27.2% | 4.22% |
-| equal weight buy hold | -15.8% | -0.616 | -25.3% | 0.00% |
-| equal weight rebalanced | -17.6% | -0.642 | -27.0% | 0.65% |
-| naive sign rule | -15.4% | -0.539 | -27.5% | 20.45% |
+| sentiment tilt | -26.1% | -1.203 | -29.8% | 19.10% |
+| equal weight buy hold | -21.5% | -1.083 | -25.2% | 0.00% |
+| equal weight rebalanced | -23.3% | -1.044 | -27.0% | 0.67% |
+| naive sign rule | -23.4% | -1.055 | -27.5% | 20.61% |
 
-Information coefficient (daily Spearman, s_t vs r_t+1): mean 0.0407, t-stat 2.77, hit rate 0.5657 over 251 days.
-
-**Module B** (replay 2021-09 to 2022-09): 6,828 high-impact candidates, 1110 triggers fired, 694 stress runs.
+**Module B** (replay 2021-09 to 2022-09): 4,279 high-impact candidates, 811 triggers fired (60 escalations), 459 stress runs. Cooldown: 24 h per event class and macro-region, re-run within it only on higher impact. Stress runs per month: 2021-09 2, 2021-10 41, 2021-11 32, 2021-12 28, 2022-01 29, 2022-02 30, 2022-03 44, 2022-04 46, 2022-05 43, 2022-06 48, 2022-07 38, 2022-08 39, 2022-09 39. First runs:
 
 | Trigger time (UTC) | Scenario | Impact | Sources | Total impact | CET1 after |
 |---|---|---|---|---|---|
 | 2021-09-30T03:00 | GEOPOLITICAL:default | 8 | 2 | -0.10% | 12.98% |
-| 2021-09-30T16:00 | MACROECONOMIC:default | 8 | 5 | -1.19% | 11.83% |
 | 2021-09-30T17:00 | GEOPOLITICAL:default | 8 | 2 | -0.10% | 12.98% |
 | 2021-10-01T05:00 | GEOPOLITICAL:default | 8 | 4 | -0.10% | 12.98% |
+| 2021-10-01T08:00 | GEOPOLITICAL:default | 9 | 2 | -0.13% | 12.98% |
 | 2021-10-01T17:00 | MACROECONOMIC:default | 8 | 2 | -1.19% | 11.83% |
-| 2021-10-02T06:00 | GEOPOLITICAL:default | 8 | 14 | -0.10% | 12.98% |
 | 2021-10-04T14:00 | GEOPOLITICAL:default | 8 | 4 | -0.10% | 12.98% |
 | 2021-10-04T17:00 | OPERATIONAL_ESG:default | 8 | 2 | -3.77% | 9.50% |
 | 2021-10-05T01:00 | OPERATIONAL_ESG:default | 8 | 2 | -3.77% | 9.50% |
 | 2021-10-05T04:00 | OPERATIONAL_ESG:default | 8 | 2 | -3.77% | 9.50% |
 | 2021-10-05T16:00 | CREDIT_EVENT:default | 9 | 2 | -1.49% | 11.82% |
-| 2021-10-05T17:00 | OPERATIONAL_ESG:default | 9 | 5 | -4.95% | 8.27% |
+| 2021-10-05T17:00 | OPERATIONAL_ESG:default | 8 | 5 | -3.77% | 9.50% |
+| 2021-10-06T08:00 | CREDIT_EVENT:severe | 10 | 2 | -5.68% | 7.34% |
 
 **Pipeline** (cpu, 10 cores): 150.1 docs/s batch; single-document latency p50 18.5 ms, p95 20.7 ms; dedup removed 39.0% of news and 5.3% of social items.
 
-**Impact score vs realised market reaction** (ticker-days after the burn-in, n = 3,538; market-model abnormal returns, CAR[0,+1])
+**Impact score vs realised market reaction** (untouched 2021-22 test set: ticker-days after the burn-in, n = 3,538; market-model abnormal returns, CAR[0,+1])
 
 | Score | Spearman vs abs(CAR) | Top-decile hit rate (10% by chance) | Spearman vs abnormal volume |
 |---|---|---|---|
-| Impact v1 | 0.046 | 13.8% | 0.080 |
+| Impact v2 (learned on Benzinga ≤ 2018) | 0.108 | 24.0% | 0.096 |
+| Impact v1 (live, spec formula) | 0.046 | 13.8% | 0.080 |
 | abs(sentiment) only (baseline) | 0.104 | 25.7% | 0.107 |
 
-Impact v1 is weaker than the sentiment-only baseline (95% CI of the Spearman difference [-0.0858, -0.0282]); impact v2, calibrated on the event study: TBD (Benzinga event study, time split train <= 2018 / validate 2019-2020).
+95% bootstrap CI of the Spearman difference: v2 − v1 [0.0348, 0.0894], v2 − abs(sentiment) [-0.0197, 0.0303]. Pre-registered rule: adopt v2 only if 95% CIs of rho(v2)-rho(|s|) and rho(v2)-rho(v1) are both > 0. Adopted: no; the live engine keeps v1 and this comparison is reported as is.
+
+**Module B out-of-sample check (2022 episodes; scenarios calibrated before Sep 2021 only)**
+
+| Episode | Status | Sign agreement | Book impact predicted | Book impact realised |
+|---|---|---|---|---|
+| russia_ukraine_2022 (2022-02-24) | fired on the day | 64.3% | -USD 8.1 m | +USD 1.6 m |
+| fomc_june_2022 (2022-06-15) | missed (supplementary: prior-week run) | 57.1% | -USD 122.3 m | +USD 36.7 m |
+
 <!-- RESULTS:END -->
 
 **Domain impact.** For a credit or risk desk the platform shortens the path from headline to portfolio consequence:

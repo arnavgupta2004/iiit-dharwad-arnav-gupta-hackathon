@@ -17,6 +17,15 @@ def pct(x: float | None, d: int = 1) -> str:
     return "TBD" if x is None else f"{x * 100:.{d}f}%"
 
 
+def usd(x: float) -> str:
+    a = abs(x)
+    return (
+        f"{'-' if x < 0 else '+'}USD {a / 1e9:.2f} bn"
+        if a >= 1e9
+        else f"{'-' if x < 0 else '+'}USD {a / 1e6:.1f} m"
+    )
+
+
 def build(m: dict) -> str:
     out: list[str] = []
     s = m.get("sentiment")
@@ -75,7 +84,11 @@ def build(m: dict) -> str:
     if b:
         out += [
             f"**Module B** (replay 2021-09 to 2022-09): {b['n_high_impact_candidates']:,} high-impact candidates, "
-            f"{b['n_triggers_fired']} triggers fired, {b['n_stress_runs']} stress runs.",
+            f"{b['n_triggers_fired']} triggers fired ({b.get('n_escalations', 0)} escalations), {b['n_stress_runs']} "
+            "stress runs. Cooldown: 24 h per event class and macro-region, re-run within it only on higher impact. "
+            "Stress runs per month: "
+            + ", ".join(f"{k} {v}" for k, v in b.get("stress_runs_per_month", {}).items())
+            + ". First runs:",
             "",
             "| Trigger time (UTC) | Scenario | Impact | Sources | Total impact | CET1 after |",
             "|---|---|---|---|---|---|",
@@ -94,24 +107,71 @@ def build(m: dict) -> str:
             f"{pct(pl['dedup_rate_news'])} of news and {pct(pl['dedup_rate_social'])} of social items.",
             "",
         ]
+    v2 = m.get("impact_v2")
     imp = m.get("impact")
-    if imp:
-        x = imp["replay_window_post_burn_in"]
-        car, vol = x["abs_car01"], x["abn_volume"]
-        v1, bs = car["impact_v1"], car["abs_sent"]
+    if v2:
+        t = v2["test_post_burn_in"]
+        car, vol = t["abs_car01"], t["abn_volume"]
+        rows = [
+            ("Impact v2 (learned on Benzinga ≤ 2018)", "impact_v2"),
+            ("Impact v1 (live, spec formula)", "impact_v1"),
+            ("abs(sentiment) only (baseline)", "abs_sent"),
+        ]
         out += [
-            f"**Impact score vs realised market reaction** (ticker-days after the burn-in, n = {x['n_ticker_days']:,}; market-model abnormal returns, CAR[0,+1])",
+            f"**Impact score vs realised market reaction** (untouched 2021-22 test set: ticker-days after the burn-in, "
+            f"n = {car['n']:,}; market-model abnormal returns, CAR[0,+1])",
             "",
             "| Score | Spearman vs abs(CAR) | Top-decile hit rate (10% by chance) | Spearman vs abnormal volume |",
             "|---|---|---|---|",
-            f"| Impact v1 | {v1['spearman_rho']:.3f} | {pct(v1['top_decile_hit_rate'])} | {vol['impact_v1']['spearman_rho']:.3f} |",
-            f"| abs(sentiment) only (baseline) | {bs['spearman_rho']:.3f} | {pct(bs['top_decile_hit_rate'])} | {vol['abs_sent']['spearman_rho']:.3f} |",
-            "",
-            f"Impact v1 is weaker than the sentiment-only baseline (95% CI of the Spearman difference {car['rho_diff_v1_minus_abs_sent_95ci']}); "
-            f"impact v2, calibrated on the event study: {imp['v2_status']}.",
         ]
+        for label, k in rows:
+            out.append(
+                f"| {label} | {car[k]['spearman_rho']:.3f} | {pct(car[k]['top_decile_hit_rate'])} | "
+                f"{vol[k]['spearman_rho']:.3f} |"
+            )
+        out += [
+            "",
+            f"95% bootstrap CI of the Spearman difference: v2 − v1 {car['rho_diff_v2_minus_v1_95ci']}, "
+            f"v2 − abs(sentiment) {car['rho_diff_v2_minus_abs_sent_95ci']}. Pre-registered rule: {v2['adoption_rule']}. "
+            f"Adopted: {'yes' if v2['adopted'] else 'no'}; the live engine keeps v1 and this comparison is reported as is.",
+            "",
+        ]
+    elif imp:
+        x = imp["replay_window_post_burn_in"]
+        out.append(
+            f"**Impact v1 vs abs(sentiment):** Spearman {x['abs_car01']['impact_v1']['spearman_rho']:.3f} vs "
+            f"{x['abs_car01']['abs_sent']['spearman_rho']:.3f}."
+        )
     else:
         out.append("**Impact score validation:** TBD (event study, P1).")
+    val = m.get("moduleB_validation")
+    if val:
+        out += [
+            "**Module B out-of-sample check (2022 episodes; scenarios calibrated before Sep 2021 only)**",
+            "",
+            "| Episode | Status | Sign agreement | Book impact predicted | Book impact realised |",
+            "|---|---|---|---|---|",
+        ]
+        for name, e in val["episodes"].items():
+            x = e if "factors" in e else e.get("supplementary_latest_run_in_prior_week")
+            status = (
+                "fired on the day" if "factors" in e else "missed (supplementary: prior-week run)"
+            )
+            if x:
+                out.append(
+                    f"| {name} ({e['event_date']}) | {status} | {pct(x['sign_agreement'])} | "
+                    f"{usd(x['book_total_impact_predicted'])} | {usd(x['book_total_impact_realised'])} |"
+                )
+            else:
+                out.append(f"| {name} ({e['event_date']}) | {status} | n/a | n/a | n/a |")
+        out.append("")
+    ft = m.get("sentiment_finetune")
+    if ft:
+        out += [
+            f"**Sentiment fine-tune experiment** (FinBERT on tweet train split only, {ft['budget_minutes']:.0f}-min CPU "
+            f"budget): test macro-F1 {ft['test_macro_f1']:.3f} vs bar {ft['bar_finbert_train_tuned']:.3f}; {ft['decision']}.",
+            "",
+        ]
     return "\n".join(out)
 
 
