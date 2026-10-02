@@ -11,6 +11,7 @@ from riskpulse.common.config import data_path, load_config, reports_path
 from riskpulse.common.metrics import update_metrics
 from riskpulse.ingestion.prices import trading_days, wide
 from riskpulse.moduleA.backtest import daily_sentiment, run_strategies
+from riskpulse.moduleA.calibrate import calibrate_kappa, save
 from riskpulse.moduleA.metrics import information_coefficient, performance
 
 
@@ -29,59 +30,85 @@ def load_inputs() -> tuple[pd.DataFrame, pd.DataFrame, list[str]]:
 
 
 def run(write: bool = True) -> dict:
+    """Calibrate kappa on months 1-2 (signals only), freeze it, evaluate from month 3 (D-038)."""
     cfg = load_config("moduleA")
     m, rets, tickers = load_inputs()
     hl = float(cfg["signal"]["half_life_hours"])
-    s, c, net = daily_sentiment(m, rets.index, tickers, hl)
-    res = run_strategies(rets, s, c, net, cfg)
+    s_all, c_all, net_all = daily_sentiment(m, rets.index, tickers, hl)
+    cal = cfg["calibration"]
+    cal_end = rets.index[0] + pd.DateOffset(months=int(cal["calibration_months"]))
+    in_cal = rets.index < cal_end
+    calib = calibrate_kappa(
+        s_all[in_cal], c_all[in_cal], cfg, float(cal["target_median_abs_active_weight"])
+    )
+    calib.update(
+        {
+            "calibration_window": [
+                str(rets.index[in_cal][0].date()),
+                str(rets.index[in_cal][-1].date()),
+            ],
+            "half_life_hours": hl,
+            "uses_returns": False,
+        }
+    )
+    kappa = float(calib["kappa"])
+    ev = ~in_cal
+    s, c, net, r = s_all[ev], c_all[ev], net_all[ev], rets[ev]
+    res = run_strategies(r, s, c, net, cfg, kappa=kappa)
     perf = {k: performance(v) for k, v in res.items()}
-    ic = information_coefficient(s, rets)
+    ic = information_coefficient(s, r)
     ic_series = ic.pop("series")
-    # robustness grid: kappa x half-life (no parameter is chosen from this grid)
+    ic_full = information_coefficient(s_all, rets)
+    ic_full.pop("series")
+    # sensitivity only: kappa x half-life on the evaluation window (nothing is chosen from it)
     grid = []
     for hl_g in cfg["robustness_grid"]["half_life_hours"]:
-        s_g, c_g, net_g = daily_sentiment(m, rets.index, tickers, float(hl_g))
-        ew = performance(run_strategies(rets, s_g, c_g, net_g, cfg, kappa=0.0)["sentiment_tilt"])
-        for k in cfg["robustness_grid"]["kappa"]:
+        s_g, c_g, net_g = (x[ev] for x in daily_sentiment(m, rets.index, tickers, float(hl_g)))
+        ew = performance(run_strategies(r, s_g, c_g, net_g, cfg, kappa=0.0)["sentiment_tilt"])
+        for k in sorted({*cfg["robustness_grid"]["kappa"], round(kappa, 2)}):
             p = performance(
-                run_strategies(rets, s_g, c_g, net_g, cfg, kappa=float(k))["sentiment_tilt"]
+                run_strategies(r, s_g, c_g, net_g, cfg, kappa=float(k))["sentiment_tilt"]
             )
             grid.append(
                 {
                     "kappa": k,
                     "half_life_hours": hl_g,
                     "cumulative_return": p["cumulative_return"],
-                    "sharpe_rf0": p["sharpe_rf0"],
                     "excess_vs_ew_rebalanced": round(
                         p["cumulative_return"] - ew["cumulative_return"], 4
                     ),
                     "avg_turnover": p["avg_daily_one_way_turnover"],
                 }
             )
-        ic_g = information_coefficient(s_g, rets)
-        ic_g.pop("series")
-        grid.append(
-            {"kappa": "IC", "half_life_hours": hl_g, **{f"ic_{k}": v for k, v in ic_g.items()}}
-        )
-    coverage = (c > 0).mean().round(3).to_dict()
+    active = (res["sentiment_tilt"].weights - 1.0 / len(tickers)).abs()
     payload = {
-        "window": [str(rets.index[0].date()), str(rets.index[-1].date())],
-        "n_tickers": len(tickers),
+        "headline_information_coefficient": {
+            **ic,
+            "pct_positive_days": ic.get("hit_rate"),
+            "definition": "daily cross-sectional Spearman of s_t vs next-day return",
+            "window": "evaluation window (after the calibration months)",
+        },
+        "ic_full_window_for_reference": ic_full,
+        "calibration": calib,
+        "evaluation_window": [str(r.index[0].date()), str(r.index[-1].date())],
+        "realised_median_abs_active_weight_eval": round(float(active.stack().median()), 5),
         "config": {
-            "kappa": cfg["tilt"]["kappa"],
+            "kappa": kappa,
             "half_life_hours": hl,
             "deadband": cfg["tilt"]["deadband"],
             "bounds": [cfg["constraints"]["w_min"], cfg["constraints"]["w_max"]],
             "tau_max": cfg["turnover"]["tau_max"],
             "cost_bps": cfg["turnover"]["cost_bps"],
         },
-        "performance": perf,
-        "information_coefficient": ic,
-        "robustness_grid": grid,
-        "signal_coverage_share_of_days": coverage,
-        "note": "Sentiment-tilt demonstration on a 1-year window; not an alpha claim. rf = 0.",
+        "performance_secondary": perf,
+        "sensitivity_grid": grid,
+        "signal_coverage_share_of_days": (c > 0).mean().round(3).to_dict(),
+        "n_tickers": len(tickers),
+        "note": "IC is the headline; returns are secondary (sentiment-tilt demonstration, "
+        "not an alpha claim; rf = 0).",
     }
     if write:
+        save(calib)
         update_metrics("moduleA", payload, script="riskpulse backtest")
         out = data_path("processed", "moduleA")
         out.mkdir(parents=True, exist_ok=True)
@@ -145,4 +172,4 @@ def _figures(res: dict, ic: pd.Series) -> None:
 
 
 def summary_json() -> str:
-    return json.dumps(run(write=False)["performance"], indent=2)
+    return json.dumps(run(write=False)["performance_secondary"], indent=2)

@@ -38,7 +38,9 @@ if not out or not met:
 
 w = out["weights_tilt"]
 rets = out["returns"]
-perf = met["performance"]
+perf = met["performance_secondary"]
+icm = met["headline_information_coefficient"]
+cal = met["calibration"]
 cfg = load_config("moduleA")
 names = {
     "sentiment_tilt": "Sentiment tilt",
@@ -47,6 +49,33 @@ names = {
     "naive_sign_rule": "Naive sign rule",
 }
 
+# ---------- headline: information coefficient ----------
+st.subheader("Headline: does sentiment rank next-day returns? (information coefficient)")
+h = st.columns(4)
+h[0].markdown(
+    kpi("Mean daily IC", f"{icm['mean_ic']:+.3f}", f"Spearman, {icm['n_days']} days"),
+    unsafe_allow_html=True,
+)
+h[1].markdown(kpi("IC t-stat", f"{icm['t_stat']}", "mean / (sd / √n)"), unsafe_allow_html=True)
+h[2].markdown(
+    kpi("Days with IC > 0", pct(icm["pct_positive_days"]), "50% = no skill"), unsafe_allow_html=True
+)
+h[3].markdown(
+    kpi(
+        "Tilt strength κ (frozen)",
+        f"{cal['kappa']:.2f}",
+        f"median |active weight| {pct(cal['achieved'], 2)} target",
+    ),
+    unsafe_allow_html=True,
+)
+st.markdown(
+    f'<p class="rp-note">κ was calibrated without returns: the value giving a median absolute active weight of '
+    f"{pct(cal['target'], 1)} on the signals of {cal['calibration_window'][0]} → {cal['calibration_window'][1]}. "
+    f"Everything here is evaluated on {met['evaluation_window'][0]} → {met['evaluation_window'][1]}.</p>",
+    unsafe_allow_html=True,
+)
+
+st.subheader("Returns (secondary)")
 k = st.columns(4)
 for col, key in zip(k, names, strict=True):
     p = perf[key]
@@ -169,7 +198,6 @@ st.dataframe(pd.DataFrame(perf).T.rename(index=names), use_container_width=True)
 # ---------- IC and turnover ----------
 c1, c2 = st.columns(2)
 ic = out.get("ic")
-icm = met.get("information_coefficient", {})
 if ic is not None and not ic.empty:
     fig = go.Figure(go.Bar(x=ic.index, y=ic["ic"], marker_color=np.where(ic["ic"] > 0, POS, NEG)))
     fig.add_trace(
@@ -181,7 +209,7 @@ if ic is not None and not ic.empty:
         )
     )
     fig.update_layout(
-        title=f"Daily IC: mean {icm.get('mean_ic')}, t-stat {icm.get('t_stat')}, hit rate {icm.get('hit_rate')}",
+        title=f"Daily IC: mean {icm['mean_ic']}, t-stat {icm['t_stat']}, positive {pct(icm['pct_positive_days'])}",
         height=320,
         showlegend=False,
     )
@@ -196,8 +224,13 @@ fig.update_layout(
 c2.plotly_chart(fig, use_container_width=True)
 
 # ---------- robustness grid ----------
-st.subheader("Robustness: κ × half-life (excess cumulative return vs equal weight, rebalanced)")
-grid = pd.DataFrame([g for g in met.get("robustness_grid", []) if g.get("kappa") != "IC"])
+st.subheader(
+    "Sensitivity only: κ × half-life (excess cumulative return vs equal weight, rebalanced)"
+)
+st.caption(
+    "Shown for transparency; no parameter is chosen from this grid (κ is frozen by the risk budget above)."
+)
+grid = pd.DataFrame(met.get("sensitivity_grid", []))
 if not grid.empty:
     piv = grid.pivot(index="half_life_hours", columns="kappa", values="excess_vs_ew_rebalanced")
     fig = go.Figure(
@@ -232,7 +265,7 @@ if latest:
         np.full(len(u), 1 / len(u)),
         s.to_numpy(),
         c.to_numpy(),
-        cfg["tilt"]["kappa"],
+        cal["kappa"],
         cfg["tilt"]["deadband"],
         cfg["constraints"]["w_min"],
         cfg["constraints"]["w_max"],

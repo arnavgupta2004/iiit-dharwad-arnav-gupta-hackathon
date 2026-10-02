@@ -50,26 +50,27 @@ def build(m: dict) -> str:
         out.append("")
     a = m.get("moduleA")
     if a:
-        p = a["performance"]
+        ic, cal, w = a["headline_information_coefficient"], a["calibration"], a["evaluation_window"]
         out += [
-            f"**Module A** (daily backtest {a['window'][0]} to {a['window'][1]}, net of 5 bps costs; a sentiment-tilt "
-            "demonstration, not an alpha claim)",
+            f"**Module A, headline: information coefficient** (evaluation {w[0]} to {w[1]}): mean daily IC "
+            f"{ic['mean_ic']:+.4f}, t-stat {ic['t_stat']}, IC > 0 on {pct(ic['pct_positive_days'])} of "
+            f"{ic['n_days']} days (daily Spearman of decayed sentiment vs next-day return).",
+            "",
+            f"Tilt strength κ = {cal['kappa']:.2f}, frozen by a risk budget (median absolute active weight "
+            f"{pct(cal['target'], 1)}) computed from signals only over {cal['calibration_window'][0]} to "
+            f"{cal['calibration_window'][1]}; returns were never used to set it.",
+            "",
+            "Returns (secondary; net of 5 bps costs; a sentiment-tilt demonstration, not an alpha claim):",
             "",
             "| Strategy | Cumulative return | Sharpe (rf = 0) | Max drawdown | Avg daily turnover |",
             "|---|---|---|---|---|",
         ]
-        for k, v in p.items():
+        for k, v in a["performance_secondary"].items():
             out.append(
                 f"| {k.replace('_', ' ')} | {pct(v['cumulative_return'])} | {v['sharpe_rf0']} | "
                 f"{pct(v['max_drawdown'])} | {pct(v['avg_daily_one_way_turnover'], 2)} |"
             )
-        ic = a.get("information_coefficient", {})
-        out += [
-            "",
-            f"Information coefficient (daily Spearman, s_t vs r_t+1): mean {ic.get('mean_ic', 'TBD')}, "
-            f"t-stat {ic.get('t_stat', 'TBD')}, hit rate {ic.get('hit_rate', 'TBD')} over {ic.get('n_days', 'TBD')} days.",
-            "",
-        ]
+        out.append("")
     b = m.get("moduleB_triggers")
     if b:
         out += [

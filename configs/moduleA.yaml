@@ -29,3 +29,8 @@ backtest:
 robustness_grid:
   kappa: [0.25, 0.5, 1.0, 2.0, 4.0]
   half_life_hours: [2, 6, 24, 72]
+
+# Risk-budget calibration of kappa (GATE C, D-038): never uses returns.
+calibration:
+  target_median_abs_active_weight: 0.015   # median |w~ - w0| over name-days in the calibration window
+  calibration_months: 2                    # first 2 months of the window; evaluation starts after

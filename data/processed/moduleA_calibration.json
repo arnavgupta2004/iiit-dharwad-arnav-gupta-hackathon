@@ -1,0 +1,12 @@
+{
+  "kappa": 7.473,
+  "achieved": 0.015000002247363434,
+  "target": 0.015,
+  "reachable": true,
+  "calibration_window": [
+    "2021-09-30",
+    "2021-11-29"
+  ],
+  "half_life_hours": 6.0,
+  "uses_returns": false
+}

@@ -22,6 +22,22 @@ on (monthly table in metrics.json). Still about 1.3 runs per day; class errors r
 GEOPOLITICAL). On 2022-06-15 (the FOMC hike) no MACROECONOMIC run fired; the nearest were the CPI-day runs on 06-10.
 **Nothing else is tuned on the 2022 window: it is the validation set.**
 
+### D-038 Module A: kappa from a risk budget, frozen; IC is the headline (Arnav's GATE C item 3)
+kappa = 1 (a spec default) is replaced by a calibration that never uses returns (`moduleA/calibrate.py`): bisection on
+kappa so the **median absolute active weight |w~ − w0| of the target weights equals 1.5%**, over all name-days of
+the first 2 months (2021-09-30 → 2021-11-29), using only the signal distribution (s, c) and the existing deadband
+and [2%, 12%] bounds. Result: **kappa = 7.473** (the median |s·c| outside the deadband is small, so a large kappa is
+needed). It is frozen in `data/processed/moduleA_calibration.json` and the evaluation runs from 2021-11-30 to
+2022-09-29 (209 days). The realised median |active| of the held weights over the evaluation is 1.23% (lower than 1.5%
+because the turnover cap slows convergence to targets).
+
+Headline (`metrics.json → moduleA.headline_information_coefficient`): mean daily IC 0.0376, t = 2.31, 56.5%
+positive days. Returns are reported as secondary: tilt −26.1% vs EW rebalanced −23.3% vs EW buy-and-hold −21.5% over
+the evaluation window. The cost drag is 2.0% at about 19% average daily turnover. The kappa × half-life grid
+(kappa 7.47 added) is shown as a sensitivity chart only; nothing is selected from it. **Not tuned after seeing these
+results.** Interpretation for the jury: the signal ranks next-day returns slightly better than chance, but a daily
+tilt of this size pays more in turnover and in concentration in falling names than the IC earns.
+
 ### D-039 Impact v2 trained, evaluated once, **not adopted** (Arnav's GATE C item 2)
 `reports/metrics.json → impact_v2`, `reports/figures/impact_v2_deciles.png`, `riskpulse eval impact_v2`.
 LightGBM on the impact drivers plus |sentiment| (S) and log mention count, monotone-increasing constraints, target =

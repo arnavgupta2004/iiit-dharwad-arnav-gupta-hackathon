@@ -208,8 +208,17 @@ def backtest() -> None:
     """Module A: daily backtest of the sentiment-tilted index -> reports/."""
     from riskpulse.moduleA.run import run
 
-    perf = run()["performance"]
-    for name, p in perf.items():
+    out = run()
+    ic, cal = out["headline_information_coefficient"], out["calibration"]
+    typer.echo(
+        f"kappa {cal['kappa']} (median |active| {cal['achieved']:.4f}, "
+        f"calibrated on {cal['calibration_window']})"
+    )
+    typer.echo(
+        f"IC mean {ic['mean_ic']}  t-stat {ic['t_stat']}  "
+        f"positive days {ic['pct_positive_days']:.1%}"
+    )
+    for name, p in out["performance_secondary"].items():
         typer.echo(f"{name:26s} cum {p['cumulative_return']:+.2%}  sharpe {p['sharpe_rf0']}")
 
 
