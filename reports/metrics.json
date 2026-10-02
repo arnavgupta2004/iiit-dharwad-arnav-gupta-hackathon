@@ -8421,5 +8421,53 @@
       "generated_at": "2026-10-02T06:19:00+00:00",
       "git_commit": "46e871f"
     }
+  },
+  "sentiment_finetune": {
+    "base_model": "ProsusAI/finbert",
+    "train_rows": 8597,
+    "dev_rows_from_train": 946,
+    "test_split": "valid (touched once)",
+    "hyperparameters": {
+      "lr": 2e-05,
+      "batch": 32,
+      "max_len": 64,
+      "epochs": 3,
+      "warmup_frac": 0.1,
+      "seed": 20261002
+    },
+    "budget_minutes": 45.0,
+    "stop_reason": "completed",
+    "history": [
+      {
+        "epoch": 1,
+        "dev_macro_f1": 0.824,
+        "elapsed_min": 7.1
+      },
+      {
+        "epoch": 2,
+        "dev_macro_f1": 0.8343,
+        "elapsed_min": 14.7
+      },
+      {
+        "epoch": 3,
+        "dev_macro_f1": 0.8308,
+        "elapsed_min": 23.1
+      }
+    ],
+    "test_macro_f1": 0.8435,
+    "bar_finbert_train_tuned": 0.6609,
+    "finbert_argmax_for_reference": 0.6682,
+    "kept": true,
+    "decision": "kept (beats FinBERT 0.661)",
+    "label_map": {
+      "0": "negative",
+      "1": "positive",
+      "2": "neutral"
+    },
+    "_provenance": {
+      "script": "riskpulse eval finetune",
+      "generated_at": "2026-10-02T06:45:10+00:00",
+      "git_commit": "eac7ee2"
+    }
   }
 }
