@@ -1,0 +1,371 @@
+{
+  "protocol": "D-052 step 5: evaluated once; the selected model was fixed in commit 6df41d5 before gold-2 was read",
+  "n": 200,
+  "label_counts": {
+    "OTHER": 98,
+    "GEOPOLITICAL": 33,
+    "MACROECONOMIC": 27,
+    "PRODUCT_LAUNCH": 11,
+    "REGULATORY_LEGAL": 10,
+    "MERGER_ACQUISITION": 7,
+    "OPERATIONAL_ESG": 5,
+    "EARNINGS": 4,
+    "CREDIT_EVENT": 4,
+    "MANAGEMENT_CHANGE": 1
+  },
+  "models": {
+    "selected_C1": {
+      "path": "data/trained/event_clf_round2.pkl",
+      "sha256": "a9b87af858ae2bdd1e51ff67ec8f240b7d63a9a5de02510851caf1cdc6ef8adf"
+    },
+    "previous_deployed": {
+      "path": "data/processed/models/event_clf.pkl",
+      "sha256": "499d417612ac7d0ab56cc1aba4085abb5ee13f3c1d76480de8b66398cb908e6b"
+    },
+    "zero_shot_large_reference": "MoritzLaurer/deberta-v3-large-zeroshot-v2.0"
+  },
+  "results": {
+    "all": {
+      "n": 200,
+      "selected_C1": {
+        "macro_f1": 0.5594,
+        "accuracy": 0.64
+      },
+      "previous_deployed": {
+        "macro_f1": 0.5772,
+        "accuracy": 0.635
+      },
+      "keyword_baseline": {
+        "macro_f1": 0.5954,
+        "accuracy": 0.7
+      },
+      "zero_shot_base": {
+        "macro_f1": 0.5781,
+        "accuracy": 0.545
+      },
+      "zero_shot_large_reference": {
+        "macro_f1": 0.5127,
+        "accuracy": 0.575
+      },
+      "selected_minus_95ci": {
+        "previous_deployed": [
+          -0.0801,
+          0.032
+        ],
+        "keyword_baseline": [
+          -0.1261,
+          0.0487
+        ],
+        "zero_shot_base": [
+          -0.0804,
+          0.0983
+        ],
+        "zero_shot_large_reference": [
+          -0.0566,
+          0.1374
+        ]
+      }
+    },
+    "news_headlines": {
+      "n": 160,
+      "selected_C1": {
+        "macro_f1": 0.6103,
+        "accuracy": 0.6438
+      },
+      "previous_deployed": {
+        "macro_f1": 0.6251,
+        "accuracy": 0.6375
+      },
+      "keyword_baseline": {
+        "macro_f1": 0.6604,
+        "accuracy": 0.6937
+      },
+      "zero_shot_base": {
+        "macro_f1": 0.6623,
+        "accuracy": 0.65
+      },
+      "zero_shot_large_reference": {
+        "macro_f1": 0.5676,
+        "accuracy": 0.6312
+      },
+      "selected_minus_95ci": {
+        "previous_deployed": [
+          -0.0822,
+          0.0407
+        ],
+        "keyword_baseline": [
+          -0.1487,
+          0.0562
+        ],
+        "zero_shot_base": [
+          -0.13,
+          0.0744
+        ],
+        "zero_shot_large_reference": [
+          -0.0792,
+          0.1414
+        ]
+      }
+    },
+    "tweets": {
+      "n": 40,
+      "selected_C1": {
+        "macro_f1": 0.1967,
+        "accuracy": 0.625
+      },
+      "previous_deployed": {
+        "macro_f1": 0.2066,
+        "accuracy": 0.625
+      },
+      "keyword_baseline": {
+        "macro_f1": 0.2164,
+        "accuracy": 0.725
+      },
+      "zero_shot_base": {
+        "macro_f1": 0.0354,
+        "accuracy": 0.125
+      },
+      "zero_shot_large_reference": {
+        "macro_f1": 0.0786,
+        "accuracy": 0.35
+      },
+      "selected_minus_95ci": {
+        "previous_deployed": [
+          -0.0475,
+          0.0168
+        ],
+        "keyword_baseline": [
+          -0.0505,
+          0.0043
+        ],
+        "zero_shot_base": [
+          0.0428,
+          0.1853
+        ],
+        "zero_shot_large_reference": [
+          -0.0112,
+          0.1512
+        ]
+      }
+    },
+    "per_class_all": {
+      "selected_C1": {
+        "GEOPOLITICAL": 0.7949,
+        "MACROECONOMIC": 0.7778,
+        "CREDIT_EVENT": 0.6667,
+        "MERGER_ACQUISITION": 0.4444,
+        "PRODUCT_LAUNCH": 0.5,
+        "EARNINGS": 0.4,
+        "REGULATORY_LEGAL": 0.6667,
+        "MANAGEMENT_CHANGE": 0.3333,
+        "OPERATIONAL_ESG": 0.4,
+        "OTHER": 0.6098
+      },
+      "previous_deployed": {
+        "GEOPOLITICAL": 0.7895,
+        "MACROECONOMIC": 0.7407,
+        "CREDIT_EVENT": 0.6667,
+        "MERGER_ACQUISITION": 0.5455,
+        "PRODUCT_LAUNCH": 0.5625,
+        "EARNINGS": 0.4444,
+        "REGULATORY_LEGAL": 0.6,
+        "MANAGEMENT_CHANGE": 0.2222,
+        "OPERATIONAL_ESG": 0.6,
+        "OTHER": 0.6
+      },
+      "keyword_baseline": {
+        "GEOPOLITICAL": 0.7901,
+        "MACROECONOMIC": 0.8214,
+        "CREDIT_EVENT": 0.7273,
+        "MERGER_ACQUISITION": 0.4615,
+        "PRODUCT_LAUNCH": 0.25,
+        "EARNINGS": 0.6,
+        "REGULATORY_LEGAL": 0.6667,
+        "MANAGEMENT_CHANGE": 0.3333,
+        "OPERATIONAL_ESG": 0.6,
+        "OTHER": 0.7033
+      },
+      "zero_shot_base": {
+        "GEOPOLITICAL": 0.8732,
+        "MACROECONOMIC": 0.8065,
+        "CREDIT_EVENT": 0.5333,
+        "MERGER_ACQUISITION": 0.3256,
+        "PRODUCT_LAUNCH": 0.6111,
+        "EARNINGS": 0.2857,
+        "REGULATORY_LEGAL": 0.6316,
+        "MANAGEMENT_CHANGE": 1.0,
+        "OPERATIONAL_ESG": 0.4,
+        "OTHER": 0.314
+      },
+      "zero_shot_large_reference": {
+        "GEOPOLITICAL": 0.8101,
+        "MACROECONOMIC": 0.8235,
+        "CREDIT_EVENT": 0.5714,
+        "MERGER_ACQUISITION": 0.4242,
+        "PRODUCT_LAUNCH": 0.6154,
+        "EARNINGS": 0.3636,
+        "REGULATORY_LEGAL": 0.4848,
+        "MANAGEMENT_CHANGE": 0.0,
+        "OPERATIONAL_ESG": 0.6,
+        "OTHER": 0.4341
+      }
+    },
+    "confusion_selected_all": {
+      "labels": [
+        "GEOPOLITICAL",
+        "MACROECONOMIC",
+        "CREDIT_EVENT",
+        "MERGER_ACQUISITION",
+        "PRODUCT_LAUNCH",
+        "EARNINGS",
+        "REGULATORY_LEGAL",
+        "MANAGEMENT_CHANGE",
+        "OPERATIONAL_ESG",
+        "OTHER"
+      ],
+      "matrix": [
+        [
+          31,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2
+        ],
+        [
+          2,
+          21,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ],
+        [
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          2,
+          7,
+          0,
+          0,
+          0,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          1,
+          0,
+          6,
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          2
+        ],
+        [
+          12,
+          5,
+          1,
+          5,
+          9,
+          8,
+          2,
+          4,
+          2,
+          50
+        ]
+      ]
+    }
+  },
+  "deployment": "selected_C1 is deployed whatever these results show (pre-registered)",
+  "reported_only": {
+    "sentiment_macro_f1_deployed_rule": {
+      "news_headlines": {
+        "finetuned": 0.3827,
+        "finbert": 0.5532,
+        "n": 160
+      },
+      "tweets": {
+        "finetuned": 0.4298,
+        "finbert": 0.4289,
+        "n": 40
+      }
+    },
+    "entity_link_precision": 0.8981,
+    "entity_link_precision_95ci_wilson": [
+      0.8268,
+      0.9422
+    ],
+    "entity_links_checked": 108
+  }
+}

@@ -219,3 +219,119 @@ def train_final(candidate: str = "C1") -> dict:
         "rows": len(y),
         "version": clf.version,
     }
+
+
+GOLD2_JSON = reports_path("events_gold2.json")
+GOLD2_PRED = reports_path("events_gold2_predictions.csv")
+PREV_DEPLOYED = data_path("processed", "models", "event_clf.pkl")  # pre-round-2 deployed model
+LARGE_ZS = "MoritzLaurer/deberta-v3-large-zeroshot-v2.0"
+
+
+def _wilson(k: int, n: int) -> list[float]:
+    from riskpulse.eval.linking_eval import wilson
+
+    lo, hi = wilson(k, n)
+    return [round(float(lo), 4), round(float(hi), 4)]
+
+
+def evaluate_gold2() -> dict:
+    """The one gold-2 evaluation (D-052 step 5). Refuses to run twice."""
+    import hashlib
+
+    from riskpulse.engine.event_training import _paired_ci, _scores
+    from riskpulse.eval import sentiment_gold as sg
+
+    if GOLD2_JSON.exists():
+        raise RuntimeError(
+            f"gold-2 already evaluated ({GOLD2_JSON.name}); D-052 allows one evaluation"
+        )
+    g = pd.read_csv(data_path("gold", "labels_2.csv"))
+    texts, y = g["text"].tolist(), g["label_event_class"].str.strip().to_numpy()
+    sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()  # noqa: E731
+    selected = EmbeddingClassifier.load(FINAL_PATH)
+    previous = EmbeddingClassifier.load(PREV_DEPLOYED)
+    preds = {
+        "selected_C1": np.array([p.event_class for p in selected.predict(texts)]),
+        "previous_deployed": np.array([p.event_class for p in previous.predict(texts)]),
+        "keyword_baseline": np.array([p.event_class for p in KeywordClassifier().predict(texts)]),
+        "zero_shot_base": np.array([p.event_class for p in ZeroShotClassifier().predict(texts)]),
+        "zero_shot_large_reference": np.array(
+            [p.event_class for p in ZeroShotClassifier(LARGE_ZS).predict(texts)]
+        ),
+    }
+    seed = 20261002
+    subsets = {
+        "all": np.ones(len(g), bool),
+        "news_headlines": (g["source"] == "gdelt").to_numpy(),
+        "tweets": (g["source"] == "kaggle_tweets").to_numpy(),
+    }
+    res: dict = {}
+    for sub, m in subsets.items():
+        r = {"n": int(m.sum())}
+        for k, p in preds.items():
+            r[k] = {
+                "macro_f1": round(macro_f1(y[m], p[m]), 4),
+                "accuracy": round(float((y[m] == p[m]).mean()), 4),
+            }
+        r["selected_minus_95ci"] = {
+            k: _paired_ci(y[m], preds["selected_C1"][m], p[m], seed)
+            for k, p in preds.items()
+            if k != "selected_C1"
+        }
+        res[sub] = r
+    res["per_class_all"] = {
+        k: _scores(list(y), list(p), CLASSES)["f1_per_class"] for k, p in preds.items()
+    }
+    res["confusion_selected_all"] = _scores(list(y), list(preds["selected_C1"]), CLASSES)[
+        "confusion_matrix"
+    ]
+
+    # Reported only (D-052): gold-2 sentiment (deployed rule) and entity-link correctness.
+    g2 = g.assign(
+        tickers=g["linked_tickers"].astype(str).str.split(","),
+        gold=g["label_sentiment"].str.strip().str.lower(),
+    )
+    sent: dict = {}
+    for v in ("finetuned", "finbert"):
+        s, _ = sg.model_scores(g2, v)
+        sent[v] = np.array([sg.label_from_score(x) for x in s])
+    sent_res = {
+        sub: {k: round(sg.macro_f1(g2["gold"].to_numpy()[m], p[m]), 4) for k, p in sent.items()}
+        | {"n": int(m.sum())}
+        for sub, m in subsets.items()
+        if sub != "all"
+    }
+    ent = g["label_entity_correct"].dropna().astype(str).str.strip()
+    k_ok, n_ent = int((ent == "y").sum()), int(ent.isin(["y", "n", "partial"]).sum())
+
+    payload = {
+        "protocol": "D-052 step 5: evaluated once; the selected model was fixed in commit "
+        "6df41d5 before gold-2 was read",
+        "n": int(len(g)),
+        "label_counts": pd.Series(y).value_counts().to_dict(),
+        "models": {
+            "selected_C1": {
+                "path": str(FINAL_PATH.relative_to(repo_root())),
+                "sha256": sha(FINAL_PATH),
+            },
+            "previous_deployed": {
+                "path": str(PREV_DEPLOYED.relative_to(repo_root())),
+                "sha256": sha(PREV_DEPLOYED),
+            },
+            "zero_shot_large_reference": LARGE_ZS,
+        },
+        "results": res,
+        "deployment": "selected_C1 is deployed whatever these results show (pre-registered)",
+        "reported_only": {
+            "sentiment_macro_f1_deployed_rule": sent_res,
+            "entity_link_precision": round(k_ok / n_ent, 4) if n_ent else None,
+            "entity_link_precision_95ci_wilson": _wilson(k_ok, n_ent) if n_ent else None,
+            "entity_links_checked": n_ent,
+        },
+    }
+    pd.DataFrame({"item_id": g["item_id"], "source": g["source"], "gold": y, **preds}).to_csv(
+        GOLD2_PRED, index=False
+    )
+    GOLD2_JSON.write_text(json.dumps(payload, indent=2))
+    update_metrics("events_gold2", payload, script="riskpulse.engine.event_round2.evaluate_gold2")
+    return payload
