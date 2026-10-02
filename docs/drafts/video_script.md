@@ -51,7 +51,8 @@ Show briefly: the `model origin` log lines (repo / hub, no FALLBACK), then `127.
 Actions:
 1. Document feed: headlines arriving with entity, sentiment, event class and impact.
 2. Event signals: select a story; show the "Impact drivers (0-1)" chart and its evidence.
-3. Analyze a headline: "JPMorgan beats estimates while Bank of America misses" shows per-company sentiment.
+3. Analyze a headline: "Exxon posts record quarterly profit while Chevron cuts its outlook" gives Exxon +0.64 and Chevron −0.94, while the whole sentence scores −0.95. Rehearse
+   it; these are the deployed news model's values.
 
 Voice-over:
 > "Each item is linked to companies or to the market, scored for sentiment with FinBERT for news and a tweet-tuned

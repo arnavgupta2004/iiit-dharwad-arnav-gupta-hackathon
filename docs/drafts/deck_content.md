@@ -52,7 +52,8 @@ Visual: `docs/architecture.png`.
 
 ## Slide 4: Implementation highlights (what and why)
 
-- **Entity-level sentiment:** "JPM beats while BAC misses" scores each bank separately. News uses FinBERT (better
+- **Entity-level sentiment:** "Exxon posts record quarterly profit while Chevron cuts its outlook" gives Exxon +0.64
+  and Chevron −0.94; a whole-sentence score (−0.95) would wrongly mark Exxon negative. News uses FinBERT (better
   on labelled live news); tweets use the tweet-fine-tuned model (the two score about the same on tweets).
 - **Impact v2:** monotone gradient boosting learned on 2009-18 Benzinga headlines vs abnormal returns. Scored live
   from per-session aggregates (no look-ahead), with every score's drivers shown.

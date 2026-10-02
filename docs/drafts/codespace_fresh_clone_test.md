@@ -54,7 +54,7 @@ grep "model origin" serve.log
 grep -c "FALLBACK IN USE" serve.log          # expect 0
 curl -s http://127.0.0.1:8000/health
 time curl -s -X POST http://127.0.0.1:8000/analyze -H 'Content-Type: application/json' \
-  -d '{"text": "JPMorgan beats estimates while Bank of America misses"}' | python -m json.tool | head -40
+  -d '{"text": "Exxon posts record quarterly profit while Chevron cuts its outlook"}' | python -m json.tool | head -40
 ```
 
 ### What to check
@@ -66,7 +66,7 @@ time curl -s -X POST http://127.0.0.1:8000/analyze -H 'Content-Type: application
 | `model origin | impact_company` | `repo:data/trained/impact_v2.json` |
 | `model origin | embeddings` | `hub:sentence-transformers/all-MiniLM-L6-v2` |
 | `FALLBACK IN USE` lines | **0** |
-| `/analyze` | JSON with `sentiment_score`, `event_class`, `entities` (each with its own `sentiment_score`, `impact_score` and `drivers`; JPM and BAC should get different clause-level scores) and `model_versions` (`news:finbert@…; social:finbert-tweets-ft`); well under 1 s after start-up |
+| `/analyze` | JSON with `sentiment_score`, `event_class`, `entities` (each with its own `sentiment_score`, `impact_score` and `drivers`; expect XOM positive and CVX negative, as in CI: XOM +0.64, CVX −0.94) and `model_versions` (`news:finbert@…; social:finbert-tweets-ft`); well under 1 s after start-up |
 
 ## 7. Optional: full demo with the dashboard and live replay
 Stop `serve` (Ctrl+C), then:

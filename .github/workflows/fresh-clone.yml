@@ -83,7 +83,7 @@ jobs:
           for k in 1 2; do
             t0=$(date +%s.%N)
             curl -sf -X POST http://127.0.0.1:8000/analyze -H 'Content-Type: application/json' \
-              -d '{"text": "JPMorgan beats estimates while Bank of America misses"}' > analyze.json
+              -d '{"text": "Exxon posts record quarterly profit while Chevron cuts its outlook"}' > analyze.json
             echo "ANALYZE_CALL_$k=$(python -c "print(round($(date +%s.%N) - $t0, 3))")s" | tee -a "$GITHUB_STEP_SUMMARY"
           done
           python - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
@@ -92,6 +92,7 @@ jobs:
           assert r["event_class"] and r["entities"], r
           ents = {e["ticker"]: e["sentiment_score"] for e in r["entities"]}
           print("analyze:", {"event_class": r["event_class"], "entities": ents, "sentiment_model": r["model_versions"]["sentiment"]})
+          assert ents["XOM"] > 0 > ents["CVX"], f"entity-level sentiment should split: {ents}"
           PY
           pkill -f "riskpulse serve" || true
 
