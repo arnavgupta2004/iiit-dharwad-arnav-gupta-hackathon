@@ -271,6 +271,74 @@ def build(m: dict) -> str:
     return "\n".join(out)
 
 
+def build_glance(m: dict, fs: dict) -> str:
+    """'Results at a glance' (top of README): one line per result with a trust note."""
+    ru = m["moduleB_validation"]["episodes"]["russia_ukraine_2022"]
+    first = next(
+        r
+        for r in ru["class_runs_in_prior_week"]
+        if any(w in (r["headline"] or "") for w in ("Russia", "Ukrain", "Putin"))
+    )
+    signs = round(ru["sign_agreement"] * len(ru["factors"]))
+    a = m["moduleA"]["headline_information_coefficient"]
+    perf = m["moduleA"]["performance_secondary"]
+    t = m["impact_v2"]["test_post_burn_in"]["abs_car01"]
+    g = m["sentiment_gold"]["results"]["news_headlines"]
+    lk, pl = m["entity_linking"], m["pipeline"]
+    when = first["as_of"].replace("T", " ")[:16]
+    rows = [
+        (
+            f"**End to end on {fs['n_docs']:,} real documents** ({fs['by_source']['gdelt']:,} GDELT news, "
+            f"{fs['by_source']['kaggle_tweets']:,} tweets, 2021-09 → 2022-09); one command: `python -m riskpulse demo --fast`.",
+            "Real public data, replayed in time order; fresh-clone install tested.",
+        ),
+        (
+            f"**2022 Russia–Ukraine:** a geopolitical stress test fired at **{when} UTC**, two days before the "
+            f'24 Feb invasion, on "{first["headline"]}"; the scenario got **{signs} of {len(ru["factors"])} factor '
+            "directions right** over the 10 sessions from 24 Feb.",
+            "Out-of-sample: scenarios calibrated only on episodes before Sep 2021; the oil shock was underestimated.",
+        ),
+        (
+            f"**Module A, information coefficient {a['mean_ic']:+.3f}, t-stat {a['t_stat']}** "
+            f"(IC > 0 on {pct(a['pct_positive_days'])} of {a['n_days']} days).",
+            "Out-of-sample after a returns-free calibration of the tilt; returns are secondary "
+            f"(tilt {pct(perf['sentiment_tilt']['cumulative_return'])} vs equal weight {pct(perf['equal_weight_rebalanced']['cumulative_return'])}).",
+        ),
+        (
+            f"**Impact v2 vs v1:** Spearman with abnormal returns {t['impact_v2']['spearman_rho']:.3f} vs "
+            f"{t['impact_v1']['spearman_rho']:.3f} (95% CI of the gain {t['rho_diff_v2_minus_v1_95ci']}); on par with "
+            f"abs(sentiment) ({t['abs_sent']['spearman_rho']:.3f}).",
+            "Trained on 2009-18 Benzinga, tested on 2021-22 (every look at that window logged, D-050); adoption rule "
+            "revised after the first test (D-039).",
+        ),
+        (
+            f"**Sentiment on live news (FinBERT):** macro-F1 {g['macro_f1']['finbert']:.3f} vs VADER "
+            f"{g['macro_f1']['vader']:.3f} and Loughran-McDonald {g['macro_f1']['lm']:.3f} (n {g['n']}).",
+            "Human-labelled, pre-registered; these labels also helped choose FinBERT for news, so slightly optimistic.",
+        ),
+        (
+            f"**Entity linking precision {pct(lk['precision'])}** (95% CI {pct(lk['precision_95ci_wilson'][0])}–"
+            f"{pct(lk['precision_95ci_wilson'][1])}).",
+            f"Human-checked: {lk['n_marked']} random headline links.",
+        ),
+        (
+            f"**Pipeline:** {pl['batch_docs_per_sec']} documents/s batch; {pl['single_doc_latency_ms_p95']} ms p95 per "
+            "document.",
+            f"Measured on a {pl['n_cpu']}-core laptop CPU, no GPU, with both sentiment models loaded.",
+        ),
+    ]
+    out = ["### Results at a glance", "", "| Result | Why you can trust it |", "|---|---|"]
+    out += [f"| {r} | {n} |" for r, n in rows]
+    out += [
+        "",
+        "Not everything worked; see [Limitations](#limitations-measured-not-assumed): event classification is no better "
+        "than a keyword baseline, market-wide impact does not predict SPY or VIX moves, and the June 2022 FOMC hike was "
+        "missed (no adverse trigger on the day; the reaction was a relief rally that the scenarios, lacking a "
+        "surprise-vs-consensus measure, can't represent).",
+    ]
+    return "\n".join(out)
+
+
 def main() -> None:
     m = json.loads((repo_root() / "reports" / "metrics.json").read_text())
     readme = repo_root() / "README.md"
@@ -279,6 +347,9 @@ def main() -> None:
     new = re.sub(
         r"<!-- RESULTS:START -->.*?<!-- RESULTS:END -->", lambda _: block, text, flags=re.S
     )
+    fs = json.loads((repo_root() / "reports" / "feed_stats.json").read_text())
+    glance = f"<!-- GLANCE:START -->\n{build_glance(m, fs)}\n<!-- GLANCE:END -->"
+    new = re.sub(r"<!-- GLANCE:START -->.*?<!-- GLANCE:END -->", lambda _: glance, new, flags=re.S)
     readme.write_text(new)
     print("README results block updated")
 

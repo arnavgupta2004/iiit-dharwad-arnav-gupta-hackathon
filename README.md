@@ -5,6 +5,22 @@
 **Demo Video Link:** [YouTube unlisted link: to be added]
 **Slide Deck Link (if hosted externally):** [`docs/presentation.pdf`](docs/presentation.pdf)
 
+<!-- GLANCE:START -->
+### Results at a glance
+
+| Result | Why you can trust it |
+|---|---|
+| **End to end on 203,363 real documents** (165,782 GDELT news, 37,581 tweets, 2021-09 → 2022-09); one command: `python -m riskpulse demo --fast`. | Real public data, replayed in time order; fresh-clone install tested. |
+| **2022 Russia–Ukraine:** a geopolitical stress test fired at **2022-02-22 00:00 UTC**, two days before the 24 Feb invasion, on "Putin recognizes separatist eastern Ukrainian regions, raising fears of invasion"; the scenario got **9 of 14 factor directions right** over the 10 sessions from 24 Feb. | Out-of-sample: scenarios calibrated only on episodes before Sep 2021; the oil shock was underestimated. |
+| **Module A, information coefficient +0.047, t-stat 2.85** (IC > 0 on 56.9% of 209 days). | Out-of-sample after a returns-free calibration of the tilt; returns are secondary (tilt -24.0% vs equal weight -23.3%). |
+| **Impact v2 vs v1:** Spearman with abnormal returns 0.111 vs 0.055 (95% CI of the gain [0.0289, 0.0856]); on par with abs(sentiment) (0.110). | Trained on 2009-18 Benzinga, tested on 2021-22 (every look at that window logged, D-050); adoption rule revised after the first test (D-039). |
+| **Sentiment on live news (FinBERT):** macro-F1 0.592 vs VADER 0.471 and Loughran-McDonald 0.442 (n 237). | Human-labelled, pre-registered; these labels also helped choose FinBERT for news, so slightly optimistic. |
+| **Entity linking precision 82.0%** (95% CI 73.3%–88.3%). | Human-checked: 100 random headline links. |
+| **Pipeline:** 86.6 documents/s batch; 21.3 ms p95 per document. | Measured on a 10-core laptop CPU, no GPU, with both sentiment models loaded. |
+
+Not everything worked; see [Limitations](#limitations-measured-not-assumed): event classification is no better than a keyword baseline, market-wide impact does not predict SPY or VIX moves, and the June 2022 FOMC hike was missed (no adverse trigger on the day; the reaction was a relief rally that the scenarios, lacking a surprise-vs-consensus measure, can't represent).
+<!-- GLANCE:END -->
+
 ## 1. Project Overview / Problem Statement & Approach
 
 Risk desks read thousands of headlines and posts a day, but positioning and stress testing need *structured* inputs.
@@ -231,7 +247,7 @@ an analyst sees which names and stories drive sentiment, why a story scores 8/10
 breaks, an immediate estimate of the P&L, expected-loss and CET1 effect on a wholesale book, with every shock traceable
 to a named historical episode.
 
-**Limitations (measured, not assumed).**
+### Limitations (measured, not assumed)
 - Fine-tuning helped in-domain (0.844) but was worse than base FinBERT on live news (pooled check), so news uses
   FinBERT. The fine-tuned model is kept for tweets, where the two score about the same (gold-1: CI includes 0, n 63;
   gold-2: 0.430 vs 0.429, n 40).
@@ -241,8 +257,11 @@ to a named historical episode.
 - Impact v2 matches abs(sentiment) for predicting the market reaction, without beating it. Market-wide impact (v1)
   shows no measurable relation to SPY or VIX moves.
 - Geopolitical scenarios average risk-off and supply-shock analogues, so the 2022 invasion's oil move was badly
-  underestimated. Scheduled macro events lack a surprise-vs-consensus measure: the June 2022 FOMC scenario predicted a
-  sell-off into what became a relief rally.
+  underestimated. Scheduled macro events lack a surprise-vs-consensus measure. The June 2022 FOMC hike was missed: no
+  adverse macro story reached the trigger on the day, and the market's actual reaction was a relief rally, which a
+  stress scenario can't represent. An earlier version did trigger, on the relief-rally headline itself; that flaw led
+  to the adverse-sentiment rule (D-059).
+- Trigger timing was never validated against VIX spikes or SPY drawdown days, so trigger precision is unmeasured.
 - Data: one year of replay, 20 names, a 1-in-4 sample of GDELT files, tweets for 12 of 20 names, rule-based linking,
   and a synthetic book with credit-risk RWA only.
 
