@@ -31,6 +31,9 @@ def run(n_batch: int = 1024, n_latency: int = 100) -> dict:
             break
     scorer = NLPScorer()
     scorer.score(docs[:8])  # warm-up: load models
+    # Both sentiment models (news and social, D-058) must be loaded before timing.
+    scorer.finbert.score(["warm up"])
+    scorer.finbert_news.score(["warm up"])
     t0 = time.perf_counter()
     scored = []
     for i in range(0, len(docs), 128):

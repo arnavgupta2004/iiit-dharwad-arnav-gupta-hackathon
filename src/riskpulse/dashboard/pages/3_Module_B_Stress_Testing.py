@@ -26,9 +26,10 @@ st.title("Module B: Strategic Portfolio Stress Testing")
 st.markdown(
     '<p class="rp-note">Synthetic book: 121 counterparties (CP_xxxx) seeded from card-transaction '
     "merchant data, 334 positions (loans, bonds, IRS, FX forwards, options, TRS, CDS, equity), "
-    "USD 10 bn notional. A stress test fires for event signals with impact ≥ 8, event confidence ≥ 0.6 "
-    "and ≥ 2 sources (24 h cooldown per event class and macro-region; within a cooldown it re-runs "
-    "only if impact escalates). Shocks come from pre-2021 historical analogues.</p>",
+    "USD 10 bn notional. A stress test fires for event signals with impact ≥ 8, event confidence ≥ 0.6, "
+    "≥ 2 sources and adverse sentiment (below −0.15, D-059), with a 24 h cooldown per event class and "
+    "macro-region (within a cooldown it re-runs only if impact escalates). Shocks come from pre-2021 "
+    "historical analogues.</p>",
     unsafe_allow_html=True,
 )
 

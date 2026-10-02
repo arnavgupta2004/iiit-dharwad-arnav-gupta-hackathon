@@ -56,9 +56,9 @@ def build(m: dict) -> str:
     if ft and sg:
         n, t = sg["results"]["news_headlines"], sg["results"]["tweets"]
         out += [
-            f"**Sentiment model in use: FinBERT fine-tuned on the tweet train split only** (D-043, D-048). In-domain test "
-            f"(same dataset as training): {ft['test_macro_f1']:.3f}. On live-feed text (Arnav's gold labels, rule "
-            "pre-registered before scoring):",
+            "**Sentiment models in use: FinBERT for news, FinBERT fine-tuned on the tweet train split for tweets** "
+            f"(D-058). The fine-tuned model scores {ft['test_macro_f1']:.3f} in-domain (same dataset as its training "
+            "data). On live-feed text (Arnav's gold-1 labels, rule pre-registered before scoring, D-041):",
             "",
             "| Live-feed gold | n | FinBERT | Fine-tuned | Fine-tuned − FinBERT (95% CI) | VADER | LM |",
             "|---|---|---|---|---|---|---|",
@@ -67,10 +67,18 @@ def build(m: dict) -> str:
             f"| Tweets | {t['n']} | {t['macro_f1']['finbert']:.3f} | {t['macro_f1']['finetuned']:.3f} | "
             f"{t['diff_finetuned_minus_finbert']:+.3f} {t['diff_95ci']} | {t['macro_f1']['vader']:.3f} | {t['macro_f1']['lm']:.3f} |",
             "",
-            "The in-domain gain does not transfer: on live text the two models are statistically indistinguishable "
-            "(point estimates favour FinBERT); the pre-registered rule therefore keeps the fine-tuned model.",
+            "The in-domain gain does not transfer to news.",
             "",
         ]
+        pooled = m.get("sentiment_news_pooled")
+        if pooled:
+            out += [
+                f"Pooled news check (gold-1 + gold-2 news, n = {pooled['n']}, rule pre-registered in D-057): fine-tuned "
+                f"{pooled['macro_f1']['finetuned']:.3f} vs FinBERT {pooled['macro_f1']['finbert']:.3f}, difference "
+                f"{pooled['diff_finetuned_minus_finbert']:+.3f}, 95% CI {pooled['diff_95ci']} (entirely below 0), so news "
+                "switched to FinBERT. This was a post-hoc revision prompted by the gold-2 evidence (D-058).",
+                "",
+            ]
     e, g2, cv = m.get("events"), m.get("events_gold2"), m.get("events_round2_cv")
     if g2:
         r = g2["results"]
