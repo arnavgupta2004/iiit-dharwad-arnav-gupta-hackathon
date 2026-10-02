@@ -27,8 +27,8 @@ st.markdown(
     '<p class="rp-note">Synthetic book: 121 counterparties (CP_xxxx) seeded from card-transaction '
     "merchant data, 334 positions (loans, bonds, IRS, FX forwards, options, TRS, CDS, equity), "
     "USD 10 bn notional. A stress test fires for event signals with impact ≥ 8, event confidence ≥ 0.6 "
-    "and ≥ 2 sources (24 h cooldown per class and region). Shocks come from pre-2021 historical "
-    "analogues.</p>",
+    "and ≥ 2 sources (24 h cooldown per event class and macro-region; within a cooldown it re-runs "
+    "only if impact escalates). Shocks come from pre-2021 historical analogues.</p>",
     unsafe_allow_html=True,
 )
 
@@ -274,6 +274,102 @@ for cls in ["GEOPOLITICAL", "MACROECONOMIC", "CREDIT_EVENT", "OPERATIONAL_ESG"]:
             }
         )
 st.dataframe(pd.DataFrame(rows), use_container_width=True)
+
+# ---------- trigger frequency ----------
+trig = data.metrics().get("moduleB_triggers", {})
+if trig.get("stress_runs_per_month"):
+    st.subheader("Trigger frequency")
+    months = list(trig["stress_runs_per_month"])
+    fig = go.Figure(
+        go.Bar(
+            x=months,
+            y=[trig["stress_runs_per_month"][m] for m in months],
+            marker_color=NAVY,
+            hovertemplate="%{x}: %{y} stress runs<extra></extra>",
+        )
+    )
+    fig.update_layout(height=260, yaxis_title="stress runs", showlegend=False)
+    st.plotly_chart(fig, use_container_width=True)
+    blocked = trig.get("candidates_blocked_by", {})
+    st.caption(
+        f"{trig['n_triggers_fired']} triggers fired ({trig.get('n_escalations', 0)} escalations), "
+        f"{trig['n_stress_runs']} stress runs over the replay year. Candidates blocked: "
+        + ", ".join(f"{k.replace('_', ' ')} {v:,}" for k, v in blocked.items())
+        + ". Sep 2021 holds one replay day. Source: reports/metrics.json → moduleB_triggers."
+    )
+
+# ---------- out-of-sample validation ----------
+FACTOR_UNITS = {
+    "rates_10y_bp": "bp",
+    "rates_3m_bp": "bp",
+    "credit_bbb_bp": "bp",
+    "vol_vix_pts": "pts",
+}
+
+
+def _fmt_factor(f: str, x: float) -> str:
+    unit = FACTOR_UNITS.get(f)
+    return f"{x:+.1f} {unit}" if unit else f"{x * 100:+.1f}%"
+
+
+val = data.metrics().get("moduleB_validation", {})
+if val.get("episodes"):
+    st.subheader("Out-of-sample check: 2022 predicted vs realised")
+    st.markdown(
+        '<p class="rp-note">Scenario shocks are calibrated only on episodes before Sep 2021. For each '
+        "2022 episode, the prediction is the stress test the trigger actually fired on the event date; "
+        "realised moves are measured from the close before the event over the next 10 sessions. "
+        "Reported, not tuned.</p>",
+        unsafe_allow_html=True,
+    )
+    for name, e in val["episodes"].items():
+        x = e if "factors" in e else e.get("supplementary_latest_run_in_prior_week")
+        title = f"{name.replace('_', ' ')} ({e['event_date']}, {e['class']})"
+        with st.expander(title, expanded=True):
+            if "factors" not in e:
+                st.markdown(f"**Missed:** {e['status'].split(': ', 1)[-1]}.")
+                if x:
+                    st.markdown(
+                        "Supplementary context only (not the pre-registered comparison): the latest "
+                        f"{e['class']} run in the preceding week, fired {x['trigger']['as_of'][:16]}."
+                    )
+            if not x:
+                continue
+            c = st.columns(4)
+            c[0].markdown(
+                kpi("Sign agreement", pct(x["sign_agreement"], 1)), unsafe_allow_html=True
+            )
+            c[1].markdown(
+                kpi("Book impact, predicted", usd(x["book_total_impact_predicted"])),
+                unsafe_allow_html=True,
+            )
+            c[2].markdown(
+                kpi("Book impact, realised", usd(x["book_total_impact_realised"])),
+                unsafe_allow_html=True,
+            )
+            c[3].markdown(
+                kpi(
+                    "CET1 after: predicted / realised",
+                    f"{pct(x['cet1_after_predicted'], 2)} / {pct(x['cet1_after_realised'], 2)}",
+                ),
+                unsafe_allow_html=True,
+            )
+            st.markdown(f"Trigger headline: _{x['headline']}_ · scenario `{x['scenario']}`")
+            st.dataframe(
+                pd.DataFrame(
+                    [
+                        {
+                            "factor": r["factor"],
+                            "predicted": _fmt_factor(r["factor"], r["predicted"]),
+                            "realised": _fmt_factor(r["factor"], r["realised"]),
+                            "same sign": "yes" if r["same_sign"] else "no",
+                        }
+                        for r in x["factors"]
+                    ]
+                ),
+                use_container_width=True,
+                hide_index=True,
+            )
 
 # ---------- inject demo event ----------
 st.subheader("Inject demo event (synthetic)")

@@ -4,6 +4,26 @@ Newest first within each date. Each entry: decision, rationale, and status (acce
 
 ## 2026-10-02 (GATE C decisions by Arnav)
 
+### D-040 2022 predicted vs realised: one hit with partial agreement, one miss (GATE A item 3)
+`riskpulse eval predicted_vs_realised` → `metrics.json → moduleB_validation`, shown on the Module B page. Rule fixed
+before running: the prediction is the highest-impact stress run that actually fired on the event date for the mapped
+class; realised moves are measured with the calibration code from the close before the event over 10 sessions.
+- **Russia–Ukraine, 2022-02-24 (GEOPOLITICAL):** fired 09:00 UTC, impact 8, 17 outlets ("EU Sanctions Hit Russian
+  Defense Minister…"), scenario from Crimea 2014 / Brexit 2016 / Abqaiq 2019 at severity 0.6. Sign agreement 9 of 14
+  factors (64.3%): right on European equities, financials, oil up, BBB spreads wider, EUR/GBP down, USD up and VIX up.
+  Wrong on SPY, energy and tech equities (they rose), 3m rates and JPY. Magnitudes too small for oil (+4.9% vs +18.0%)
+  and BBB (+6 bp vs +22 bp). Book: predicted −USD 8.1 m vs realised +USD 1.6 m. CET1 12.98% vs 12.95%; the realised
+  ratio is lower despite a gain because equity and derivative exposures grow RWA. The analogues are not oil-supply
+  shocks of this size.
+- **FOMC 75 bp hike, 2022-06-15 (MACROECONOMIC):** **missed.** No MACROECONOMIC run fired on the date. Cooldown was not the
+  cause: every MACROECONOMIC story that day peaked at impact 7, including "Fed Raises Interest Rates by
+  Three-Quarters…" (20:00 UTC, confidence 0.94, 2 outlets in the 1-in-4 GKG sample), one notch below the threshold. As supplementary context only, the
+  latest run in the preceding week (CPI day, 2022-06-10, impact 9, growth_scare scenario) would have predicted
+  −8.9% SPY and +18.4 VIX pts, against a realised +2.2% and −4.5 pts over 06-14 → 06-29 (sign agreement 57.1%).
+  The sell-off had already happened between the CPI print and the hike.
+
+Nothing is tuned on these two episodes. They are the validation set.
+
 ### D-037 Stress trigger: macro-region cooldown, escalation, no breadth bonus (Arnav's GATE C item 1)
 Changes (Arnav's choice of options (c) and (d) from GATE C):
 - **Story breadth bonus removed** (`app.yaml → event_breadth_bonus: []`). Breadth already enters impact through B.

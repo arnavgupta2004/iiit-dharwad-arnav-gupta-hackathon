@@ -8147,5 +8147,279 @@
       "generated_at": "2026-10-02T06:12:32+00:00",
       "git_commit": "3209f73"
     }
+  },
+  "moduleB_validation": {
+    "method": "predicted = shocks of the highest-impact stress test fired on the event date for the mapped class; realised = same proxies, close before event -> +10 sessions. If no run fired on the date the episode is reported as missed; the latest same-class run of the preceding 7 days is shown as supplementary context only.",
+    "episodes": {
+      "russia_ukraine_2022": {
+        "event_date": "2022-02-24",
+        "class": "GEOPOLITICAL",
+        "status": "stress test fired on the event date",
+        "trigger": {
+          "as_of": "2022-02-24T09:00:00Z",
+          "impact_score": 8,
+          "n_sources": 17,
+          "regions": [
+            "EUROPE",
+            "RUSSIA_UKRAINE"
+          ]
+        },
+        "headline": "EU Sanctions Hit Russian Defense Minister, Top Advisor, Lawmakers",
+        "scenario": "GEOPOLITICAL:default",
+        "analogues": [
+          "crimea_2014",
+          "brexit_2016",
+          "abqaiq_2019"
+        ],
+        "realised_window": [
+          "2022-02-23",
+          "2022-03-09"
+        ],
+        "factors": [
+          {
+            "factor": "eq_SPY",
+            "predicted": -0.031906,
+            "realised": 0.01294,
+            "error": -0.044846,
+            "same_sign": false
+          },
+          {
+            "factor": "eq_Energy",
+            "predicted": -0.037994,
+            "realised": 0.111324,
+            "error": -0.149318,
+            "same_sign": false
+          },
+          {
+            "factor": "eq_Financials",
+            "predicted": -0.04835,
+            "realised": -0.035733,
+            "error": -0.012617,
+            "same_sign": true
+          },
+          {
+            "factor": "eq_Information Technology",
+            "predicted": -0.03466,
+            "realised": 0.013582,
+            "error": -0.048242,
+            "same_sign": false
+          },
+          {
+            "factor": "eq_EUROPE",
+            "predicted": -0.081611,
+            "realised": -0.05458,
+            "error": -0.027031,
+            "same_sign": true
+          },
+          {
+            "factor": "rates_10y_bp",
+            "predicted": -16.739995,
+            "realised": -2.900004,
+            "error": -13.839991,
+            "same_sign": true
+          },
+          {
+            "factor": "rates_3m_bp",
+            "predicted": -2.400001,
+            "realised": 3.0,
+            "error": -5.400001,
+            "same_sign": false
+          },
+          {
+            "factor": "credit_bbb_bp",
+            "predicted": 6.0,
+            "realised": 22.0,
+            "error": -16.0,
+            "same_sign": true
+          },
+          {
+            "factor": "oil",
+            "predicted": 0.049116,
+            "realised": 0.180239,
+            "error": -0.131123,
+            "same_sign": true
+          },
+          {
+            "factor": "fx_EUR",
+            "predicted": -0.015481,
+            "realised": -0.038035,
+            "error": 0.022554,
+            "same_sign": true
+          },
+          {
+            "factor": "fx_GBP",
+            "predicted": -0.054299,
+            "realised": -0.036062,
+            "error": -0.018237,
+            "same_sign": true
+          },
+          {
+            "factor": "fx_JPY",
+            "predicted": 0.014823,
+            "realised": -0.00541,
+            "error": 0.020233,
+            "same_sign": false
+          },
+          {
+            "factor": "usd_index",
+            "predicted": 0.019309,
+            "realised": 0.018505,
+            "error": 0.000804,
+            "same_sign": true
+          },
+          {
+            "factor": "vol_vix_pts",
+            "predicted": 3.96,
+            "realised": 1.43,
+            "error": 2.53,
+            "same_sign": true
+          }
+        ],
+        "sign_agreement": 0.643,
+        "book_total_impact_predicted": -8091236.27,
+        "book_total_impact_realised": 1642082.73,
+        "capital_losses_predicted": 8091236.274791,
+        "capital_losses_realised": -1642082.727811,
+        "cet1_after_predicted": 0.129842,
+        "cet1_after_realised": 0.129506
+      },
+      "fomc_june_2022": {
+        "event_date": "2022-06-15",
+        "class": "MACROECONOMIC",
+        "status": "missed: no stress test fired for this class on the event date",
+        "supplementary_latest_run_in_prior_week": {
+          "trigger": {
+            "as_of": "2022-06-10T21:00:00Z",
+            "impact_score": 9,
+            "n_sources": 2,
+            "regions": [
+              "US"
+            ]
+          },
+          "headline": "Bank of America Warns of Future Inflation Shocks, Declares 'Technical Recession'",
+          "scenario": "MACROECONOMIC:growth_scare",
+          "analogues": [
+            "china_deval_2015"
+          ],
+          "realised_window": [
+            "2022-06-14",
+            "2022-06-29"
+          ],
+          "factors": [
+            {
+              "factor": "eq_SPY",
+              "predicted": -0.088589,
+              "realised": 0.0217,
+              "error": -0.110289,
+              "same_sign": false
+            },
+            {
+              "factor": "eq_Energy",
+              "predicted": -0.118233,
+              "realised": -0.12311,
+              "error": 0.004877,
+              "same_sign": true
+            },
+            {
+              "factor": "eq_Financials",
+              "predicted": -0.093913,
+              "realised": 0.019467,
+              "error": -0.11338,
+              "same_sign": false
+            },
+            {
+              "factor": "eq_Information Technology",
+              "predicted": -0.093014,
+              "realised": 0.024628,
+              "error": -0.117642,
+              "same_sign": false
+            },
+            {
+              "factor": "eq_EUROPE",
+              "predicted": -0.061145,
+              "realised": 0.016452,
+              "error": -0.077597,
+              "same_sign": false
+            },
+            {
+              "factor": "rates_10y_bp",
+              "predicted": -1.360016,
+              "realised": -39.00001,
+              "error": 37.639994,
+              "same_sign": true
+            },
+            {
+              "factor": "rates_3m_bp",
+              "predicted": -0.56,
+              "realised": -3.799999,
+              "error": 3.239999,
+              "same_sign": true
+            },
+            {
+              "factor": "credit_bbb_bp",
+              "predicted": 16.0,
+              "realised": 25.0,
+              "error": -9.0,
+              "same_sign": true
+            },
+            {
+              "factor": "oil",
+              "predicted": -0.048914,
+              "realised": -0.076936,
+              "error": 0.028022,
+              "same_sign": true
+            },
+            {
+              "factor": "fx_EUR",
+              "predicted": 0.035342,
+              "realised": 0.010408,
+              "error": 0.024934,
+              "same_sign": true
+            },
+            {
+              "factor": "fx_GBP",
+              "predicted": 0.005674,
+              "realised": 0.003706,
+              "error": 0.001968,
+              "same_sign": true
+            },
+            {
+              "factor": "fx_JPY",
+              "predicted": 0.036782,
+              "realised": -0.013392,
+              "error": 0.050174,
+              "same_sign": false
+            },
+            {
+              "factor": "usd_index",
+              "predicted": -0.018922,
+              "realised": -0.003885,
+              "error": -0.015037,
+              "same_sign": true
+            },
+            {
+              "factor": "vol_vix_pts",
+              "predicted": 18.4,
+              "realised": -4.529999,
+              "error": 22.929999,
+              "same_sign": false
+            }
+          ],
+          "sign_agreement": 0.571,
+          "book_total_impact_predicted": -122344446.84,
+          "book_total_impact_realised": 36709417.96,
+          "capital_losses_predicted": 122344446.838152,
+          "capital_losses_realised": -36709417.96379,
+          "cet1_after_predicted": 0.117249,
+          "cet1_after_realised": 0.134238
+        }
+      }
+    },
+    "note": "Out-of-sample: calibration used only episodes ending before 2021-09-30. Reported, not tuned.",
+    "_provenance": {
+      "script": "riskpulse eval predicted_vs_realised",
+      "generated_at": "2026-10-02T06:19:00+00:00",
+      "git_commit": "46e871f"
+    }
   }
 }
