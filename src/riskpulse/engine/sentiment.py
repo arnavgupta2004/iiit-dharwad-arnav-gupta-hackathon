@@ -91,6 +91,26 @@ def resolve_model(variant: str | None = None) -> tuple[str, str]:
     return base, "base_fallback"
 
 
+@cache
+def weights_fingerprint(variant: str | None = None) -> str:
+    """Short hash identifying the sentiment weights (cache key). The same fine-tuned weights give
+    the same key whether they came from the Hub or the local rebuild."""
+    import hashlib
+    from pathlib import Path
+
+    name, origin = resolve_model(variant)
+    h = hashlib.sha1()
+    if origin in ("base", "base_fallback"):
+        h.update(f"base|{name}".encode())
+    else:
+        root = Path(name)
+        for f in sorted([root / "config.json", *root.glob("*.safetensors")]):
+            with f.open("rb") as fh:
+                for block in iter(lambda: fh.read(1 << 22), b""):
+                    h.update(block)
+    return h.hexdigest()[:10]
+
+
 @dataclass(frozen=True)
 class SentimentResult:
     score: float

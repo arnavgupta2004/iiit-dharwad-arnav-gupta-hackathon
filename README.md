@@ -194,4 +194,9 @@ synthetic book with credit-risk RWA only; scenario severity limited by what pre-
 
 ## License
 
-MIT; see [LICENSE](LICENSE).
+- **Code:** MIT; see [LICENSE](LICENSE).
+- **Fine-tuned sentiment model weights:** CC BY-NC-SA 3.0, hosted separately on the Hugging Face Hub with a model
+  card. The reason: the weights derive from `ProsusAI/finbert`, whose sentiment fine-tuning used Financial
+  PhraseBank (CC BY-NC-SA 3.0), and the base model's card declares no licence. So the derivative takes the
+  conservative, non-commercial share-alike licence. Our own fine-tuning data (`zeroshot/twitter-financial-news-sentiment`)
+  is MIT. Third-party datasets keep their own licences; see [data/SOURCES.md](data/SOURCES.md).

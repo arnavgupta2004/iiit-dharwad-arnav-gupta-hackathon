@@ -4,11 +4,13 @@
   to download and are dropped; survivorship is a stated limitation).
 - Prices: daily adjusted close and volume 2008-06 -> 2020-07, cached in
   data/raw/_downloads/event_study/prices.parquet (gitignored, reproducible here).
-- Stage 1 (cached): FinBERT sentiment, MiniLM embedding and event class for every headline of
-  those tickers, using the same models as the live engine.
+- Stage 1 (cached in parts): MiniLM embeddings; sentiment per sentiment weights; event class per
+  event model, using the same models as the live engine.
 """
 
 from __future__ import annotations
+
+import hashlib
 
 import numpy as np
 import pandas as pd
@@ -67,39 +69,92 @@ def select_universe(df: pd.DataFrame) -> tuple[list[str], pd.DataFrame]:
     return keep, px
 
 
-def stage1(df: pd.DataFrame) -> pd.DataFrame:
-    """FinBERT score, event class/confidence and embeddings for each headline (cached)."""
+def universe_headlines() -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Headlines of the event-study tickers in time order, plus their long price frame."""
+    df = headlines()
+    keep, px_long = select_universe(df)
+    sub = df[df["ticker"].isin(keep)].sort_values("published_at").reset_index(drop=True)
+    return sub, px_long
+
+
+def _titles_key(titles: list[str]) -> str:
+    return hashlib.sha1("\n".join(titles).encode()).hexdigest()[:10]
+
+
+def _base(df: pd.DataFrame) -> pd.DataFrame:
+    """Headline rows plus MiniLM embeddings (cached in stage1.parquet / stage1_emb.npy)."""
     meta_p, emb_p = CACHE / "stage1.parquet", CACHE / "stage1_emb.npy"
+    cols = ["published_at", "ticker", "title"]
     if meta_p.exists() and emb_p.exists():
         meta = pd.read_parquet(meta_p)
-        if len(meta) == len(df):
-            return meta
-    from riskpulse.common.config import repo_root
-    from riskpulse.engine.events import Embedder, EmbeddingClassifier
-    from riskpulse.engine.pipeline import EVENT_MODEL_PATH
-    from riskpulse.engine.sentiment import FinBertScorer
+        if len(meta) == len(df) and (meta["title"].to_numpy() == df["title"].to_numpy()).all():
+            return meta[cols].copy()
+    from riskpulse.engine.events import Embedder
 
+    emb_model, embs = Embedder(), []
     titles = df["title"].tolist()
-    emb_model = Embedder()
-    clf = EmbeddingClassifier.load(repo_root() / EVENT_MODEL_PATH, embedder=emb_model)
-    fb = FinBertScorer()
-    sent, cls, conf, embs = [], [], [], []
-    step = 4096
-    for i in range(0, len(titles), step):
-        chunk = titles[i : i + step]
-        p = fb.probs(chunk)
-        sent.extend((p[:, 0] - p[:, 1]).tolist())
-        e = emb_model.encode(chunk)
-        for pred in clf.predict_from_embeddings(e):
-            cls.append(pred.event_class)
-            conf.append(pred.confidence)
-        embs.append(e.astype(np.float16))
-        log.info(f"event-study stage 1: {min(i + step, len(titles)):,}/{len(titles):,}")
-    meta = df[["published_at", "ticker", "title"]].copy()
-    meta["sentiment"], meta["event_class"], meta["event_confidence"] = sent, cls, conf
+    for i in range(0, len(titles), 4096):
+        embs.append(emb_model.encode(titles[i : i + 4096]).astype(np.float16))
+        log.info(f"event-study embeddings: {min(i + 4096, len(titles)):,}/{len(titles):,}")
+    meta = df[cols].copy()
     CACHE.mkdir(parents=True, exist_ok=True)
     meta.to_parquet(meta_p, index=False)
     np.save(emb_p, np.vstack(embs))
+    return meta
+
+
+def sentiment(titles: list[str], variant: str | None = None) -> np.ndarray:
+    """Document score P(pos) - P(neg) per headline, cached per sentiment weights (D-043)."""
+    from riskpulse.engine.sentiment import FinBertScorer, weights_fingerprint
+
+    path = CACHE / f"sentiment_{_titles_key(titles)}_{weights_fingerprint(variant)}.npy"
+    if path.exists():
+        return np.load(path)
+    fb, out = FinBertScorer(variant=variant), []
+    for i in range(0, len(titles), 4096):
+        p = fb.probs(titles[i : i + 4096])
+        out.append(p[:, 0] - p[:, 1])
+        log.info(f"event-study sentiment: {min(i + 4096, len(titles)):,}/{len(titles):,}")
+    res = np.concatenate(out)
+    CACHE.mkdir(parents=True, exist_ok=True)
+    np.save(path, res)
+    return res
+
+
+def events(titles: list[str]) -> pd.DataFrame:
+    """Event class and confidence per headline from cached embeddings; cached per event model."""
+    from riskpulse.common.config import repo_root
+    from riskpulse.engine.events import EmbeddingClassifier
+    from riskpulse.engine.pipeline import EVENT_MODEL_PATH
+
+    model_path = repo_root() / EVENT_MODEL_PATH
+    ek = hashlib.sha1(model_path.read_bytes()).hexdigest()[:8]
+    path = CACHE / f"events_{_titles_key(titles)}_{ek}.parquet"
+    if path.exists():
+        return pd.read_parquet(path)
+    clf = EmbeddingClassifier.load(model_path)
+    preds = clf.predict_from_embeddings(embeddings().astype(np.float32))
+    out = pd.DataFrame(
+        {
+            "event_class": [p.event_class for p in preds],
+            "event_confidence": [p.confidence for p in preds],
+        }
+    )
+    out.to_parquet(path, index=False)
+    return out
+
+
+def stage1(df: pd.DataFrame, variant: str | None = None) -> pd.DataFrame:
+    """Per headline: sentiment (configured or given weights), event class/confidence, with the
+    embeddings in ``embeddings()``. Each part is cached under its own model key."""
+    meta = _base(df)
+    titles = meta["title"].tolist()
+    meta["sentiment"] = sentiment(titles, variant)
+    ev = events(titles)
+    meta["event_class"], meta["event_confidence"] = (
+        ev["event_class"].to_numpy(),
+        ev["event_confidence"].to_numpy(),
+    )
     return meta
 
 

@@ -105,10 +105,21 @@ class NLPScorer:
         embedder: Embedder | None = None,
         event_clf: EmbeddingClassifier | None = None,
     ) -> None:
+        # Models are created on first use, so linking alone (e.g. building caches) loads none.
         self.linker = linker or EntityLinker()
-        self.finbert = finbert or FinBertScorer()
-        self.embedder = embedder or Embedder()
-        self.event_clf = event_clf or EmbeddingClassifier.load(
+        self._finbert, self._embedder, self._event_clf = finbert, embedder, event_clf
+
+    @cached_property
+    def finbert(self) -> FinBertScorer:
+        return self._finbert or FinBertScorer()
+
+    @cached_property
+    def embedder(self) -> Embedder:
+        return self._embedder or Embedder()
+
+    @cached_property
+    def event_clf(self) -> EmbeddingClassifier:
+        return self._event_clf or EmbeddingClassifier.load(
             repo_root() / EVENT_MODEL_PATH, embedder=self.embedder
         )
 
@@ -136,21 +147,33 @@ class NLPScorer:
         )
         return links, regions
 
-    def score(self, docs: list[Document]) -> list[DocScore]:
-        texts = [d.title or d.text for d in docs]
-        sent = self.finbert.score(texts)
-        emb = self.embedder.encode(texts)
-        events = self.event_clf.predict_from_embeddings(emb)
+    def sentiments(
+        self, texts: list[str], links: list[dict[str, float]]
+    ) -> list[tuple[float, dict[str, float]]]:
+        """(document score, entity scores) per text; entity scores are clause-level when two or
+        more companies are linked, else the document score for every link."""
         out = []
-        for d, s, e, x, text in zip(docs, sent, events, emb, texts, strict=True):
-            links, regions = self.link(d)
-            companies = [t for t in links if t != MKT]
+        for s, text, lk in zip(self.finbert.score(texts), texts, links, strict=True):
+            companies = [t for t in lk if t != MKT]
             if len(companies) >= 2:
                 ent = entity_sentiment(text, companies, self.finbert, self.linker, s.score)
             else:
-                ent = dict.fromkeys(links, s.score)
-            out.append(DocScore(d, links, regions, s.score, ent, e, x))
+                ent = dict.fromkeys(lk, s.score)
+            out.append((s.score, ent))
         return out
+
+    def score(self, docs: list[Document]) -> list[DocScore]:
+        texts = [d.title or d.text for d in docs]
+        linked = [self.link(d) for d in docs]
+        sent = self.sentiments(texts, [lk for lk, _ in linked])
+        emb = self.embedder.encode(texts)
+        events = self.event_clf.predict_from_embeddings(emb)
+        return [
+            DocScore(d, links, regions, s, ent, e, x)
+            for d, (links, regions), (s, ent), e, x in zip(
+                docs, linked, sent, events, emb, strict=True
+            )
+        ]
 
     @property
     def versions(self) -> dict[str, str]:

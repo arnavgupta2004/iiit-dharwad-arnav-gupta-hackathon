@@ -26,12 +26,7 @@ from riskpulse.common.logging import get_logger
 from riskpulse.common.metrics import update_metrics
 from riskpulse.engine.clustering import StoryClusterer
 from riskpulse.engine.impact import BreadthTracker, ImpactFeatures, VelocityTracker, raw_impact
-from riskpulse.eval.event_study_data import (
-    embeddings,
-    headlines,
-    select_universe,
-    stage1,
-)
+from riskpulse.eval.event_study_data import embeddings, stage1, universe_headlines
 from riskpulse.ingestion.prices import trading_days, wide
 
 log = get_logger()
@@ -189,9 +184,8 @@ def compare(df: pd.DataFrame, target: str, seed: int = 0, n_boot: int = 1000) ->
 def run() -> dict:
     import lightgbm as lgb
 
-    df = headlines()
-    keep, px_long = select_universe(df)
-    sub = df[df["ticker"].isin(keep)].sort_values("published_at").reset_index(drop=True)
+    sub, px_long = universe_headlines()
+    keep = sorted(sub["ticker"].unique())
     meta = stage1(sub)
     emb = embeddings()
     items = benzinga_item_features(meta, emb)

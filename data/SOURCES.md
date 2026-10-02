@@ -16,7 +16,7 @@ No proprietary or client data is used. Synthetic records are labelled synthetic 
 | 2 | GDELT GKG 2.0 raw 15-min files | News, historical | Free; GDELT open terms | Verified; pilot passed (D-017) | News for the replay window (2021-22) with themes, orgs and tone | Script + derived replay feed |
 | 3 | Kaggle: equinxx/stock-tweets-for-sentiment-analysis-and-prediction | Social, historical | CC0 | Verified | Second (social) source; replay feed; Module A window | Cleaned sample for universe (Phase 1) |
 | 4 | Kaggle: miguelaenlle/massive-stock-news-analysis-db-for-nlpbacktests | News, historical | CC0 | Verified | Cross-sectional event study for impact v2 | Download script + derived features |
-| 5 | HF: zeroshot/twitter-financial-news-sentiment | Labelled sentiment | MIT | Verified | Sentiment evaluation (valid split = our test) | Download script |
+| 5 | HF: zeroshot/twitter-financial-news-sentiment | Labelled sentiment | MIT | Verified | Sentiment evaluation (valid split = our test); fine-tuning on the train split only (D-043) | Download script |
 | 6 | HF: zeroshot/twitter-financial-news-topic | Labelled topics | MIT | Verified | Weak labels / extra eval for event classes via topic map | Download script |
 | 7 | yfinance (Yahoo Finance) | Prices | Yahoo terms; personal/research use | Verified | Event study, backtests, shock calibration | Cached CSV/Parquet under `data/prices/` |
 | 8 | Kaggle: computingvictor/transactions-fraud-datasets | Transactions | Apache 2.0 | Verified | Seeds the Module B synthetic wholesale book | Download script + derived synthetic portfolio |
@@ -107,6 +107,15 @@ No proprietary or client data is used. Synthetic records are labelled synthetic 
 ### 10. S&P 100 membership
 - Wikipedia constituents table (page last edited 2026-09-27): 101 rows (GOOG and GOOGL both listed).
   All 20 proposed tickers are current members.
+
+### 11. Models and the fine-tuned sentiment weights (licences checked 2026-10-02)
+- `ProsusAI/finbert` (HF revision 4556d130): the model card declares **no licence**; the code repo
+  github.com/ProsusAI/finBERT is Apache-2.0; its sentiment fine-tuning used Financial PhraseBank, which is
+  CC BY-NC-SA 3.0 on the HF copy `takala/financial_phrasebank`.
+- Our fine-tuned weights (D-043): trained on the **train split only** of `zeroshot/twitter-financial-news-sentiment`
+  (MIT, HF revision ccbe24de). Released as **CC BY-NC-SA 3.0** (conservative, inheriting from the base model's
+  training data). Hosted on the Hugging Face Hub, with a card from `scripts/make_model_card.py`. They're not in this
+  repo (418 MB); `scripts/build_finetuned_sentiment.py` rebuilds them.
 
 ### Rejected / not used
 - **thedevastator Tweet Sentiment's Impact** (the organisers' example): the CSV is structurally broken when parsed.

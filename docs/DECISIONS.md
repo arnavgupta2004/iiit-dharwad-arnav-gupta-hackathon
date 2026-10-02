@@ -39,8 +39,8 @@ Pipeline order: Hub → local rebuild (`scripts/build_finetuned_sentiment.py`) �
 Licences checked 2026-10-02: training data `zeroshot/twitter-financial-news-sentiment` is **MIT** (redistribution
 allowed). Base model `ProsusAI/finbert`: the HF model card declares **no licence**; the code repo
 github.com/ProsusAI/finBERT is Apache-2.0. The base weights were fine-tuned on Financial PhraseBank, which is
-**CC BY-NC-SA 3.0**. **Open for Arnav** before uploading publicly: the card will declare cc-by-nc-sa-3.0 as the
-conservative choice for a non-commercial hackathon artefact, and state the provenance.
+**CC BY-NC-SA 3.0**. **Approved by Arnav:** the weights are released under CC BY-NC-SA 3.0 and the code under MIT;
+the README states both, with the reason.
 
 ### D-044 GEOPOLITICAL means cross-border only (Arnav's item 3)
 GEOPOLITICAL = war and military conflict, sanctions, trade conflict and tariffs between countries, international
@@ -54,6 +54,19 @@ A 19% average daily one-way turnover is not operationally realistic for an index
 λ = min(1, τ/turnover)) goes from τ = 20% to **τ = 5%**. This is a policy choice, not a return optimisation, and
 it was not chosen from the sensitivity grid. Results are reported as they come out. IC stays the headline. Returns
 are secondary and shown gross, with cost drag and net.
+
+### D-047 Stage-1 caches split by model, so the sentiment re-score can run ahead of the rerun
+Before this, the feed cache was keyed by feed + all models, and the Benzinga cache only checked its row count, so a
+sentiment change would have reused stale scores. Now there are three parts. **Base** = links, regions and MiniLM
+embeddings, keyed by feed + universe/linking config + tweet map + embedder. **Sentiment** is keyed by a hash of the
+weights files, so Hub and local copies of the same weights share a key. **Events** are predicted from the cached
+embeddings, keyed by the event-model file. The existing caches were migrated without recomputation, and the new code
+reproduces them **exactly** (all fields, 203,363 feed docs and 330,100 Benzinga headlines). Note: embeddings are stored
+as float16. Re-predicting events from them flips 31 of 203,363 feed docs (0.015%), all within ±0.001 of the 0.5
+confidence threshold. That's why events are cached rather than recomputed. After the D-044 retrain, events will come
+from the float16 embeddings. Arnav asked to start the fine-tuned re-score now (compute only):
+`scripts/precompute_sentiment.py --variant finetuned`, measured at about 16 min (feed) + 28 min (Benzinga) on CPU, so
+the ~3 h limit that would have required a sampled Benzinga set is not reached.
 
 ### D-046 Final rerun protocol (Arnav's item 5)
 One combined rerun once the gold labels are in, in this order: sentiment model (D-041/D-043) → event classifier with
