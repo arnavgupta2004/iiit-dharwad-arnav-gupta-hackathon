@@ -8469,5 +8469,73 @@
       "generated_at": "2026-10-02T06:45:10+00:00",
       "git_commit": "eac7ee2"
     }
+  },
+  "sentiment_gold": {
+    "protocol": "pre-registered in DECISIONS.md D-041 before the gold labels were scored",
+    "prediction_rule": "entity score, first linked ticker, +-0.15 band (deployed rule)",
+    "results": {
+      "news_headlines": {
+        "n": 237,
+        "label_counts": {
+          "negative": 84,
+          "positive": 79,
+          "neutral": 74
+        },
+        "macro_f1": {
+          "finbert": 0.5917,
+          "finetuned": 0.5489,
+          "vader": 0.4714,
+          "lm": 0.4417
+        },
+        "macro_f1_argmax_secondary": {
+          "finbert": 0.5425,
+          "finetuned": 0.5099
+        },
+        "diff_finetuned_minus_finbert": -0.0428,
+        "diff_95ci": [
+          -0.1146,
+          0.0321
+        ]
+      },
+      "tweets": {
+        "n": 63,
+        "label_counts": {
+          "positive": 35,
+          "negative": 24,
+          "neutral": 4
+        },
+        "macro_f1": {
+          "finbert": 0.3889,
+          "finetuned": 0.3678,
+          "vader": 0.2972,
+          "lm": 0.2569
+        },
+        "macro_f1_argmax_secondary": {
+          "finbert": 0.2943,
+          "finetuned": 0.2538
+        },
+        "diff_finetuned_minus_finbert": -0.0211,
+        "diff_95ci": [
+          -0.1087,
+          0.0705
+        ]
+      }
+    },
+    "decision_rule": "fine-tuned everywhere unless the news-headline CI of F1(fine-tuned) - F1(FinBERT) lies entirely below 0",
+    "news_ci_entirely_below_zero": false,
+    "decision": {
+      "news": "finetuned",
+      "tweets": "finetuned"
+    },
+    "in_domain_test_macro_f1_finetuned": 0.8435,
+    "labels": {
+      "in_domain": "HF twitter-financial-news-sentiment test split (training's dataset)",
+      "live_feed": "gold spot check: GDELT headlines and equinxx tweets from the replay"
+    },
+    "_provenance": {
+      "script": "riskpulse eval sentiment_gold",
+      "generated_at": "2026-10-02T11:08:16+00:00",
+      "git_commit": "7fb5609"
+    }
   }
 }

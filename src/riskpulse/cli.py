@@ -41,6 +41,7 @@ class EvalTarget(StrEnum):
     predicted_vs_realised = "predicted_vs_realised"
     finetune = "finetune"
     impact_market_check = "impact_market_check"
+    sentiment_gold = "sentiment_gold"
 
 
 def _not_yet(what: str, phase: int) -> NoReturn:

@@ -69,6 +69,12 @@ def _impact_market() -> None:
     run()
 
 
+def _sentiment_gold() -> None:
+    from riskpulse.eval.sentiment_gold import run
+
+    run()
+
+
 def _finetune() -> None:
     from riskpulse.eval.finetune_sentiment import run
 
@@ -78,6 +84,7 @@ def _finetune() -> None:
 EVALS: dict[str, Callable[[], None]] = {
     "predicted_vs_realised": _pvr,
     "finetune": _finetune,
+    "sentiment_gold": _sentiment_gold,
     "impact_market_check": _impact_market,
     "impact_v2": _impact_v2,
     "impact": _impact,
@@ -94,6 +101,7 @@ EVALS: dict[str, Callable[[], None]] = {
 # explicitly (`riskpulse eval finetune`), not as part of `all`.
 ALL_ORDER = [
     "sentiment",
+    "sentiment_gold",
     "events",
     "linking",
     "impact",

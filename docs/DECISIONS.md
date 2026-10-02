@@ -55,6 +55,22 @@ A 19% average daily one-way turnover is not operationally realistic for an index
 it was not chosen from the sensitivity grid. Results are reported as they come out. IC stays the headline. Returns
 are secondary and shown gross, with cost drag and net.
 
+### D-048 D-041 applied: gold sentiment result and the mechanical decision
+`riskpulse eval sentiment_gold` → `metrics.json → sentiment_gold`, run once with the pre-registered protocol.
+Macro-F1 with the deployed rule (first-ticker entity score, ±0.15 band):
+
+| Live-feed gold | FinBERT | Fine-tuned | F1(ft) − F1(FinBERT), 95% CI | VADER | LM |
+|---|---|---|---|---|---|
+| News headlines (237) | 0.592 | 0.549 | −0.043 [−0.115, 0.032] | 0.471 | 0.442 |
+| Tweets (63) | 0.389 | 0.368 | −0.021 [−0.109, 0.071] | 0.297 | 0.257 |
+
+In-domain (HF test split): fine-tuned 0.844 vs FinBERT 0.661/0.668. **The in-domain gain does not transfer to live-feed
+text.** Point estimates favour FinBERT on both subsets, but neither CI lies entirely below zero, so **the rule selects
+the fine-tuned model everywhere.** It is applied as written; changing it now would be a post-hoc choice. How to
+report it: "fine-tuning helped in-domain; on our live feed it is statistically indistinguishable from FinBERT (point
+estimate 4 F1 points lower on news)". Tweet gold has only 4 neutral items, so its macro-F1 is unstable. Both models
+beat the lexicon baselines on live text.
+
 ### D-047 Stage-1 caches split by model, so the sentiment re-score can run ahead of the rerun
 Before this, the feed cache was keyed by feed + all models, and the Benzinga cache only checked its row count, so a
 sentiment change would have reused stale scores. Now there are three parts. **Base** = links, regions and MiniLM
