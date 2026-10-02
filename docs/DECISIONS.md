@@ -2,6 +2,63 @@
 
 Newest first within each date. Each entry: decision, rationale, and status (accepted, or proposed pending Arnav's OK at a gate).
 
+## 2026-10-02 (final rerun, D-046): results
+
+### D-051 Final rerun results (all from `reports/metrics.json`, `riskpulse eval all` run once)
+Order followed: sentiment decision (D-048) → taxonomy fix (D-044) and event retrain → v2 retrained (sentiment and events
+changed) with the validation check → re-score → kappa recalibrated → τ = 5% → triggers and the 2022 check → all evals →
+snapshot. Nothing was tuned on any result below.
+- **Event classes, gold (n = 300, first and only gold evaluation):** macro-F1 primary 0.593, keyword baseline 0.612,
+  zero-shot 0.612. CI of primary − keyword [−0.071, 0.033], primary − zero-shot [−0.073, 0.034]. **The trained
+  classifier does not beat the simple baselines on live-feed text.** It was trained on weak labels whose largest
+  source is HF tweets. News 0.616 / 0.657 / 0.640; tweets 0.399 / 0.389 / 0.396. Strongest classes: REGULATORY_LEGAL
+  0.77, MACROECONOMIC 0.75. Weakest: MANAGEMENT_CHANGE 0.34, OTHER 0.43.
+- **Entity linking:** precision 82.0% on 100 hand-checked links (Wilson 95% CI 73.3-88.3%).
+- **Impact v2 (retrained: 134 trees):** validation ρ v2 0.192 vs v1 0.075 (CI of v2 − v1 [0.108, 0.126]), so the
+  adoption check passes; vs |s| 0.215 (CI [−0.032, −0.014]). Test (post burn-in, n = 3,538): v2 0.129, v1 0.058,
+  |s| 0.129. v2 − v1 [0.044, 0.096]; v2 − |s| [−0.022, 0.024]. Top-decile hit rate: v2 24.9%, v1 16.7%, |s| 24.9%.
+  **v2 is live for company mentions; it is on par with |sentiment| and above v1.**
+- **Market-wide check (D-042):** 188 sessions. ρ with |SPY return| −0.033 (CI [−0.165, 0.099]), with |ΔVIX| −0.037
+  (CI [−0.170, 0.108]). **No measurable relation:** market-wide v1 impact does not rank market-move days.
+- **Module A:** kappa 10.98 (median |active| 1.52% on the calibration months; the target was 1.5%, and the median is
+  a step function of kappa). IC +0.0381, t = 2.39, 56.5% positive days (209 days). With τ = 5%, the tilt net return is
+  −21.9% (gross −21.5%, cost drag 0.52%, turnover 5.0%/day), vs EW rebalanced −23.3%, EW buy-and-hold −21.5%, naive
+  sign rule −21.8%. The realised median |active| in the evaluation is 0.76%: the 5% cap slows convergence to targets.
+- **Module B:** 2,527 candidates, 470 triggers (29 escalations), **349 stress runs** (from 459). Classes: MACRO 181,
+  GEOPOLITICAL 79 (from 210), CREDIT 75, OPERATIONAL_ESG 14.
+- **2022 check:** Russia–Ukraine fired at 06:00 UTC on 2022-02-24 ("Global market plunges, stocks dive after
+  Vladimir Putin launches military operations in Ukraine", impact 9). 9 of 14 signs right; oil +6.6% predicted vs
+  +18.0% realised. The FOMC hike **now fires on the day** (00:00 UTC, "Sterling slides as US ramps up inflation
+  fight", inflation_hawkish from taper_tantrum_2013). But only 6 of 14 signs are right: it predicted +36 bp on the
+  10y vs −39 bp realised, and equities down vs up. Book −USD 101.0 m predicted vs +USD 36.7 m realised.
+  Both misses stay as written up (supply shock vs risk-off; surprise vs consensus).
+- **Pipeline:** 107.4 docs/s batch, p50 35.7 ms, p95 47.6 ms per document. This was measured on a machine hot from
+  hours of compute (the same process timed base FinBERT at 193 then 109 docs/s), so it is to be re-measured idle in
+  Phase 9.
+
+### D-050 Evaluation history: every look at the 2021-22 replay window (Arnav's item 5)
+The replay window (2021-09-30 → 2022-09-29) is both the demo window and the out-of-sample test period. Listed here,
+in order, is every time its **outcomes** (returns, abnormal returns, VIX/SPY, realised factor moves, trigger
+counts) informed or were reported by a result. Inspections of texts, links or score distributions with no outcome
+attached are listed separately at the end.
+
+| # | When | What was looked at | Outcome data | Did it change anything? |
+|---|---|---|---|---|
+| 1 | Phase 5 | Module A backtest, κ = 1, full window: returns, IC, κ × half-life grid | next-day returns | No parameter chosen from it; κ later replaced by a returns-free rule (D-038) |
+| 2 | Phase 6 | Module B trigger replay with decile bins: 2,574 triggers/yr | trigger counts (no market outcomes) | Yes: severity scale per population (D-035); design rationale was the trigger rate, not market outcomes |
+| 3 | pre-GATE C item 5 | Impact v1 vs abs(sentiment) vs abs(CAR), post burn-in (D-036) | abnormal returns/volume | No retuning of v1; motivated v2 |
+| 4 | GATE C | Trigger redesign (D-037) reviewed against trigger counts per month | trigger counts | Yes: macro-region cooldown, escalation, breadth bonus removed (Arnav) |
+| 5 | GATE C | Impact v2 first test (D-039) | abnormal returns/volume | Pre-registered rule not met → reported; **rule later revised** (D-039 revision) → v2 adopted |
+| 6 | GATE C | Module A with frozen κ (D-038): IC and returns from month 3 | next-day returns | No; τ change (D-045) justified by turnover, not returns |
+| 7 | GATE C | 2022 predicted vs realised (D-040) | realised factor moves | No; misses written up as limitations |
+| 8 | Final rerun (D-046) | Gold events (first time), sentiment gold (same numbers as D-048), all evals recomputed once with the final models | all | Reported as final (D-051) |
+
+Not outcome looks (recorded for completeness): GKG pilot and linking rules (D-017, D-020) inspected texts and links;
+D-035 fitted bins on burn-in raw-impact distributions; the FOMC-day investigation in D-040 read impact values of
+2022-06-15 stories; the D-042 dry run read the distribution of daily max market-wide impact (no SPY/VIX).
+Other test sets: HF sentiment test split, base FinBERT evaluated in Phase 2, the fine-tuned model once (D-043);
+gold set: sentiment once (D-048), events once (final rerun).
+
 ## 2026-10-02 (P1 review by Arnav). Decisions recorded now; applied together in one final rerun
 
 ### D-041 PRE-REGISTERED before any gold label is scored: sentiment model choice on live-feed text
