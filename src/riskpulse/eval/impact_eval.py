@@ -20,6 +20,7 @@ from scipy.stats import spearmanr
 from riskpulse.common.config import data_path, load_config, reports_path
 from riskpulse.common.metrics import update_metrics
 from riskpulse.common.timeutils import market_date
+from riskpulse.eval.impact_v2 import v1_from_drivers
 from riskpulse.ingestion.prices import trading_days, wide
 
 EST, GAP, VOL_LO, VOL_HI = 120, 20, 30, 5
@@ -32,10 +33,12 @@ def ticker_day_frame(mentions: pd.DataFrame) -> pd.DataFrame:
     days = trading_days()
     m["day0"] = [market_date(t, days) for t in pd.to_datetime(m["published_at"], utc=True)]
     m["abs_sent"] = m["sentiment"].abs()
+    # v1 from the stored drivers (company mentions are scored live by v2 once it is adopted).
+    m["v1_raw"] = v1_from_drivers(m["drivers"])
     return (
         m.groupby(["ticker", "day0"])
         .agg(
-            impact_v1=("impact_raw", "max"),
+            impact_v1=("v1_raw", "max"),
             abs_sent=("abs_sent", "max"),
             n_mentions=("doc_id", "nunique"),
         )

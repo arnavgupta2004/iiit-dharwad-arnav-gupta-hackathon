@@ -4,6 +4,14 @@
 
 version: v1
 
+# Impact v2 for company mentions (D-039 revised, D-049): monotone LightGBM trained on the Benzinga
+# event study (`riskpulse train impact_v2`). Market-wide items keep v1. If the model file is absent
+# (e.g. a fresh clone: model files are not committed) the engine falls back to v1 and logs it.
+v2:
+  enabled: true
+  scope: company
+  model_path: data/processed/models/impact_v2.json   # JSON tree dump (engine/gbm.py)
+
 # T: prior severity per event class, in [0, 1]. Initial values from the spec;
 # documented as assumptions, to be sanity-checked against the event study.
 type_prior:

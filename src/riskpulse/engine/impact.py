@@ -193,3 +193,82 @@ class BreadthTracker:
             q.popleft()
         n = len({o for _, o in q})
         return min(1.0, math.log1p(n) / math.log1p(self.sat)), n
+
+
+class ImpactV2:
+    """Company-level impact v2 (D-039, D-049): monotone LightGBM from the Benzinga event study.
+
+    v2 was trained on ticker-session aggregates (max of each driver over the session's mentions,
+    plus log(1 + mentions)). Live, each company mention updates its ticker's running aggregate for
+    the current session (16:00 ET rule), so by the session close the input equals the training
+    features, and every intermediate score uses only information available at that time.
+    Market-wide (MKT) items keep v1: v2 has no market-wide training target.
+    """
+
+    FEATS = ("S", "T", "V", "B", "N", "C", "R", "log_n")
+
+    def __init__(self, model_path: Path, trading_days: list | None = None) -> None:
+        from riskpulse.engine.gbm import TreeEnsemble
+
+        # JSON tree dump evaluated without lightgbm (OpenMP clash with torch; engine/gbm.py).
+        self.model = TreeEnsemble.load(model_path)
+        self.days = sorted(trading_days or [])
+        self._day_set = set(self.days)
+        self.state: dict[str, tuple] = {}
+
+    @classmethod
+    def load(cls) -> ImpactV2 | None:
+        """The configured v2 model, or None (v1 everywhere) if disabled or not trained here."""
+        from riskpulse.common.logging import get_logger
+
+        cfg = load_config("impact").get("v2", {})
+        if not cfg.get("enabled", False):
+            return None
+        path = repo_root() / cfg["model_path"]
+        if not path.exists():
+            get_logger().warning(
+                f"impact v2 model {cfg['model_path']} not found: using v1 for all mentions "
+                "(train it with `riskpulse train impact_v2`)"
+            )
+            return None
+        try:
+            from riskpulse.ingestion.prices import trading_days
+
+            days = [d.date() for d in trading_days()]
+        except Exception:  # no price cache: weekday rule only
+            days = []
+        return cls(path, days)
+
+    def session(self, ts: datetime):
+        """Trading session a timestamp belongs to: same day before 16:00 ET, else next session."""
+        from zoneinfo import ZoneInfo
+
+        local = ts.astimezone(ZoneInfo("America/New_York"))
+        d = local.date() + timedelta(days=1 if local.hour >= 16 else 0)
+        if self.days and self.days[0] <= d <= self.days[-1]:
+            i = bisect.bisect_left(self.days, d)
+            return self.days[i]
+        while d.weekday() >= 5:
+            d += timedelta(days=1)
+        return d
+
+    def observe(self, ticker: str, ts: datetime, f: ImpactFeatures) -> float:
+        sess = self.session(ts)
+        x = np.array(
+            [
+                f.sentiment,
+                f.type_prior,
+                f.velocity,
+                f.breadth,
+                f.novelty,
+                f.credibility,
+                f.relevance,
+            ]
+        )
+        prev = self.state.get(ticker)
+        if prev is None or prev[0] != sess:
+            mx, n = x, 1
+        else:
+            mx, n = np.maximum(prev[1], x), prev[2] + 1
+        self.state[ticker] = (sess, mx, n)
+        return self.model.predict_one([*mx.tolist(), math.log1p(n)])

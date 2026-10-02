@@ -30,6 +30,8 @@ from riskpulse.engine.impact import (
     BreadthTracker,
     ImpactBins,
     ImpactFeatures,
+    ImpactScore,
+    ImpactV2,
     VelocityTracker,
     score_impact,
 )
@@ -183,9 +185,12 @@ class NLPScorer:
 class SignalEngine:
     """Stage 2: time-ordered impact scoring and aggregation."""
 
-    def __init__(self, bins: ImpactBins | None = None) -> None:
+    def __init__(self, bins: ImpactBins | None = None, v2: ImpactV2 | bool | None = None) -> None:
+        """``v2``: None = as configured (configs/impact.yaml), False = v1 for all mentions."""
         self.impact_cfg = load_config("impact")
         self.bins = bins if bins is not None else ImpactBins.load()
+        self.v2 = ImpactV2.load() if v2 is None else (v2 or None)
+        self.impact_version = "v2-company+v1-market" if self.v2 else "v1-burnin-quantile"
         self.clusterer = StoryClusterer()
         self.velocity = VelocityTracker(self.impact_cfg)
         self.breadth = BreadthTracker(self.impact_cfg)
@@ -243,6 +248,11 @@ class SignalEngine:
                 )
                 group = "market" if ticker == MKT else "company"
                 imp = score_impact(feats, self.bins, self.impact_cfg, group)
+                if group == "company" and self.v2 is not None:
+                    raw2 = round(self.v2.observe(ticker, ts, feats), 6)
+                    imp = ImpactScore(
+                        raw2, self.bins.score(raw2, group), imp.drivers, imp.contributions
+                    )
                 m = ScoredMention(
                     doc_id=d.doc_id,
                     source=d.source.value,

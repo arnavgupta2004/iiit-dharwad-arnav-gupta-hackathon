@@ -27,7 +27,11 @@ class LiveEngine:
         with self._lock:
             scored = self.scorer.score(docs)
             mentions, signals = self.engine.process(scored)
-        return mentions, stamp_versions(signals, self.scorer.versions)
+        return mentions, stamp_versions(signals, self.versions)
+
+    @property
+    def versions(self) -> dict[str, str]:
+        return {**self.scorer.versions, "impact": self.engine.impact_version}
 
     def analyze(self, text: str, source: str = "synthetic_demo") -> dict:
         """Score one headline without mutating engine state (a dry run for the jury demo)."""
@@ -62,7 +66,7 @@ class LiveEngine:
                 for m in mentions
             ],
             "note": note,
-            "model_versions": self.scorer.versions,
+            "model_versions": self.versions,
         }
 
     def inject(

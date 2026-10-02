@@ -24,7 +24,7 @@ from tests.legacy.pipeline_v0 import SignalEngine as LegacySignalEngine  # noqa:
 
 def compare(scored: list, label: str) -> dict:
     bins = ImpactBins.load()
-    new_m, new_s = SignalEngine(bins=bins).process(scored)
+    new_m, new_s = SignalEngine(bins=bins, v2=False).process(scored)
     old_m, old_s = LegacySignalEngine(bins=bins).process(scored)
     assert len(new_m) == len(old_m)
     same_ids = all(

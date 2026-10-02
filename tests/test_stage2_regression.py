@@ -68,7 +68,7 @@ def synthetic_stage1(n: int = 1000, seed: int = 7) -> list[DocScore]:
 def outputs():
     scored = synthetic_stage1()
     bins = ImpactBins.fit(np.linspace(0.0, 0.6, 500))
-    new = SignalEngine(bins=bins).process(scored)
+    new = SignalEngine(bins=bins, v2=False).process(scored)  # v1 path vs legacy v1
     old = LegacySignalEngine(bins=bins).process(scored)
     return new, old
 

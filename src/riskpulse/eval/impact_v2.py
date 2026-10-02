@@ -9,7 +9,11 @@ Protocol (D-014, Arnav's GATE C item 2), fixed before any test result was seen:
 - Test (scored once): the 2021-22 replay ticker-days used for v1 (post-burn-in main, full window
   secondary), same metrics and CIs as v1.
 - Pre-registered adoption rule: v2 replaces v1 only if the paired-bootstrap 95% CIs of
-  rho(v2) - rho(|s|) and rho(v2) - rho(v1) both lie above zero. Otherwise report and stop.
+  rho(v2) - rho(|s|) and rho(v2) - rho(v1) both lie above zero. Not met at the first test; the
+  rule was revised afterwards to the spec rule "v2 beats v1" on validation and test (D-039).
+- `train()` fits in a spawned subprocess and saves the model text plus a JSON tree dump
+  (`riskpulse train impact_v2`); `evaluate()` scores the JSON trees with engine/gbm.py
+  (`riskpulse eval impact_v2`), so this process never loads lightgbm (OpenMP clash with torch).
 """
 
 from __future__ import annotations
@@ -25,6 +29,7 @@ from riskpulse.common.config import data_path, load_config, reports_path
 from riskpulse.common.logging import get_logger
 from riskpulse.common.metrics import update_metrics
 from riskpulse.engine.clustering import StoryClusterer
+from riskpulse.engine.gbm import TreeEnsemble
 from riskpulse.engine.impact import BreadthTracker, ImpactFeatures, VelocityTracker, raw_impact
 from riskpulse.eval.event_study_data import embeddings, stage1, universe_headlines
 from riskpulse.ingestion.prices import trading_days, wide
@@ -72,6 +77,15 @@ def benzinga_item_features(meta: pd.DataFrame, emb: np.ndarray) -> pd.DataFrame:
     return pd.DataFrame(rows, columns=["ticker", "published_at", *FEATS[:-1], "v1"])
 
 
+def v1_from_drivers(drivers: pd.Series) -> np.ndarray:
+    """v1 raw impact recomputed from mentions' stored driver JSON (not the live model's raw)."""
+    cfg = load_config("impact")
+    keys = ("type_prior", "sentiment", "velocity", "breadth", "novelty", "credibility", "relevance")
+    return np.array(
+        [raw_impact(ImpactFeatures(*(x[k] for k in keys)), cfg)[0] for x in drivers.map(json.loads)]
+    )
+
+
 def replay_item_features(mentions: pd.DataFrame) -> pd.DataFrame:
     """Same columns from the replay's scored mentions (drivers stored per mention)."""
     tickers = list(load_config("universe")["tickers"])
@@ -88,9 +102,10 @@ def replay_item_features(mentions: pd.DataFrame) -> pd.DataFrame:
             "N": d.map(lambda x: x["novelty"]).to_numpy(),
             "C": d.map(lambda x: x["credibility"]).to_numpy(),
             "R": d.map(lambda x: x["relevance"]).to_numpy(),
-            "v1": m["impact_raw"].to_numpy(),
         }
     )
+    # v1 recomputed from the stored drivers: once v2 scores company mentions, `impact_raw` holds v2.
+    out["v1"] = v1_from_drivers(m["drivers"])
     out["published_at"] = pd.to_datetime(out["published_at"], utc=True)
     return out
 
@@ -180,15 +195,16 @@ def compare(df: pd.DataFrame, target: str, seed: int = 0, n_boot: int = 1000) ->
     return res
 
 
-# ---------- run ----------
-def run() -> dict:
-    import lightgbm as lgb
+# ---------- train / evaluate ----------
+META_PATH = data_path("processed", "models", "impact_v2_meta.json")
+JSON_PATH = data_path("processed", "models", "impact_v2.json")
 
+
+def _benzinga() -> tuple[pd.DataFrame, pd.DataFrame, int]:
+    """(train, valid) Benzinga ticker-days with features and |CAR|, and the ticker count."""
     sub, px_long = universe_headlines()
-    keep = sorted(sub["ticker"].unique())
     meta = stage1(sub)
-    emb = embeddings()
-    items = benzinga_item_features(meta, emb)
+    items = benzinga_item_features(meta, embeddings())
     pxw = px_long.pivot(index="date", columns="symbol", values="adj_close").sort_index()
     volw = px_long.pivot(index="date", columns="symbol", values="volume").sort_index()
     bz = attach_car(ticker_days(items, pd.DatetimeIndex(pxw.index)), pxw, volw)
@@ -196,19 +212,72 @@ def run() -> dict:
     train = bz[bz["day0"] <= TRAIN_END]
     valid = bz[(bz["day0"] > TRAIN_END) & (bz["day0"] <= VALID_END)]
     log.info(f"Benzinga ticker-days: train {len(train):,}, valid {len(valid):,}")
+    return train, valid, int(sub["ticker"].nunique())
+
+
+def _fit_in_subprocess(tr: pd.DataFrame, va: pd.DataFrame) -> dict:
+    """LightGBM fit in a spawned process: lightgbm's OpenMP runtime must not share a process with
+    torch on macOS (see engine/gbm.py). Returns the model text, its JSON dump and metadata."""
+    import lightgbm as lgb
 
     model = lgb.LGBMRegressor(monotone_constraints=[1] * len(FEATS), **PARAMS)
     model.fit(
-        train[FEATS],
-        train["rank_y"].rank(pct=True),
-        eval_set=[(valid[FEATS], valid["rank_y"].rank(pct=True))],
+        tr[FEATS],
+        tr["rank_y"].rank(pct=True),
+        eval_set=[(va[FEATS], va["rank_y"].rank(pct=True))],
         callbacks=[lgb.early_stopping(100, verbose=False)],
     )
-    MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
-    model.booster_.save_model(str(MODEL_PATH))
-    valid = valid.assign(v2=model.predict(valid[FEATS]))
+    b = model.booster_
+    return {
+        "check_pred": b.predict(va[FEATS].head(2000)).tolist(),
+        "text": b.model_to_string(),
+        "dump": b.dump_model(),
+        "best_iteration": int(model.best_iteration_ or 0),
+        "gain": [float(g) for g in b.feature_importance("gain")],
+    }
 
-    # ---- test: 2021-22 replay ticker-days, scored once ----
+
+def train() -> dict:
+    """Fit v2 on Benzinga <= 2018 (early stopping on 2019 -> 2020-07) and save it. No test data."""
+    import multiprocessing as mp
+    from concurrent.futures import ProcessPoolExecutor
+
+    tr, va, n_tickers = _benzinga()
+    with ProcessPoolExecutor(1, mp_context=mp.get_context("spawn")) as ex:
+        fit = ex.submit(_fit_in_subprocess, tr[[*FEATS, "rank_y"]], va[[*FEATS, "rank_y"]]).result()
+    MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+    MODEL_PATH.write_text(fit["text"])
+    JSON_PATH.write_text(json.dumps(fit["dump"]))
+    ens = TreeEnsemble.from_dump(fit["dump"])
+    check = va[FEATS].head(2000).to_numpy()
+    meta = {
+        "tickers": n_tickers,
+        "tickers_dropped_no_prices": 300 - n_tickers,
+        "train_ticker_days": int(len(tr)),
+        "valid_ticker_days": int(len(va)),
+        "best_iteration": fit["best_iteration"],
+        "n_trees": len(fit["dump"]["tree_info"]),
+        "feature_importance_gain": {
+            f: round(g, 1) for f, g in zip(FEATS, fit["gain"], strict=True)
+        },
+        "json_evaluator_max_abs_diff_vs_lightgbm": float(
+            np.max(np.abs(ens.predict(check) - np.array(fit["check_pred"])))
+        ),
+    }
+    if meta["json_evaluator_max_abs_diff_vs_lightgbm"] > 1e-9:
+        raise RuntimeError(f"JSON tree evaluator disagrees with LightGBM: {meta}")
+    META_PATH.write_text(json.dumps(meta, indent=2))
+    log.info(f"impact v2 trained: {meta['n_trees']} trees, best iteration {meta['best_iteration']}")
+    return meta
+
+
+def evaluate() -> dict:
+    """Score the saved v2 on validation and on the 2021-22 replay test; write metrics."""
+    booster = TreeEnsemble.load(JSON_PATH)
+    meta = json.loads(META_PATH.read_text())
+    _, valid, _ = _benzinga()
+    valid = valid.assign(v2=booster.predict(valid[FEATS]))
+
     mentions = pd.read_parquet(data_path("processed", "mentions.parquet"))
     rep = replay_item_features(mentions)
     tickers = sorted(rep["ticker"].unique())
@@ -217,33 +286,34 @@ def run() -> dict:
         wide("adj_close", [*tickers, "SPY"]),
         wide("volume", tickers),
     )
-    test = test.assign(v2=model.predict(test[FEATS]))
+    test = test.assign(v2=booster.predict(test[FEATS]))
     burn_end = pd.Timestamp(load_config("impact")["binning"]["burn_in"][1])
     post = test[test["day0"] >= burn_end]
 
+    v_car = compare(valid, "abs_car01")
     t_car = compare(post, "abs_car01")
-    lo_s, lo_v1 = t_car["rho_diff_v2_minus_abs_sent_95ci"][0], t_car["rho_diff_v2_minus_v1_95ci"][0]
-    adopted = bool(lo_s > 0 and lo_v1 > 0)
+    pre_registered = bool(
+        t_car["rho_diff_v2_minus_abs_sent_95ci"][0] > 0
+        and t_car["rho_diff_v2_minus_v1_95ci"][0] > 0
+    )
+    beats_v1 = bool(
+        v_car["rho_diff_v2_minus_v1_95ci"][0] > 0 and t_car["rho_diff_v2_minus_v1_95ci"][0] > 0
+    )
     payload = {
         "protocol": "Benzinga train <= 2018, valid 2019-2020-07 (early stopping only); "
-        "test once on the 2021-22 replay ticker-days used for v1",
-        "adoption_rule": "adopt v2 only if 95% CIs of rho(v2)-rho(|s|) and "
-        "rho(v2)-rho(v1) are both > 0",
-        "adopted": adopted,
-        "benzinga": {
-            "tickers": len(keep),
-            "tickers_dropped_no_prices": 300 - len(keep),
-            "train_ticker_days": int(len(train)),
-            "valid_ticker_days": int(len(valid)),
-            "best_iteration": int(model.best_iteration_ or 0),
-            "feature_importance_gain": {
-                f: round(float(g), 1)
-                for f, g in zip(FEATS, model.booster_.feature_importance("gain"), strict=True)
-            },
-            "validation_abs_car01": compare(valid, "abs_car01"),
-        },
+        "test on the 2021-22 replay ticker-days (post burn-in main, full window secondary)",
+        "pre_registered_rule": "adopt only if 95% CIs of rho(v2)-rho(|s|) and rho(v2)-rho(v1) "
+        "are both > 0 on test",
+        "pre_registered_rule_met": pre_registered,
+        "applied_rule": "spec rule, revised after the first test was seen (D-039): adopt if v2 "
+        "beats v1 (CI of rho(v2)-rho(v1) > 0) on validation and on test",
+        "v2_beats_v1_on_validation_and_test": beats_v1,
+        "adopted": beats_v1,
+        "scope": "company mentions; market-wide items keep v1 (D-042)",
+        "benzinga": {**meta, "validation_abs_car01": v_car},
         "test_post_burn_in": {"abs_car01": t_car, "abn_volume": compare(post, "abn_volume")},
         "test_full_window": {"abs_car01": compare(test, "abs_car01")},
+        "test_note": "v1 on the test set is recomputed from each mention's stored drivers.",
         "limitations": [
             "survivorship: delisted Benzinga tickers have no yfinance prices and are excluded",
             "Benzinga is single-publisher, so breadth is constant in training (no learned effect)",

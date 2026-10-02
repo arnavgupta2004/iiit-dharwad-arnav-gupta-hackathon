@@ -219,10 +219,12 @@ def run_batch(limit: int | None = None) -> dict:
     bins = fit_bins(scored)
     engine = SignalEngine(bins=bins)
     mentions, signals = engine.process(scored)
+    from riskpulse.engine.sentiment import FinBertScorer
+
     versions = {
-        "sentiment": f"finbert@{load_config('app')['sentiment']['model']}",
+        "sentiment": FinBertScorer().version,
         "event": "embed-lr@" + load_config("app")["events"]["embedding_model"],
-        "impact": "v1-burnin-quantile",
+        "impact": engine.impact_version,
     }
     signals = stamp_versions(signals, versions)
     JsonlSignalWriter(truncate=True).write(signals)
