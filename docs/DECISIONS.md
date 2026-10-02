@@ -55,6 +55,24 @@ A 19% average daily one-way turnover is not operationally realistic for an index
 it was not chosen from the sensitivity grid. Results are reported as they come out. IC stays the headline. Returns
 are secondary and shown gross, with cost drag and net.
 
+### D-049 Impact v2 in the live engine (company mentions); engineering choices
+- **Live features = the training features, causally.** v2 was trained on ticker-session aggregates (max of each
+  driver over the session's mentions plus log(1 + mentions), 16:00 ET rule). In the engine, each company mention
+  updates its ticker's running aggregate for the current session and is scored on it. So by the session close the
+  input equals the training features, and no score uses later information. Market-wide items keep v1 (D-042).
+  The 1-10 scale is unchanged in method: burn-in quantile bins per population (company bins now fitted on v2 raws).
+- **v1 stays measurable.** Mentions store v1's drivers, and the evals recompute v1 from them (max deviation from the
+  previously stored v1 raw: 3e-5, from 4-decimal driver rounding).
+- **No lightgbm in torch processes.** On macOS, LightGBM's and PyTorch's OpenMP runtimes cannot share a process:
+  lightgbm-then-torch hangs at 0% CPU, and torch-then-lightgbm segfaults (both reproduced 2026-10-02 in standalone
+  scripts and in pytest). v2 is therefore fitted in a spawned subprocess and exported as a JSON tree dump. The engine,
+  API and evals score it with `engine/gbm.py`, a small pure-Python/NumPy evaluator that matches
+  `Booster.predict` to 1e-9 (tested in a child process, and checked again at every training run).
+- **Training and evaluation are separate commands:** `riskpulse train events|impact_v2` and `riskpulse eval ...`.
+  So `eval all` scores saved models and never retrains, and each test set is looked at once per evaluation.
+- **Fresh clone:** model files are not committed (CLAUDE.md). Without `impact_v2.json` the engine logs a warning and
+  uses v1 everywhere; `demo --fast` is unaffected.
+
 ### D-048 D-041 applied: gold sentiment result and the mechanical decision
 `riskpulse eval sentiment_gold` → `metrics.json → sentiment_gold`, run once with the pre-registered protocol.
 Macro-F1 with the deployed rule (first-ticker entity score, ±0.15 band):
