@@ -28,15 +28,26 @@ Status legend: DONE · IN PROGRESS · NEXT · OPEN
 - **2022 predicted vs realised** (D-040): invasion fired on the day (sign agreement 64.3%); June FOMC missed (impact
   peaked at 7). `metrics.json → moduleB_validation`, Module B page.
 - **Coverage:** 12 of 20 tickers have tweets (SOURCES.md, ASSUMPTIONS.md).
-- **Fine-tune** (P1, item 6): IN PROGRESS (45-min CPU budget).
+- **Fine-tune** (P1, item 6): DONE. Test macro-F1 0.844 vs bar 0.661, kept (D-043). Hub hosting prepared
+  (model card from `scripts/make_model_card.py`, resolver Hub → local rebuild → base FinBERT).
+
+## P1 review (2026-10-02): decisions recorded (D-039 revision, D-041 to D-046); applied in ONE final rerun
+- Pre-registered before scoring the gold set: sentiment model choice per text type (D-041).
+- Ready and waiting for the rerun: market-wide impact check (D-042), cross-border GEOPOLITICAL (D-044; labelling guide
+  already updated), turnover cap 5% (D-045), stage-1 cache keyed on model fingerprints.
+- Drafts (placeholders, not final numbers): `docs/drafts/deck_content.md`, `docs/drafts/video_script.md`.
 
 ## Waiting on Arnav
 - Gold labels: `data/gold/to_label.csv` → `labels.csv` (final event-class evaluation, sentiment spot check).
 - Entity check: mark `data/gold/entity_check.csv` → `riskpulse eval linking`.
 
-## Remaining P1 (after the fine-tune)
-1. ΔEL and CET1 refinements (rating migration is P2).
-2. Final gold-set evaluation of event classification and entity-linking precision (needs the labels above).
+- Licence decision before the public Hub upload (D-043: base FinBERT weights trace to CC BY-NC-SA 3.0 data).
+- Hugging Face username for `configs/app.yaml → sentiment.finetuned.hub_repo`.
+
+## Next: final rerun (D-046), once the gold labels are in
+Order: sentiment decision → taxonomy fix + event retrain → v2 retrain (sentiment changed) + validation recheck →
+re-score → kappa recalibration (2-month window) → τ = 5% → triggers + 2022 check → all evals once → snapshot once →
+test-set look history in DECISIONS.md → README/deck numbers.
 
 ## Then
 Phase 9 hardening (fresh-clone test in a new venv, README), Phase 10 deck and video script (GATE D).
