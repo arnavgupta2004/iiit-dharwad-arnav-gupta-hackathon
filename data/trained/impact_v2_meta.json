@@ -3,17 +3,17 @@
   "tickers_dropped_no_prices": 84,
   "train_ticker_days": 124436,
   "valid_ticker_days": 29079,
-  "best_iteration": 302,
-  "n_trees": 302,
+  "best_iteration": 562,
+  "n_trees": 440,
   "feature_importance_gain": {
-    "S": 749.7,
-    "T": 164.1,
-    "V": 1756.5,
+    "S": 408.8,
+    "T": 189.5,
+    "V": 1710.8,
     "B": 0.0,
-    "N": 181.6,
+    "N": 156.0,
     "C": 0.0,
     "R": 0.0,
-    "log_n": 3694.8
+    "log_n": 3883.7
   },
   "json_evaluator_max_abs_diff_vs_lightgbm": 0.0
 }
