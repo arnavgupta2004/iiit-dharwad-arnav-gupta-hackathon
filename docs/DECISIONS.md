@@ -4,6 +4,44 @@ Newest first within each date. Each entry: decision, rationale, and status (acce
 
 ## 2026-10-02 (event classification round 2, approved by Arnav)
 
+### D-060 Final mechanical rerun (D-058 + D-059), then FEATURE FREEZE (Arnav)
+One rerun, reusing the cached per-model sentiment scores: impact v2 retrained on Benzinga with FinBERT (news)
+sentiment and C1 classes. The validation rule passed: ρ v2 0.175 vs v1
+0.054, CI of v2 − v1 [0.111, 0.1302] (LightGBM best iteration 562;
+440 trees in the dump; JSON evaluator matches exactly). Then: re-score, kappa recalibrated on the same 2-month window,
+Module A, triggers, the 2022 check, `eval all` once, one snapshot refresh (15.6 MB).
+- **Impact (test, n 3,538):** v2 0.111 (top-decile hit 23.4%), v1
+  0.055 (15.8%), abs(sentiment) 0.110
+  (28.2%). v2 − v1 [0.0289, 0.0856]; v2 − abs(s) [-0.0224, 0.0255].
+- **Market-wide check:** ρ -0.025 with abs(SPY) (CI [-0.1606, 0.1143]),
+  -0.145 with abs(ΔVIX) (CI [-0.2866, 0.0119]). Both CIs span 0.
+- **Module A:** kappa 7.69. IC +0.0472, t 2.85, 56.9% positive days.
+  Tilt net -24.0% (gross -23.6%, cost
+  0.52%) vs EW rebalanced -23.3%, EW buy-and-hold
+  -21.5%.
+- **Pipeline:** 86.6 docs/s batch, p95 21.3 ms per document, with two sentiment models
+  (news and social). The benchmark warm-up now loads both before timing; a first run without that gave 43.4 docs/s.
+**Feature freeze from here:** no further model or logic changes unless Arnav asks. Remaining work: the README
+"results at a glance", deck, video script and prep notes.
+
+### D-059 Stress triggers require adverse sentiment (design fix, Arnav)
+Stress tests model adverse scenarios, but the trigger only checked impact, confidence and sources. **The June 2022
+FOMC case revealed the flaw:** in round 2 a trigger fired on "Wall Street rallies in relief after Fed's assurance on
+rates" (D-055) and applied a stress scenario to a relief rally. The fix: the event signal's sentiment must be below the
+existing negative threshold (−0.15, `configs/app.yaml`). No other trigger parameter changed. Results after the rerun:
+3,382 candidates, 403 triggers (17 escalations), **345 stress runs**. Blocked as not
+adverse: 507. Classes: GEOPOLITICAL 184, CREDIT_EVENT 78, MACROECONOMIC 64, OPERATIONAL_ESG 19.
+Stress runs per month: 2021-09 1, 2021-10 34, 2021-11 21, 2021-12 19, 2022-01 25, 2022-02 27, 2022-03 36, 2022-04 38, 2022-05 32, 2022-06 24, 2022-07 31, 2022-08 32, 2022-09 25.
+2022 check: **invasion** fired at 13:00 UTC on "Stocks slip, oil jumps as Russia orders troops into Ukraine regions" (impact
+9, 9 outlets), 9 of 14 signs right, book −USD
+10.7 m predicted vs +USD 1.6 m realised. **FOMC**: no adverse
+macro trigger on the day, so the episode is reported as missed. (Checked: the relief-rally story now scores impact 4,
+with sentiment −0.06 under FinBERT, so it never reaches the trigger. The new rule was not what stopped it in this run,
+but it blocked 507 other non-adverse candidates.)
+Supplementary (prior week): the CPI-day run ("Worst Ever: Consumer Sentiment Craters to Record Low as Inflation Expectations Explode Higher", MACROECONOMIC:inflation_hawkish) gets 6 of 14
+signs right. The class mix moved toward GEOPOLITICAL (184) and away from MACROECONOMIC (64): news sentiment
+now comes from FinBERT, and non-negative macro stories no longer trigger.
+
 ### D-058 Sentiment by source: FinBERT for news, fine-tuned for tweets (D-057 rule met; post-hoc revision)
 `reports/sentiment_news_pooled.json`, computed once. On 397 pooled news items: macro-F1 fine-tuned 0.488 vs FinBERT
 0.576, difference −0.088, **95% CI [−0.146, −0.030], entirely below 0**. D-041's alternative branch therefore applies:
@@ -212,6 +250,8 @@ attached are listed separately at the end.
 | 10 | Round 2 (D-053) | Gold-1 cross-validation for selection (gold-1 = training data from here on) | gold-1 labels | Yes: selected C1, by the pre-registered rule |
 | 11 | Round 2 (D-055) | Gold-2 evaluated once | gold-2 labels | No; C1 deployed as pre-registered |
 | 12 | Round 2 downstream (D-055) | v2 retrained (validation check), impact evals, triggers, Module B and 2022 check rerun with C1 | abnormal returns, trigger counts, realised factor moves | No parameter changed from them |
+| 13 | D-057/D-058 | Pooled gold-1 + gold-2 news sentiment check (rule pre-registered, computed once) | gold labels | Yes: news switched to FinBERT (post-hoc revision, disclosed) |
+| 14 | Final rerun (D-060) | v2 retrained (validation rule), Module A, triggers (D-059), 2022 check, all evals once | all | No parameter changed from them; feature freeze |
 
 Not outcome looks (recorded for completeness): GKG pilot and linking rules (D-017, D-020) inspected texts and links;
 D-035 fitted bins on burn-in raw-impact distributions; the FOMC-day investigation in D-040 read impact values of

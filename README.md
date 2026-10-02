@@ -10,7 +10,7 @@
 Risk desks read thousands of headlines and posts a day, but positioning and stress testing need *structured* inputs.
 RiskPulse is a CPU-only platform that ingests unstructured text from two kinds of sources (news from the GDELT
 Global Knowledge Graph and social posts from a stock-tweet corpus), and turns each item into a versioned risk signal
-with a **sentiment score** (−1 to 1, FinBERT fine-tuned on financial tweets, at document *and* entity level), an **event class** (ten classes
+with a **sentiment score** (−1 to 1, FinBERT for news and a tweet-fine-tuned FinBERT for tweets, at document *and* entity level), an **event class** (ten classes
 including the five in the brief), and an **impact score** (1 to 10) whose drivers are explained ("why 8/10").
 Signals are written to an append-only JSONL file and served by a FastAPI service with a Server-Sent Events stream
 that downstream modules subscribe to.
@@ -19,8 +19,8 @@ Both downstream modules are implemented. **Module A** maintains a mock index of 
 with decayed entity sentiment, `w = w0 · exp(κ · s · c)`, inside weight bounds and a 5% daily turnover cap, and is backtested
 daily without look-ahead against an equal-weight index and a naive sign rule. **Module B** holds a synthetic
 wholesale-banking book (loans, bonds, interest-rate swaps, FX forwards, equity options and total-return swaps, CDS and
-equity) seeded from card-transaction merchant data. When a high-impact event arrives (impact ≥ 8, confident class,
-≥ 2 independent sources) it applies risk-factor shocks *measured* over historical analogue episodes, then reports
+equity) seeded from card-transaction merchant data. When a high-impact adverse event arrives (impact ≥ 8, confident
+class, ≥ 2 independent sources, negative sentiment) it applies risk-factor shocks *measured* over historical analogue episodes, then reports
 portfolio value before and after, P&L by asset class, sector, rating and region, the change in expected loss, and a
 CET1 ratio using Basel CRE20 risk weights.
 
@@ -37,7 +37,7 @@ every number in this README is produced by a script and stored in `reports/metri
 |---|---|---|
 | Ingestion | GDELT GKG 2.0 15-minute files streamed and filtered in memory (2021-09 → 2022-09), stock tweets, GDELT DOC API (live), optional NewsAPI; normalisation; exact and near-duplicate removal; replay feed | requests, pandas, rapidfuzz |
 | Entity linking | aliases, cashtags, brands and executives with context rules for ambiguous names; market-wide `MKT` entity with region tags | regex rules, spaCy (available) |
-| Sentiment | FinBERT fine-tuned on the tweet train split (weights on the Hugging Face Hub, local rebuild or base FinBERT as fallbacks); document and clause-level entity sentiment; VADER and Loughran-McDonald baselines | transformers, torch (CPU) |
+| Sentiment | FinBERT for news; FinBERT fine-tuned on the tweet train split for tweets (weights on the Hugging Face Hub, local rebuild or base FinBERT as fallbacks); document and clause-level entity sentiment; VADER and Loughran-McDonald baselines | transformers, torch (CPU) |
 | Event classification | calibrated logistic regression on MiniLM embeddings trained on weak labels; keyword and zero-shot NLI baselines | sentence-transformers, scikit-learn |
 | Impact | company mentions: v2, monotone gradient boosting learned on a Benzinga event study (2009-2018) and scored from a JSON tree dump; market-wide items: v1, class prior × (sentiment, velocity, breadth, novelty, credibility) × relevance; burn-in quantile mapping to 1-10 per population | LightGBM (training only), numpy |
 | Story clustering | online cosine clustering in a 48 h window, novelty over 72 h | sentence-transformers |
@@ -132,14 +132,16 @@ All figures below are generated from `reports/metrics.json` by `scripts/render_r
 | VADER | 0.448 | 0.534 |
 | Majority class (neutral) | 0.264 | 0.656 |
 
-**Sentiment model in use: FinBERT fine-tuned on the tweet train split only** (D-043, D-048). In-domain test (same dataset as training): 0.844. On live-feed text (Arnav's gold labels, rule pre-registered before scoring):
+**Sentiment models in use: FinBERT for news, FinBERT fine-tuned on the tweet train split for tweets** (D-058). The fine-tuned model scores 0.844 in-domain (same dataset as its training data). On live-feed text (Arnav's gold-1 labels, rule pre-registered before scoring, D-041):
 
 | Live-feed gold | n | FinBERT | Fine-tuned | Fine-tuned − FinBERT (95% CI) | VADER | LM |
 |---|---|---|---|---|---|---|
 | News headlines | 237 | 0.592 | 0.549 | -0.043 [-0.1146, 0.0321] | 0.471 | 0.442 |
 | Tweets | 63 | 0.389 | 0.368 | -0.021 [-0.1087, 0.0705] | 0.297 | 0.257 |
 
-The in-domain gain does not transfer: on live text the two models are statistically indistinguishable (point estimates favour FinBERT); the pre-registered rule therefore keeps the fine-tuned model.
+The in-domain gain does not transfer to news.
+
+Pooled news check (gold-1 + gold-2 news, n = 397, rule pre-registered in D-057): fine-tuned 0.488 vs FinBERT 0.576, difference -0.088, 95% CI [-0.1455, -0.0299] (entirely below 0), so news switched to FinBERT. This was a post-hoc revision prompted by the gold-2 evidence (D-058).
 
 **Event classification: final test on gold-2** (n = 200, Arnav's labels, evaluated once; model fixed before the labels were read, D-052/D-053). Macro-F1 over 10 classes:
 
@@ -167,58 +169,58 @@ In-domain reference sets (not the final test):
 
 **Entity linking:** precision 82.0% on 100 hand-checked headline links (95% Wilson CI 73.3%–88.3%).
 
-**Module A, headline: information coefficient** (evaluation 2021-11-30 to 2022-09-29): mean daily IC +0.0381, t-stat 2.39, IC > 0 on 56.5% of 209 days (daily Spearman of decayed sentiment vs next-day return).
+**Module A, headline: information coefficient** (evaluation 2021-11-30 to 2022-09-29): mean daily IC +0.0472, t-stat 2.85, IC > 0 on 56.9% of 209 days (daily Spearman of decayed sentiment vs next-day return).
 
-Tilt strength κ = 10.98, frozen by a risk budget (median absolute active weight 1.5%) computed from signals only over 2021-09-30 to 2021-11-29; returns were never used to set it.
+Tilt strength κ = 7.69, frozen by a risk budget (median absolute active weight 1.5%) computed from signals only over 2021-09-30 to 2021-11-29; returns were never used to set it.
 
 Returns (secondary; net of 5 bps costs; a sentiment-tilt demonstration, not an alpha claim):
 
 | Strategy | Gross return | Cost drag | Net return | Sharpe (rf = 0) | Max drawdown | Avg daily turnover |
 |---|---|---|---|---|---|---|
-| sentiment tilt | -21.5% | 0.52% | -21.9% | -0.977 | -25.9% | 5.00% |
+| sentiment tilt | -23.6% | 0.52% | -24.0% | -1.074 | -27.9% | 5.00% |
 | equal weight buy hold | -21.5% | 0.00% | -21.5% | -1.083 | -25.2% | 0.00% |
 | equal weight rebalanced | -23.2% | 0.07% | -23.3% | -1.044 | -27.0% | 0.67% |
-| naive sign rule | -20.4% | 1.78% | -21.8% | -0.926 | -25.9% | 17.02% |
+| naive sign rule | -20.9% | 2.10% | -22.6% | -0.976 | -26.7% | 20.10% |
 
 Turnover cap 5% one-way per day, set by policy for operational realism (D-045), not optimised on returns.
 
-**Module B** (replay 2021-09 to 2022-09): 2,613 high-impact candidates, 464 triggers fired (29 escalations), 349 stress runs. Cooldown: 24 h per event class and macro-region, re-run within it only on higher impact. Stress runs per month: 2021-09 2, 2021-10 24, 2021-11 16, 2021-12 22, 2022-01 27, 2022-02 22, 2022-03 28, 2022-04 33, 2022-05 31, 2022-06 40, 2022-07 34, 2022-08 39, 2022-09 31. First runs:
+**Module B** (replay 2021-09 to 2022-09): 3,382 high-impact candidates, 403 triggers fired (17 escalations), 345 stress runs. Cooldown: 24 h per event class and macro-region, re-run within it only on higher impact. Stress runs per month: 2021-09 1, 2021-10 34, 2021-11 21, 2021-12 19, 2022-01 25, 2022-02 27, 2022-03 36, 2022-04 38, 2022-05 32, 2022-06 24, 2022-07 31, 2022-08 32, 2022-09 25. First runs:
 
 | Trigger time (UTC) | Scenario | Impact | Sources | Total impact | CET1 after |
 |---|---|---|---|---|---|
-| 2021-09-30T14:00 | MACROECONOMIC:default | 8 | 2 | -1.19% | 11.83% |
-| 2021-09-30T16:00 | MACROECONOMIC:growth_scare | 9 | 3 | -1.44% | 11.72% |
+| 2021-09-30T03:00 | GEOPOLITICAL:default | 8 | 2 | -0.10% | 12.98% |
+| 2021-10-01T08:00 | GEOPOLITICAL:default | 9 | 2 | -0.13% | 12.98% |
 | 2021-10-04T14:00 | GEOPOLITICAL:default | 8 | 4 | -0.10% | 12.98% |
-| 2021-10-05T14:00 | OPERATIONAL_ESG:default | 8 | 78 | -3.77% | 9.50% |
-| 2021-10-06T05:00 | MACROECONOMIC:inflation_hawkish | 8 | 2 | -1.19% | 11.83% |
-| 2021-10-06T08:00 | CREDIT_EVENT:default | 9 | 2 | -1.49% | 11.82% |
+| 2021-10-04T17:00 | OPERATIONAL_ESG:default | 8 | 2 | -3.77% | 9.50% |
+| 2021-10-05T01:00 | OPERATIONAL_ESG:default | 8 | 2 | -3.77% | 9.50% |
+| 2021-10-05T04:00 | OPERATIONAL_ESG:default | 8 | 2 | -3.77% | 9.50% |
+| 2021-10-05T17:00 | OPERATIONAL_ESG:default | 8 | 5 | -3.77% | 9.50% |
+| 2021-10-06T08:00 | CREDIT_EVENT:severe | 10 | 2 | -5.68% | 7.34% |
 | 2021-10-06T16:00 | CREDIT_EVENT:default | 9 | 2 | -1.49% | 11.82% |
-| 2021-10-06T20:00 | CREDIT_EVENT:default | 8 | 2 | -1.12% | 12.12% |
-| 2021-10-07T15:00 | MACROECONOMIC:default | 8 | 2 | -1.19% | 11.83% |
-| 2021-10-07T16:00 | MACROECONOMIC:growth_scare | 8 | 2 | -1.08% | 12.05% |
-| 2021-10-12T18:00 | MACROECONOMIC:inflation_hawkish | 8 | 2 | -1.19% | 11.83% |
-| 2021-10-13T00:00 | MACROECONOMIC:inflation_hawkish | 8 | 2 | -1.19% | 11.83% |
+| 2021-10-06T17:00 | OPERATIONAL_ESG:default | 8 | 4 | -3.77% | 9.50% |
+| 2021-10-06T18:00 | OPERATIONAL_ESG:default | 8 | 2 | -3.77% | 9.50% |
+| 2021-10-06T20:00 | CREDIT_EVENT:default | 9 | 2 | -1.49% | 11.82% |
 
-**Pipeline** (cpu, 10 cores): 140.4 docs/s batch; single-document latency p50 29.5 ms, p95 33.0 ms; dedup removed 39.0% of news and 5.3% of social items.
+**Pipeline** (cpu, 10 cores): 86.6 docs/s batch; single-document latency p50 19.1 ms, p95 21.3 ms; dedup removed 39.0% of news and 5.3% of social items.
 
 **Impact score vs realised market reaction** (2021-22 test set, every look at it listed in D-050: ticker-days after the burn-in, n = 3,538; market-model abnormal returns, CAR[0,+1])
 
 | Score | Spearman vs abs(CAR) | Top-decile hit rate (10% by chance) | Spearman vs abnormal volume |
 |---|---|---|---|
-| Impact v2 (learned on Benzinga ≤ 2018) | 0.129 | 25.4% | 0.117 |
-| Impact v1 (spec formula; live for market-wide items) | 0.062 | 16.1% | 0.109 |
-| abs(sentiment) only (baseline) | 0.129 | 24.9% | 0.130 |
+| Impact v2 (learned on Benzinga ≤ 2018) | 0.111 | 23.4% | 0.102 |
+| Impact v1 (spec formula; live for market-wide items) | 0.055 | 15.8% | 0.091 |
+| abs(sentiment) only (baseline) | 0.110 | 28.2% | 0.111 |
 
-95% bootstrap CI of the Spearman difference: v2 − v1 [0.0406, 0.0954], v2 − abs(sentiment) [-0.0219, 0.0242]. **Impact v2 is on par with abs(sentiment) for predicting the market reaction and adds explainable drivers; it clearly beats the hand-set v1.** It scores company mentions live; market-wide items keep v1. Adoption: the stricter rule written before the first test (beat both v1 and abs(sentiment)) was not met; the rule was revised after that test to the spec's "beats v1" on validation and test (D-039), which is met.
+95% bootstrap CI of the Spearman difference: v2 − v1 [0.0289, 0.0856], v2 − abs(sentiment) [-0.0224, 0.0255]. **Impact v2 is on par with abs(sentiment) for predicting the market reaction and adds explainable drivers; it clearly beats the hand-set v1.** It scores company mentions live; market-wide items keep v1. Adoption: the stricter rule written before the first test (beat both v1 and abs(sentiment)) was not met; the rule was revised after that test to the spec's "beats v1" on validation and test (D-039), which is met.
 
-**Market-wide impact (v1), descriptive check (D-042):** over 188 sessions the day's maximum market-wide impact has Spearman -0.015 with abs(SPY return) (CI [-0.1514, 0.1194]) and -0.032 with abs(ΔVIX) (CI [-0.1694, 0.1158]): no measurable relation.
+**Market-wide impact (v1), descriptive check (D-042):** over 188 sessions the day's maximum market-wide impact has Spearman -0.025 with abs(SPY return) (CI [-0.1606, 0.1143]) and -0.145 with abs(ΔVIX) (CI [-0.2866, 0.0119]): no measurable relation.
 
 **Module B out-of-sample check (2022 episodes; scenarios calibrated before Sep 2021 only)**
 
 | Episode | Status | Sign agreement | Book impact predicted | Book impact realised |
 |---|---|---|---|---|
 | russia_ukraine_2022 (2022-02-24) | fired on the day | 64.3% | -USD 10.7 m | +USD 1.6 m |
-| fomc_june_2022 (2022-06-15) | fired on the day | 42.9% | -USD 134.1 m | +USD 36.7 m |
+| fomc_june_2022 (2022-06-15) | missed (supplementary: prior-week run) | 42.9% | -USD 101.0 m | +USD 36.7 m |
 
 **Sentiment fine-tune experiment** (FinBERT on tweet train split only, 45-min CPU budget): test macro-F1 0.844 vs bar 0.661; kept (beats FinBERT 0.661).
 
@@ -230,8 +232,9 @@ breaks, an immediate estimate of the P&L, expected-loss and CET1 effect on a who
 to a named historical episode.
 
 **Limitations (measured, not assumed).**
-- Fine-tuning helped in-domain (0.844) but not on live-feed text, where it is statistically indistinguishable from
-  base FinBERT (gold check above).
+- Fine-tuning helped in-domain (0.844) but was worse than base FinBERT on live news (pooled check), so news uses
+  FinBERT. The fine-tuned model is kept for tweets, where the two score about the same (gold-1: CI includes 0, n 63;
+  gold-2: 0.430 vs 0.429, n 40).
 - Event classification: two rounds, including adding 300 hand labels (selected by cross-validation, then tested
   once on 200 new labels), did not beat the keyword or zero-shot baselines. On the independent test all differences
   are within noise, and the keyword baseline has the highest point estimate.

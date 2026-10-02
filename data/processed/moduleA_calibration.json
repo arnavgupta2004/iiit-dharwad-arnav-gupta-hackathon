@@ -1,6 +1,6 @@
 {
-  "kappa": 10.9849,
-  "achieved": 0.015231148445775264,
+  "kappa": 7.6884,
+  "achieved": 0.01499999791628185,
   "target": 0.015,
   "reachable": true,
   "calibration_window": [

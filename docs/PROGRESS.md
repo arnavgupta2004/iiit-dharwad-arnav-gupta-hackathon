@@ -40,8 +40,15 @@ Status legend: DONE · IN PROGRESS · NEXT · OPEN
 - Engineering: stage-1 caches split by model (D-047); impact v2 scored by a lightgbm-free JSON tree evaluator because
   LightGBM and torch cannot share a process on macOS (D-049).
 
+## Sentiment by source, adverse-only triggers, final rerun: DONE (D-057 to D-060). FEATURE FREEZE.
+- News → FinBERT, tweets → fine-tuned (pooled news check, pre-registered, CI entirely below 0).
+- Stress triggers require adverse sentiment; final mechanical rerun done; snapshot refreshed once.
+
 ## Waiting on Arnav
-- Decision: gold-2 sentiment (reported only) shows fine-tuned 0.383 vs FinBERT 0.553 on news; revisit the model?
+- Codespace fresh-clone test (`docs/drafts/codespace_fresh_clone_test.md`).
+
+## Remaining (no model or logic changes)
+- README "results at a glance" with trust framing; deck; video script; prep notes.
 
 ## Next
 - Phase 9 hardening: DONE for the fresh-clone test (README install, `pytest -q`, `demo --fast`) and the idle benchmark
