@@ -14,6 +14,7 @@ import shutil
 import pandas as pd
 
 from riskpulse.common.config import data_path, load_config, repo_root
+from riskpulse.common.schemas import Signal
 
 LIMIT_MB = 50
 DEMO = data_path("demo")
@@ -23,7 +24,6 @@ MENTION_COLS = [
     "outlet",
     "published_at",
     "title",
-    "url",
     "ticker",
     "relevance",
     "sentiment",
@@ -41,16 +41,34 @@ def main() -> None:
     m = pd.read_parquet(data_path("processed", "mentions.parquet"), columns=MENTION_COLS)
     m["title"] = m["title"].str.slice(0, 200)
     m.to_parquet(DEMO / "mentions.parquet", index=False, compression="zstd")
+    # Signals: event signals with impact >= 6 (all stress candidates) and one entity snapshot per
+    # ticker per day (the last of the day); evidence trimmed to 3 items.
     src = repo_root() / load_config("app")["paths"]["signals_jsonl"]
-    with src.open("rb") as fi, gzip.open(DEMO / "signals.jsonl.gz", "wb", compresslevel=9) as fo:
-        shutil.copyfileobj(fi, fo)
+    last_entity: dict[tuple[str, str], str] = {}
+    keep_events: list[str] = []
+    with src.open(encoding="utf-8") as fh:
+        for line in fh:
+            s = Signal.model_validate_json(line)
+            s = s.model_copy(update={"evidence": s.evidence[:3]})
+            if s.signal_type == "event":
+                if s.impact_score >= 6:
+                    keep_events.append(s.model_dump_json())
+            elif s.entity is not None:
+                last_entity[(s.entity.ticker, s.as_of.date().isoformat())] = s.model_dump_json()
+    with gzip.open(DEMO / "signals.jsonl.gz", "wt", encoding="utf-8", compresslevel=9) as fo:
+        for line in [*keep_events, *last_entity.values()]:
+            fo.write(line + "\n")
     a_src, a_dst = data_path("processed", "moduleA"), DEMO / "moduleA"
     a_dst.mkdir(exist_ok=True)
     for f in a_src.glob("*.parquet"):
         shutil.copy(f, a_dst / f.name)
     runs = data_path("processed", "moduleB", "stress_runs.jsonl")
     if runs.exists():
-        shutil.copy(runs, DEMO / "stress_runs.jsonl")
+        with (
+            runs.open("rb") as fi,
+            gzip.open(DEMO / "stress_runs.jsonl.gz", "wb", compresslevel=9) as fo,
+        ):
+            shutil.copyfileobj(fi, fo)
     total = 0.0
     for f in sorted(DEMO.rglob("*")):
         if f.is_file():

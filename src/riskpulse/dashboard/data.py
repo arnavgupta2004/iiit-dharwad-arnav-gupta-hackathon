@@ -20,6 +20,9 @@ DEMO_DIR = data_path("demo")
 
 
 def _first(*paths: Path) -> Path | None:
+    """First existing path; RISKPULSE_FORCE_DEMO=1 skips batch outputs (fresh-clone behaviour)."""
+    if os.environ.get("RISKPULSE_FORCE_DEMO") == "1":
+        paths = tuple(p for p in paths if DEMO_DIR in p.parents)
     return next((p for p in paths if p.exists()), None)
 
 
@@ -96,11 +99,12 @@ def module_a_outputs() -> dict[str, pd.DataFrame]:
 @st.cache_data(show_spinner=False)
 def stress_runs() -> list[dict]:
     p = _first(
-        data_path("processed", "moduleB", "stress_runs.jsonl"), DEMO_DIR / "stress_runs.jsonl"
+        data_path("processed", "moduleB", "stress_runs.jsonl"), DEMO_DIR / "stress_runs.jsonl.gz"
     )
     if p is None:
         return []
-    with p.open(encoding="utf-8") as fh:
+    opener = gzip.open if p.suffix == ".gz" else open
+    with opener(p, "rt", encoding="utf-8") as fh:
         return [json.loads(line) for line in fh if line.strip()]
 
 
