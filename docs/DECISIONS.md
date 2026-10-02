@@ -22,6 +22,15 @@ corporate average cumulative default rates, 1981-2024"**, column Y1:
 Caution recorded during verification: page 56 also starts **Table 25 (U.S. region)**, whose AAA/AA/A rows read
 0.00/0.03/0.06. Those are *not* used. Only these seven values are stored; no table is copied into the repository.
 
+### D-036 Impact v1 underperforms |sentiment| (Arnav's item 5; reported, not tuned away)
+`reports/metrics.json → impact`, `reports/figures/impact_deciles.png`. Event study at the ticker-day level (market model
+on SPY, [−120, −20]; CAR[0,+1]), post-burn-in replay window, n = 3,538: Spearman ρ(v1, |CAR|) = 0.046 (p = 0.006,
+top-decile hit rate 13.8%) against ρ(|sentiment|, |CAR|) = 0.104 (p = 5e-10, hit rate 25.7%). The paired-bootstrap 95% CI of the
+difference is [−0.086, −0.028]. On abnormal volume it is 0.080 vs 0.107. v1 is positively related to market reaction, but
+its hand-set weights dilute the sentiment signal. This motivates impact v2 (P1 #1): weights learned on the Benzinga event
+study with a time split. v2 replaces v1 only if it beats both v1 and |sentiment| on held-out data. The v1 weights are
+**not** retuned on these results (that would leak the evaluation).
+
 ### D-035 Impact 1-10 as a severity scale, per population (deviation from plain deciles; for Arnav at GATE C)
 With decile bins, "impact >= 8" meant the top 30% of all items: 70.7% of market-wide (MKT) mentions scored >= 8
 against 5.3% of company mentions (MKT items carry relevance 1 and high class priors), and the Module B trigger fired

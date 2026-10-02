@@ -10960,5 +10960,184 @@
       "generated_at": "2026-10-02T04:06:27+00:00",
       "git_commit": "b35c655"
     }
+  },
+  "impact": {
+    "method": "market model on SPY over [-120,-20] trading days; CAR[0,+1]; ticker-day level; day 0 = first session at/after publication (16:00 ET rule)",
+    "replay_window_post_burn_in": {
+      "n_ticker_days": 3538,
+      "n_tickers": 20,
+      "abs_car01": {
+        "impact_v1": {
+          "spearman_rho": 0.0459,
+          "p_value": 0.00634,
+          "decile_means": [
+            0.016687,
+            0.016021,
+            0.016852,
+            0.019083,
+            0.015696,
+            0.018215,
+            0.021108,
+            0.020496,
+            0.021048,
+            0.022401
+          ],
+          "top_decile_hit_rate": 0.1384
+        },
+        "abs_sent": {
+          "spearman_rho": 0.1042,
+          "p_value": 5.22e-10,
+          "decile_means": [
+            0.014308,
+            0.016586,
+            0.016328,
+            0.017374,
+            0.018612,
+            0.018,
+            0.018196,
+            0.017495,
+            0.019423,
+            0.031273
+          ],
+          "top_decile_hit_rate": 0.2571
+        },
+        "rho_diff_v1_minus_abs_sent_95ci": [
+          -0.0858,
+          -0.0282
+        ]
+      },
+      "abn_volume": {
+        "impact_v1": {
+          "spearman_rho": 0.0797,
+          "p_value": 2.04e-06,
+          "decile_means": [
+            -0.053021,
+            -0.085491,
+            -0.09226,
+            -0.069836,
+            -0.085648,
+            -0.031795,
+            0.00097,
+            -0.020915,
+            0.008289,
+            0.041996
+          ],
+          "top_decile_hit_rate": 0.1412
+        },
+        "abs_sent": {
+          "spearman_rho": 0.1066,
+          "p_value": 2.06e-10,
+          "decile_means": [
+            -0.083611,
+            -0.072093,
+            -0.072282,
+            -0.080056,
+            -0.104052,
+            -0.045992,
+            -0.043158,
+            -0.047444,
+            -0.018544,
+            0.17937
+          ],
+          "top_decile_hit_rate": 0.2373
+        },
+        "rho_diff_v1_minus_abs_sent_95ci": [
+          -0.0568,
+          0.0021
+        ]
+      }
+    },
+    "replay_window_full": {
+      "n_ticker_days": 4755,
+      "n_tickers": 20,
+      "abs_car01": {
+        "impact_v1": {
+          "spearman_rho": 0.054,
+          "p_value": 0.000194,
+          "decile_means": [
+            0.01565,
+            0.016019,
+            0.015881,
+            0.017595,
+            0.015047,
+            0.0177,
+            0.019668,
+            0.019366,
+            0.020928,
+            0.02233
+          ],
+          "top_decile_hit_rate": 0.145
+        },
+        "abs_sent": {
+          "spearman_rho": 0.0982,
+          "p_value": 1.13e-11,
+          "decile_means": [
+            0.013983,
+            0.016331,
+            0.015361,
+            0.016625,
+            0.016978,
+            0.017218,
+            0.017909,
+            0.0171,
+            0.019182,
+            0.029486
+          ],
+          "top_decile_hit_rate": 0.2458
+        },
+        "rho_diff_v1_minus_abs_sent_95ci": [
+          -0.0698,
+          -0.0192
+        ]
+      },
+      "abn_volume": {
+        "impact_v1": {
+          "spearman_rho": 0.0897,
+          "p_value": 5.73e-10,
+          "decile_means": [
+            -0.058748,
+            -0.077762,
+            -0.091662,
+            -0.072518,
+            -0.079869,
+            -0.040069,
+            -0.001969,
+            -0.016352,
+            0.019445,
+            0.06536
+          ],
+          "top_decile_hit_rate": 0.1702
+        },
+        "abs_sent": {
+          "spearman_rho": 0.0996,
+          "p_value": 5.83e-12,
+          "decile_means": [
+            -0.088579,
+            -0.057263,
+            -0.073284,
+            -0.091496,
+            -0.079289,
+            -0.038238,
+            -0.033312,
+            -0.033495,
+            -0.006192,
+            0.146892
+          ],
+          "top_decile_hit_rate": 0.229
+        },
+        "rho_diff_v1_minus_abs_sent_95ci": [
+          -0.0351,
+          0.0169
+        ]
+      }
+    },
+    "post_burn_in_start": "2022-01-01",
+    "v2_status": "TBD (Benzinga event study, time split train <= 2018 / validate 2019-2020)",
+    "note": "v1 raw score has no fitted parameters (weights set a priori).",
+    "_provenance": {
+      "script": "riskpulse eval impact",
+      "generated_at": "2026-10-02T04:07:38+00:00",
+      "git_commit": "97f1b1e"
+    }
   }
 }
