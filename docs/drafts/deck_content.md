@@ -1,128 +1,107 @@
-# RiskPulse: deck content (DRAFT v2, 7 slides)
+# RiskPulse: deck content (DRAFT v3, 7 slides, after the feature freeze)
 
-Status: numbers filled from `reports/metrics.json` after round 2 (D-055). Re-check against metrics.json before export. Every number here must
-still match metrics.json at submission time; re-check before exporting the PDF.
+Numbers are taken from `reports/metrics.json` after the final rerun (D-060/D-061) and match the README "Results at a
+glance". Re-check them before exporting the PDF. Organisers' outline: Title, Problem and Approach, System Design,
+Implementation Highlights, Key Results, Domain Impact, Limitations and Next Steps. The hook (the 2022 event) comes first.
 
-Style: white background, navy/charcoal text, red/green only for negative/positive values, no gradients, no emoji, one
-idea per slide, at most about 25 words of body text plus one visual. Percentages to one decimal place, currency as
-"USD 10.7 m", rates and spreads in bp.
+Style: white background, navy/charcoal text, red/green only for negative/positive values, no gradients, no emoji,
+one idea per slide, at most about 25 words of body text plus one visual. Percentages to one decimal, "USD 10.7 m",
+bp for rates and spreads.
 
 ---
 
-## Slide 1: Title
+## Slide 1: Title + hook
 
-**RiskPulse: news and social sentiment as a real-time risk signal**
-Code to Connect 2026 (S&P Global and Crisil), Phase 3 case study
-Arnav Gupta, B.Tech Data Science and AI, IIIT Dharwad
+**22 February 2022, 00:00 UTC: RiskPulse triggers a geopolitical stress test.**
+Two days later, Russia launches its full-scale invasion of Ukraine.
 
-Visual: a muted strip of the Signal Monitor page.
+RiskPulse: news and social sentiment as a real-time risk signal
+Code to Connect 2026 (S&P Global and Crisil), Phase 3 · Arnav Gupta, IIIT Dharwad
 
-Speaker notes (15 s): "RiskPulse turns financial news and social posts into structured risk signals and uses them in
-two places: a tactical index rebalancer and an event-triggered stress test of a wholesale banking book."
+Visual: Module B trigger timeline for 20-25 Feb 2022 (diamonds on 22 Feb), muted.
+
+Speaker notes (20 s): "This came from replaying a year of real news through the system in time order: at midnight
+UTC on 22 February it flagged Russia's recognition of the separatist regions as a high-impact, adverse geopolitical
+event and stress-tested a USD 10 bn wholesale book. The troop order followed at 06:00. RiskPulse turns news and posts
+into risk signals and acts on them."
+Careful wording: the system flagged the **escalation**, not the invasion itself.
 
 ---
 
 ## Slide 2: Problem and approach
 
-Left, the problem:
 - Markets react to news within hours; risk teams read it in batches.
-- Raw sentiment isn't a risk signal: it needs the entity, the event type and an impact level.
+- A headline isn't a risk signal until it has an **entity**, an **event type** and an **impact level**.
 
-Right, three fields per signal:
-1. **Sentiment**, −1 to +1, at entity level (a clause about JPM doesn't score BAC).
-2. **Event class**, one of 10 (geopolitical = cross-border only, macro, credit, M&A, …).
-3. **Impact**, 1–10, learned against realised abnormal returns.
-
-Bottom: one signal schema feeds **Module A** (index tilt) and **Module B** (stress test).
+Three fields per signal: **sentiment** (−1…+1, per company), **event class** (10, geopolitical = cross-border),
+**impact** (1–10, learned against abnormal returns).
+One signal feeds **Module A** (index tilt) and **Module B** (event-triggered stress test).
 
 ---
 
 ## Slide 3: System design
 
-Visual: `docs/architecture.png`, full width.
+Visual: `docs/architecture.png`.
 
-Captions:
-- Sources: GDELT GKG news (1-in-4 sampled 15-minute files), stock tweets, Benzinga (event study only), prices.
-- Engine: entity linking → fine-tuned FinBERT → event classifier → story clustering → impact (v2 for companies,
-  v1 for market-wide).
-- Delivery: JSONL + DuckDB, FastAPI (REST and SSE), Streamlit dashboard; deterministic replay.
-- CPU only, no paid keys; `python -m riskpulse demo --fast` works on a fresh clone (tested: install to running
-  dashboard in under 5 minutes).
-
-Replay feed: 203,363 documents (165,782 news, 37,581 tweets), 2021-09-30 → 2022-09-29, 20 S&P 100 names plus
-market-wide.
+- 203,363 real documents (165,782 GDELT news, 37,581 tweets), 2021-09 → 2022-09, replayed in time order.
+- Entity linking → FinBERT (news) / tweet-tuned FinBERT (tweets) → event classifier → story clustering → impact
+  (learned model for companies, formula for market-wide).
+- FastAPI (REST + live stream) and a Streamlit dashboard; CPU only; `python -m riskpulse demo --fast` on a fresh clone.
 
 ---
 
 ## Slide 4: Implementation highlights (what and why)
 
-- **Entity-level sentiment.** Clause split, so "JPM beats while BAC misses" scores both names. FinBERT fine-tuned
-  on the tweet train split only.
-- **Impact v2.** Monotone gradient boosting on about 10 years (2009-2018) of Benzinga headlines vs abnormal returns.
-  Scored live from per-session running aggregates (no look-ahead). Every score keeps its drivers.
-- **Leakage discipline.** Time splits, a burn-in, rules written before tests, a frozen κ, 2022 never used for
-  calibration, and every look at the test window logged (D-050).
-- **Engineering.** LightGBM and torch can't share a process on macOS, so v2 is exported as JSON trees and scored by
-  a NumPy evaluator that matches LightGBM exactly on the full validation and test sets.
-
-Speaker notes, if asked "why not an LLM?": CPU-only, deterministic, auditable, and every number is reproducible with
-`python -m riskpulse eval all`.
+- **Entity-level sentiment:** "JPM beats while BAC misses" scores each bank separately. News uses FinBERT (better
+  on labelled live news); tweets use the tweet-fine-tuned model (the two score about the same on tweets).
+- **Impact v2:** monotone gradient boosting learned on 2009-18 Benzinga headlines vs abnormal returns. Scored live
+  from per-session aggregates (no look-ahead), with every score's drivers shown.
+- **Stress triggers:** impact ≥ 8, confident class, ≥ 2 outlets, adverse sentiment. Scenarios come from pre-2021
+  historical analogues only.
+- **Discipline:** decision rules pre-registered before tests, every look at the test window logged, and the small
+  trained models committed so a fresh clone runs the reported system.
 
 ---
 
-## Slide 5: Key results (vs naive baselines)
+## Slide 5: Key results (with why to trust each)
 
-| Component | RiskPulse | Naive baseline |
-|---|---|---|
-| Sentiment, live-feed news (gold, n 237) | 0.549 fine-tuned / 0.592 FinBERT | VADER 0.471, Loughran-McDonald 0.442 |
-| Sentiment, in-domain test (HF) | 0.844 fine-tuned | FinBERT 0.668, majority 0.264 |
-| Event class, independent test (gold-2, n 200) | 0.559 | keyword 0.595, zero-shot 0.578 (all within noise) |
-| Entity linking precision | 82.0% (CI 73.3–88.3%) | n/a |
-| Impact vs abs(CAR), Spearman (n 3,538) | v2 0.129 (top-decile hit 24.9%) | v1 0.058 (16.7%), abs(sentiment) 0.129 (24.9%) |
-| Module A daily IC | +0.038 (t 2.39; 56.5% of days > 0) | 0 = no skill |
-| Module B triggers | 349 stress runs from 2,613 high-impact items | every high-impact item |
+| Result | Trust |
+|---|---|
+| 2022 Russia–Ukraine: stress test at 22 Feb 00:00 UTC; 9 of 14 factor directions right | Out-of-sample: calibrated on pre-2021 episodes only |
+| Module A information coefficient +0.047, t 2.85 (IC > 0 on 56.9% of 209 days) | Tilt strength fixed without looking at returns |
+| Impact v2 vs v1: Spearman 0.111 vs 0.055 (gain CI [0.029, 0.086]); on par with abs(sentiment) 0.110 | 2021-22 test; trained on 2009-18 |
+| Sentiment on live news: FinBERT 0.592 vs VADER 0.471, Loughran-McDonald 0.442 | Human-labelled (n 237) |
+| Entity linking precision 82.0% (CI 73.3–88.3%) | 100 human-checked links |
+| 86.6 docs/s; 21.3 ms p95 per document | Laptop CPU, no GPU |
 
-Efficiency strip (measured):
-- 140.4 docs/s on CPU; 33.0 ms p95 per item (idle machine).
-- Dedup removes 39.0% of news and 5.3% of social items before scoring.
-- Analyst load: 2,613 high-impact items → 349 stress tests a year, each with a written scenario explainer.
+Efficiency vs naive: 3,382 high-impact items → 345 stress tests a year (adverse, multi-source, deduplicated by
+region and class); dedup removes 39.0% of news before scoring.
 
 Visual: `reports/figures/impact_v2_deciles.png`, small.
-
-Honesty line (small text): "Returns are secondary: net of costs the tilt returned −21.9% vs −23.3% for equal weight
-rebalanced and −21.5% buy-and-hold."
 
 ---
 
 ## Slide 6: Domain impact
 
-- **Portfolio manager (Module A):** sentiment-tilted weights, with the headlines behind each move. Turnover capped at
-  5% a day as policy; cost drag 0.5% over the evaluation window.
-- **Risk team (Module B):** on 2022-02-24 at 06:00 UTC, an impact-9 story ("Global market plunges, stocks dive after
-  Vladimir Putin launches military operations in Ukraine") triggered a stress test of a USD 10 bn synthetic book:
-  −USD 10.7 m, CET1 13.00% → 12.98%, top-10 positions and the analogue explainer.
-- **Validation habit:** 2022 used only out of sample. Invasion: 9 of 14 factor directions right; June FOMC: 6 of 14
-  (the trigger fired on a relief-rally headline, but the scenario is a stress by construction).
+- **Risk team (Module B):** an adverse geopolitical story triggers a stress test with P&L, ΔEL and CET1 on a USD 10 bn
+  synthetic book. On the 24 Feb run: predicted −USD 10.7 m, CET1 13.00% → 12.98%, every shock traced to named
+  analogues (Crimea 2014, Brexit 2016, Abqaiq 2019).
+- **Portfolio manager (Module A):** sentiment-tilted index weights with the headlines behind each move. Turnover is
+  capped at 5% a day; cost drag 0.5%.
+- **Analyst:** one screen shows why a story scores 8/10.
 
-Visual: Module B page (trigger timeline + stress result).
-
-Speaker notes: all counterparties are synthetic (CP_xxxx); no client data.
+Visual: Module B page (ranked stress runs, top 3 per month). All counterparties are synthetic (CP_xxxx).
 
 ---
 
-## Slide 7: Limitations and next steps
+## Slide 7: Limitations and next steps (measured)
 
-Limitations (measured):
-1. Fine-tuned sentiment: 0.844 in-domain, but on live news it is indistinguishable from FinBERT.
-2. Event classifier: two rounds (incl. 300 hand labels, CV selection, one blind test on 200 more) did not beat keyword
-   or zero-shot baselines; all differences within noise.
-3. Impact v2 ≈ abs(sentiment); market-wide impact shows no relation to SPY/VIX moves (ρ −0.03).
-4. Geopolitical scenarios average risk-off and supply-shock analogues: oil +6.6% predicted vs +18.0% realised in 2022.
-5. Scheduled macro events have no surprise measure: the FOMC scenario predicted a sell-off into a relief rally.
+1. Event classification: two rounds (300 + 200 hand labels, one blind test) did not beat a keyword baseline.
+2. Market-wide impact does not predict SPY or VIX moves (ρ ≈ 0).
+3. Oil shock underestimated in 2022: +6.5% predicted vs +18.0% realised (analogues mix risk-off with supply shocks).
+4. June 2022 FOMC missed: no adverse trigger, and the reaction was a relief rally (no surprise-vs-consensus measure).
+5. Trigger precision against VIX/SPY event days was never measured.
 
-Next steps:
-- Supply-shock vs risk-off variants of the geopolitical scenario, calibrated pre-2021.
-- A surprise-vs-consensus feature for scheduled releases (CPI, payrolls, FOMC).
-- Labelled news headlines for the event classifier; rating migration in the capital view; the full GDELT feed.
+Next: supply-shock vs risk-off scenarios; surprise-vs-consensus for scheduled releases; labelled news for events.
 
-Speaker notes: "We used 2022 to find where the method breaks, not to tune it until it looks right."
+Speaker notes: "We used 2022 to find out where the method breaks, not to tune it until it looks right."
