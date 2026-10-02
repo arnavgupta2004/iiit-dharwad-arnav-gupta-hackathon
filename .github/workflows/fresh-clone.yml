@@ -1,0 +1,107 @@
+# Fresh-clone check: a clean Ubuntu machine with an empty model cache runs the reported system.
+# Manual trigger only (Actions tab -> "Fresh-clone check" -> Run workflow, or `gh workflow run fresh-clone.yml`).
+name: Fresh-clone check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fresh-clone:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    defaults:
+      run:
+        shell: bash  # -eo pipefail: a failing command in a pipe fails the step
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+
+      - name: Empty Hugging Face cache
+        run: echo "HF_HOME=$RUNNER_TEMP/hf_empty" >> "$GITHUB_ENV"
+
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install exactly as the README says
+        run: |
+          start=$(date +%s)
+          python3.11 -m venv .venv && source .venv/bin/activate
+          pip install -r requirements.txt
+          echo "INSTALL_SECONDS=$(( $(date +%s) - start ))" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Preconditions (no .env, empty model cache)
+        run: |
+          source .venv/bin/activate
+          test ! -f .env && echo "no .env: OK"
+          mkdir -p "$HF_HOME"; echo "HF cache entries: $(ls -A "$HF_HOME" | wc -l)"
+          python -c "import os, riskpulse; assert os.environ.get('RISKPULSE_EXTERNAL_ROOT') is None; print('HF_HUB_CACHE:', os.environ.get('HF_HUB_CACHE'))"
+
+      - name: Tests
+        run: |
+          source .venv/bin/activate
+          pytest -q 2>&1 | tail -5
+
+      - name: demo --fast (precomputed outputs, no model downloads)
+        run: |
+          source .venv/bin/activate
+          python -m riskpulse demo --fast > demo_fast.log 2>&1 &
+          for i in $(seq 1 90); do curl -sf http://127.0.0.1:8000/health > /dev/null && break; sleep 2; done
+          curl -sf http://127.0.0.1:8000/health | tee health_fast.json
+          for i in $(seq 1 60); do curl -sf http://localhost:8501 > /dev/null && break; sleep 2; done
+          code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8501); echo "dashboard HTTP $code"
+          test "$code" = "200"
+          echo "DEMO_FAST=ok (dashboard HTTP $code, $(python -c "import json;print(json.load(open('health_fast.json'))['n_signals'])") signals)" >> "$GITHUB_STEP_SUMMARY"
+          pkill -f "riskpulse" || true; pkill -f streamlit || true; sleep 2
+
+      - name: serve --full (downloads models on first start)
+        run: |
+          source .venv/bin/activate
+          start=$(date +%s)
+          python -m riskpulse serve --full --port 8000 > serve.log 2>&1 &
+          for i in $(seq 1 450); do curl -sf http://127.0.0.1:8000/health > /dev/null && break; sleep 2; done
+          curl -sf http://127.0.0.1:8000/health
+          echo "SERVE_READY_SECONDS=$(( $(date +%s) - start ))" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Check model origins (repo or hub, no FALLBACK)
+        run: |
+          grep "model origin" serve.log | tee origins.txt
+          echo '```' >> "$GITHUB_STEP_SUMMARY"; cat origins.txt >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"
+          n=$(grep -c "FALLBACK IN USE" serve.log || true); echo "FALLBACK lines: $n" | tee -a "$GITHUB_STEP_SUMMARY"
+          test "$n" = "0"
+          grep -q "sentiment_news: base:ProsusAI/finbert" origins.txt
+          grep -q "sentiment_social: hub:" origins.txt
+          grep -q "event_classifier: repo:data/trained/" origins.txt
+          grep -q "impact_company: repo:data/trained/" origins.txt
+          grep -q "embeddings: hub:" origins.txt
+          echo "HF cache after start-up: $(du -sh "$HF_HOME" | cut -f1)" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: /analyze works
+        run: |
+          source .venv/bin/activate
+          for k in 1 2; do
+            t0=$(date +%s.%N)
+            curl -sf -X POST http://127.0.0.1:8000/analyze -H 'Content-Type: application/json' \
+              -d '{"text": "JPMorgan beats estimates while Bank of America misses"}' > analyze.json
+            echo "ANALYZE_CALL_$k=$(python -c "print(round($(date +%s.%N) - $t0, 3))")s" | tee -a "$GITHUB_STEP_SUMMARY"
+          done
+          python - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import json
+          r = json.load(open("analyze.json"))
+          assert r["event_class"] and r["entities"], r
+          ents = {e["ticker"]: e["sentiment_score"] for e in r["entities"]}
+          print("analyze:", {"event_class": r["event_class"], "entities": ents, "sentiment_model": r["model_versions"]["sentiment"]})
+          PY
+          pkill -f "riskpulse serve" || true
+
+      - name: Keep logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fresh-clone-logs
+          path: |
+            serve.log
+            demo_fast.log
+            analyze.json
+          if-no-files-found: ignore
