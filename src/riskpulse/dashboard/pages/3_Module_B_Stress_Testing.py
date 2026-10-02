@@ -98,12 +98,58 @@ if mode == "Triggered run":
     if not runs:
         st.info("No triggered runs stored. Run `python -m riskpulse stress --replay`.")
     else:
+        # Presentation only (D-061): rank runs by impact, highlight the top 3 per month.
+        rk = pd.DataFrame(
+            {
+                "i": range(len(runs)),
+                "as_of": [r["trigger"]["as_of"][:16].replace("T", " ") for r in runs],
+                "month": [r["trigger"]["as_of"][:7] for r in runs],
+                "impact": [r["trigger"]["impact_score"] for r in runs],
+                "sources": [r["trigger"]["n_sources"] for r in runs],
+                "scenario": [r["scenario"]["name"] for r in runs],
+                "headline": [
+                    (r["trigger"]["evidence"] or [{}])[0].get("title", "")[:90] for r in runs
+                ],
+                "book impact": [usd(r["total_impact"]) for r in runs],
+                "CET1 after": [pct(r["capital"]["cet1_ratio_after"], 2) for r in runs],
+            }
+        ).sort_values(["impact", "sources"], ascending=False, kind="stable")
+        rk["rank in month"] = rk.groupby("month").cumcount() + 1
+        rk["top 3 in month"] = rk["rank in month"] <= 3
+        st.markdown(
+            f"**{len(runs)} stress runs** over {rk['month'].nunique()} months "
+            f"({data.metrics().get('moduleB_triggers', {}).get('n_triggers_fired', len(runs))} "
+            "triggers fired). Ranked by impact, then "
+            "number of outlets; the top 3 per month are highlighted."
+        )
+        show_all = st.toggle(f"Show all {len(runs)} stress runs", value=False)
+        view = rk if show_all else rk[rk["top 3 in month"]].sort_values(["month", "rank in month"])
+        cols = ["as_of", "impact", "sources", "scenario", "headline", "book impact", "CET1 after"]
+        st.dataframe(
+            view[cols].style.apply(
+                lambda row: (
+                    [
+                        "background-color: #eef2f8; font-weight: 600"
+                        if rk.loc[row.name, "top 3 in month"]
+                        else ""
+                    ]
+                    * len(row)
+                ),
+                axis=1,
+            ),
+            use_container_width=True,
+            hide_index=True,
+            height=300,
+        )
+        order = view.sort_values(["impact", "sources"], ascending=False, kind="stable")[
+            "i"
+        ].tolist()
         i = st.selectbox(
-            "Triggered stress test",
-            range(len(runs)),
+            "Inspect a stress test (ranked by impact)",
+            order,
             format_func=lambda j: (
-                f"{runs[j]['trigger']['as_of'][:16]} · {runs[j]['scenario']['name']} · "
                 f"impact {runs[j]['trigger']['impact_score']} · "
+                f"{runs[j]['trigger']['as_of'][:16]} · {runs[j]['scenario']['name']} · "
                 f"{(runs[j]['trigger']['evidence'] or [{}])[0].get('title', '')[:70]}"
             ),
         )

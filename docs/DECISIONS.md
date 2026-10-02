@@ -4,6 +4,17 @@ Newest first within each date. Each entry: decision, rationale, and status (acce
 
 ## 2026-10-02 (event classification round 2, approved by Arnav)
 
+### D-061 Presentation-only changes under the feature freeze (Arnav)
+- **Module B page:** stress runs are shown ranked by impact (then outlets), with the top 3 per month highlighted. The
+  full list is behind a toggle and the totals stay visible. No change to trigger logic or any model.
+- **2022 check, reporting fields only:** each episode records its anchor (the realised window is anchored on the
+  pre-registered event date, e.g. 2022-02-24) and every same-class run in the prior week. Re-running the check
+  reproduced the same numbers. Timing on record: the first Russia-Ukraine stress tests fired at 2022-02-22 00:00 UTC
+  (recognition of the separatist regions, impact 8) and 06:00 UTC (troop order, impact 9), two days before the
+  24 February invasion. The scored prediction is the 24 February run, which uses the same GEOPOLITICAL:default
+  scenario at impact 9.
+- The trigger-validation check (trigger dates vs VIX spikes / SPY drawdown days) was **never computed**.
+
 ### D-060 Final mechanical rerun (D-058 + D-059), then FEATURE FREEZE (Arnav)
 One rerun, reusing the cached per-model sentiment scores: impact v2 retrained on Benzinga with FinBERT (news)
 sentiment and C1 classes. The validation rule passed: ρ v2 0.175 vs v1

@@ -6791,6 +6791,58 @@
       "russia_ukraine_2022": {
         "event_date": "2022-02-24",
         "class": "GEOPOLITICAL",
+        "anchor": "realised window anchored on the pre-registered event date 2022-02-24: close of the previous session to +10 sessions; the prediction uses the highest-impact run fired on that date",
+        "class_runs_in_prior_week": [
+          {
+            "as_of": "2022-02-17T20:00:00Z",
+            "impact_score": 8,
+            "n_sources": 2,
+            "scenario": "GEOPOLITICAL:default",
+            "headline": "France withdraws troops from Mali after nine-year anti-terror campaign"
+          },
+          {
+            "as_of": "2022-02-22T00:00:00Z",
+            "impact_score": 8,
+            "n_sources": 4,
+            "scenario": "GEOPOLITICAL:default",
+            "headline": "Putin recognizes separatist eastern Ukrainian regions, raising fears of invasion"
+          },
+          {
+            "as_of": "2022-02-22T06:00:00Z",
+            "impact_score": 9,
+            "n_sources": 2,
+            "scenario": "GEOPOLITICAL:default",
+            "headline": "Stocks slip, oil jumps as Russia orders troops into Ukraine regions"
+          },
+          {
+            "as_of": "2022-02-22T10:00:00Z",
+            "impact_score": 8,
+            "n_sources": 17,
+            "scenario": "GEOPOLITICAL:default",
+            "headline": "Putin Orders Troops Into Two Separatist Eastern Ukraine States Amid Warning Of 'Bloodbath'"
+          },
+          {
+            "as_of": "2022-02-22T11:00:00Z",
+            "impact_score": 9,
+            "n_sources": 4,
+            "scenario": "GEOPOLITICAL:default",
+            "headline": "World shares drop after Putin orders troops to east Ukraine"
+          },
+          {
+            "as_of": "2022-02-23T09:00:00Z",
+            "impact_score": 8,
+            "n_sources": 2,
+            "scenario": "GEOPOLITICAL:default",
+            "headline": "Ukraine's economy is another victim of Russia's 'hybrid war'"
+          },
+          {
+            "as_of": "2022-02-23T11:00:00Z",
+            "impact_score": 8,
+            "n_sources": 13,
+            "scenario": "GEOPOLITICAL:default",
+            "headline": "US sanctions Russia for 'beginning' invasion of Ukraine - KyivPost"
+          }
+        ],
         "status": "stress test fired on the event date",
         "trigger": {
           "as_of": "2022-02-24T13:00:00Z",
@@ -6922,6 +6974,23 @@
       "fomc_june_2022": {
         "event_date": "2022-06-15",
         "class": "MACROECONOMIC",
+        "anchor": "realised window anchored on the pre-registered event date 2022-06-15: close of the previous session to +10 sessions; the prediction uses the highest-impact run fired on that date",
+        "class_runs_in_prior_week": [
+          {
+            "as_of": "2022-06-08T11:00:00Z",
+            "impact_score": 8,
+            "n_sources": 2,
+            "scenario": "MACROECONOMIC:default",
+            "headline": "World Bank Warns of Global Economic Slowdown, More Inflation"
+          },
+          {
+            "as_of": "2022-06-10T21:00:00Z",
+            "impact_score": 8,
+            "n_sources": 2,
+            "scenario": "MACROECONOMIC:inflation_hawkish",
+            "headline": "Worst Ever: Consumer Sentiment Craters to Record Low as Inflation Expectations Explode Higher"
+          }
+        ],
         "status": "missed: no stress test fired for this class on the event date",
         "supplementary_latest_run_in_prior_week": {
           "trigger": {
@@ -7052,8 +7121,8 @@
     "note": "Out-of-sample: calibration used only episodes ending before 2021-09-30. Reported, not tuned.",
     "_provenance": {
       "script": "riskpulse eval predicted_vs_realised",
-      "generated_at": "2026-10-02T17:42:35+00:00",
-      "git_commit": "f1994fc"
+      "generated_at": "2026-10-02T17:56:57+00:00",
+      "git_commit": "6663896"
     }
   },
   "sentiment_finetune": {

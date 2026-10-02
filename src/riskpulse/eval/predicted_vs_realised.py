@@ -96,7 +96,26 @@ def episode(name: str, spec: dict, runs: list[dict], positions: pd.DataFrame, fr
     horizon = int(spec["horizon_trading_days"])
     of_class = [r for r in runs if r["scenario"]["event_class"] == cls]
     same_day = [r for r in of_class if r["trigger"]["as_of"][:10] == day]
-    out: dict = {"event_date": day, "class": cls}
+    out: dict = {
+        "event_date": day,
+        "class": cls,
+        "anchor": f"realised window anchored on the pre-registered event date {day}: close of the "
+        f"previous session to +{horizon} sessions; the prediction uses the highest-impact run "
+        "fired on that date",
+    }
+    # Reporting only: every run of this class in the 7 days before the event date (timing context).
+    lo7 = str((pd.Timestamp(day) - pd.Timedelta(days=SUPPLEMENTARY_LOOKBACK_DAYS)).date())
+    out["class_runs_in_prior_week"] = [
+        {
+            "as_of": r["trigger"]["as_of"],
+            "impact_score": r["trigger"]["impact_score"],
+            "n_sources": r["trigger"]["n_sources"],
+            "scenario": r["scenario"]["name"],
+            "headline": (r["trigger"]["evidence"] or [{}])[0].get("title"),
+        }
+        for r in sorted(of_class, key=lambda r: r["trigger"]["as_of"])
+        if lo7 <= r["trigger"]["as_of"][:10] < day
+    ]
     if same_day:
         fired = max(
             same_day, key=lambda r: (r["trigger"]["impact_score"], r["trigger"]["n_sources"])
