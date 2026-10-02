@@ -127,7 +127,7 @@ are secondary and shown gross, with cost drag and net.
   `Booster.predict` to 1e-9 (tested in a child process, and checked again at every training run).
 - **Training and evaluation are separate commands:** `riskpulse train events|impact_v2` and `riskpulse eval ...`.
   So `eval all` scores saved models and never retrains, and each test set is looked at once per evaluation.
-- **Fresh clone:** model files are not committed (CLAUDE.md). Without `impact_v2.json` the engine logs a warning and
+- **Fresh clone:** model files are not committed (repo rule: no model weights in git). Without `impact_v2.json` the engine logs a warning and
   uses v1 everywhere; `demo --fast` is unaffected.
 
 ### D-048 D-041 applied: gold sentiment result and the mechanical decision
