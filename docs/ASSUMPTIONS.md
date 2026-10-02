@@ -24,8 +24,8 @@ Items marked (proposed) await confirmation at a gate.
   Real Estate are not represented.
 - **A-09 Tweet coverage and the original-ticker rule.** Each tweet links only to its original ticker (D-033). The
   dataset's PG and MSFT sets are copies of the AMZN set, so PG and MSFT have no tweets of their own; AMZN tweets never
-  move PG or MSFT. Original tweets per universe name range from TSLA 35,565 to KO 173 (before quality filters); JPM,
-  BAC, GS, XOM, CVX, JNJ, PG and MSFT have news only. PG's news coverage is also thin (294 mentions in the year).
+  move PG or MSFT. Final social coverage: **12 of 20** tickers have tweets in the scored replay (37,467 tweets; TSLA
+  27,681 down to KO 55); **8 are news only**: MSFT, PG, JPM, BAC, GS, XOM, CVX, JNJ (see data/SOURCES.md). PG's news coverage is also thin (294 mentions in the year).
   Its weight stays near the 5% baseline mainly through **confidence decay**, not the deadband: the decayed sentiment
   keeps its last value between sparse items (inside ±0.10 on only 22.6% of days), but the confidence c, which
   multiplies the tilt, decays toward zero (PG mean 0.06 vs TSLA 0.99). PG's own tilt exp(κ·s·c) − 1 has a median of

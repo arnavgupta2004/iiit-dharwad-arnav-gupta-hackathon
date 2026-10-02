@@ -60,6 +60,10 @@ No proprietary or client data is used. Synthetic records are labelled synthetic 
   ENPH 216; ZS 193; VZ 123; BX 50; F 31; NOC 31.
 - **Defect:** the PG and MSFT sets (4,089 each) are exact copies of the AMZN set (mislabelled); see DECISIONS D-018.
   About 20.7% of universe tweets are cashtag lists; see D-019 for the filters and yields.
+- **Final social coverage (after the original-ticker rule, D-033):** **12 of 20** universe tickers have tweets in the
+  scored replay (37,467 tweets): TSLA 27,681; AAPL 2,729; AMZN 2,068; META 1,541; AMD 1,128; NFLX 1,022; GOOGL 509;
+  DIS 350; COST 155; INTC 116; BA 113; KO 55. **8 have none** (news only): MSFT and PG (their sets were AMZN copies),
+  JPM, BAC, GS, XOM, CVX, JNJ (not in the dataset).
 - `stock_yfinance_data.csv`: 6,300 rows of daily OHLCV for the same tickers (we use our own yfinance cache instead).
 
 ### 4. Benzinga news (miguelaenlle), CC0
