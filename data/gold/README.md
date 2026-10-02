@@ -30,3 +30,11 @@ Fill the blank columns, save as `labels.csv` in this folder (same columns), and 
 
 Tips: label what the text *says*, not what you know happened later. A stock-price move with no stated cause is `OTHER`.
 Analyst rating changes are `OTHER` (there is no analyst class), unless the note is about a downgrade of *credit*.
+
+## Entity-linking precision check (`entity_check.csv`)
+100 random headline → ticker links from the news feed, 5 per ticker, excluding the texts above. For each row, fill
+`correct` with **y** if the headline is genuinely about that company (a subsidiary or its products count, e.g.
+"JPMorgan Sec. plc" → JPM, "Gillette India" → PG), and **n** if the link is wrong (wrong entity, a word collision,
+or the company is only incidental). Use `notes` for borderline cases. Save in place and run
+`python -m riskpulse eval linking` to write precision (overall and per ticker) to `reports/metrics.json`.
+These labels are never used for training or tuning.

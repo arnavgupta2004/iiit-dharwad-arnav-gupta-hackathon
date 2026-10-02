@@ -10951,5 +10951,14 @@
       "generated_at": "2026-10-02T04:05:02+00:00",
       "git_commit": "eee718a"
     }
+  },
+  "entity_linking": {
+    "status": "PENDING - entity_check.csv not yet marked by Arnav",
+    "n_links": 100,
+    "_provenance": {
+      "script": "riskpulse eval linking",
+      "generated_at": "2026-10-02T04:06:27+00:00",
+      "git_commit": "b35c655"
+    }
   }
 }

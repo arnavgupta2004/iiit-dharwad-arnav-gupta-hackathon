@@ -39,7 +39,14 @@ def _module_b() -> None:
     replay_triggers()
 
 
+def _linking() -> None:
+    from riskpulse.eval.linking_eval import run
+
+    run()
+
+
 EVALS: dict[str, Callable[[], None]] = {
+    "linking": _linking,
     "sentiment": _sentiment,
     "events": _events,
     "pipeline": _pipeline,
