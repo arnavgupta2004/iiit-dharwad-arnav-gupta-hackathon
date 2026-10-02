@@ -4,6 +4,19 @@ Newest first within each date. Each entry: decision, rationale, and status (acce
 
 ## 2026-10-02 (event classification round 2, approved by Arnav)
 
+### D-056 Large local caches on an external drive (Arnav, disk space)
+The internal disk fell to 315 MB free (floor: 3 GB). Deleted: the large zero-shot model (879 MB, a one-off reference),
+the pip cache and the superseded combined stage-1 cache. Moved to the external drive `/Volumes/Arnav Drive` (exFAT,
+668 GB free): the Hugging Face hub cache (copied with symlinks dereferenced, since exFAT has none) and
+`data/processed/cache` and `data/processed/models` (now symlinks into the drive). Setting it up: a gitignored `.env`
+sets `RISKPULSE_EXTERNAL_ROOT`, and `riskpulse/_storage.py`, run on `import riskpulse` before any Hugging Face import,
+points `HF_HUB_CACHE` there. Only the hub cache moves, not all of `HF_HOME`, so the Hugging Face login token stays on
+the internal disk and off an exFAT volume without permissions. If the drive is configured but missing, import stops
+with a clear error instead of re-downloading or rebuilding. Checks: all models load with `HF_HUB_OFFLINE=1` (no
+download); stage-1 caches hit through the symlinks (10 s). A bug was caught: macOS writes `._*` AppleDouble files on
+exFAT, and they changed the sentiment-weights fingerprint, so the fingerprint now ignores them. The git repo and
+`.venv` stay on the internal disk. A fresh clone has no `.env`, so nothing changes for anyone else.
+
 ### D-055 Round 2 outcome: gold-2 test (once) and the downstream rerun
 **Gold-2** (`reports/events_gold2.json`, predictions in `reports/events_gold2_predictions.csv`; n = 200, 160 news / 40
 tweets; evaluated once, commit 2677491). Macro-F1 over 10 classes; last column = 95% paired-bootstrap CI of

@@ -58,3 +58,7 @@ data/signals/signals.jsonl
 
 # Round-2 gold sampling metadata holds model predictions; kept local to avoid anchoring (D-052).
 data/processed/gold2_sampling_meta.parquet
+
+# Local symlinks to external storage (D-056)
+data/processed/cache
+data/processed/models

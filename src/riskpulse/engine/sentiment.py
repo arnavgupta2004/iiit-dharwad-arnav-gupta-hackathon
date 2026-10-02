@@ -44,7 +44,9 @@ def label_from_score(score: float, pos: float | None = None, neg: float | None =
 
 
 def _has_weights(path) -> bool:
-    return (path / "config.json").exists() and any(path.glob("*.safetensors"))
+    return (path / "config.json").exists() and any(
+        f for f in path.glob("*.safetensors") if not f.name.startswith("._")
+    )
 
 
 @cache
@@ -105,7 +107,9 @@ def weights_fingerprint(variant: str | None = None) -> str:
         h.update(f"base|{name}".encode())
     else:
         root = Path(name)
-        for f in sorted([root / "config.json", *root.glob("*.safetensors")]):
+        # Skip macOS AppleDouble files ("._*"), which appear when the cache sits on exFAT (D-056).
+        weights = [f for f in root.glob("*.safetensors") if not f.name.startswith("._")]
+        for f in sorted([root / "config.json", *weights]):
             with f.open("rb") as fh:
                 for block in iter(lambda: fh.read(1 << 22), b""):
                     h.update(block)

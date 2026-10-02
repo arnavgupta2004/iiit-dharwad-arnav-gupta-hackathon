@@ -3,6 +3,8 @@ so `pytest -q` on a fresh clone never triggers large downloads."""
 
 import pytest
 
+import riskpulse  # noqa: F401  (configures the model cache location before huggingface_hub loads)
+
 
 def model_cached(repo_id: str) -> bool:
     try:
