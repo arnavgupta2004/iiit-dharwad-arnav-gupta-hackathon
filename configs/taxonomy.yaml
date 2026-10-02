@@ -6,15 +6,17 @@
 
 classes:
   GEOPOLITICAL:
-    description: war, military conflict, sanctions, elections, coups, trade conflict and tariffs between countries
-    zero_shot_label: geopolitical conflict, war, sanctions, elections or trade disputes
-    keywords: [war, invasion, invade, military, missile, sanction, sanctions, embargo, tariff, tariffs, trade war, election, coup, nato, troops, border clash, geopolitical]
-    hf_topic_map: [Politics]
+    # Cross-border only (D-044): domestic politics and election chatter with no cross-border or
+    # policy-shock dimension is OTHER.
+    description: cross-border only - war and military conflict, sanctions, trade conflict and tariffs between countries, international diplomacy
+    zero_shot_label: war, sanctions, trade disputes or diplomacy between countries
+    keywords: [war, invasion, invade, military, missile, sanction, sanctions, embargo, tariff, tariffs, trade war, nato, troops, border clash, geopolitical, ceasefire, diplomatic]
+    hf_topic_map: []   # HF "Politics" is mostly domestic; mapped by `hf_topic_conditional` below
     examples:
       - Troops cross the border as the conflict escalates overnight
       - Western governments announce new sanctions on the country's central bank
       - Tariffs on imported steel raised to 25% in escalating trade dispute
-      - Snap election called after the coalition government collapses
+      - Foreign ministers meet to negotiate a ceasefire between the two countries
       - Shipping halted in the strait after missile strikes on tankers
 
   MACROECONOMIC:
@@ -114,8 +116,8 @@ classes:
       - Global outage takes cloud services offline for hours
 
   OTHER:
-    description: anything not covered above (opinion, general market commentary, analyst notes without a clear event)
-    zero_shot_label: general market commentary
+    description: anything not covered above (opinion, general market commentary, analyst notes without a clear event, domestic politics and elections without a cross-border or policy-shock dimension)
+    zero_shot_label: general market commentary or domestic politics
     keywords: []
     hf_topic_map: [Analyst Update, "General News | Opinion", Markets, Stock Commentary, Stock Movement]
     examples:
@@ -124,12 +126,22 @@ classes:
       - Five things to watch in markets this week
       - Shares trade flat ahead of the long weekend
       - Opinion on long-term investing strategies
+      - Party leadership race heads to a runoff vote next week
+      - Senator criticises the governor's campaign spending
 
 # HF topics deliberately left unmapped (ambiguous across our classes, so not used as weak labels):
 hf_topic_unmapped: ["Company | Product News", Currencies, "Energy | Oil", Financials, "Gold | Metals | Materials", IPO]
 
 # Official label ids of zeroshot/twitter-financial-news-topic, from the dataset README
 # (verified 2026-10-02; NOT alphabetical).
+# HF topic labels that need a text rule (D-044). "Politics" -> GEOPOLITICAL only when a cross-border
+# cue is present (the GEOPOLITICAL keywords or one of `cues`), otherwise OTHER (domestic politics).
+hf_topic_conditional:
+  Politics:
+    if_cue: GEOPOLITICAL
+    else: OTHER
+    cues: [foreign minister, foreign ministers, ambassador, summit, bilateral, treaty, talks with, peace talks, united nations, export controls]
+
 hf_topic_labels:
   0: Analyst Update
   1: "Fed | Central Banks"

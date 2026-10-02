@@ -1,12 +1,13 @@
-"""Build the weak-label training set, train the primary event classifier, evaluate (provisional).
+"""Build the weak-label training set, train the primary event classifier, and evaluate it.
 
 Training sources (never the gold set):
   hf_topic  - zeroshot/twitter-financial-news-topic *train*, mapped via taxonomy `hf_topic_map`
   seed      - taxonomy example sentences (synthetic, written for the config)
   kw        - feed headlines with keyword hits for exactly one non-OTHER class
   zs        - feed headlines whose zero-shot confidence >= zero_shot_min_conf
-Provisional evaluation (until Arnav's gold labels exist):
-  hf_topic_valid - human-labelled, 7 of 10 classes, disjoint split from training
+Evaluation (`evaluate`, the saved model; training is `train`, run via `riskpulse train events`):
+  gold           - Arnav's 300 gold labels (final; all 10 classes)
+  hf_topic_valid - human-labelled, 7 of 10 classes, disjoint split from training (reference)
   weak_holdout   - held-out slice of kw + zs labels (all classes; weak by construction)
 """
 
@@ -15,6 +16,7 @@ from __future__ import annotations
 import gzip
 import hashlib
 import json
+import re
 
 import numpy as np
 import pandas as pd
@@ -37,11 +39,20 @@ HF_DIR = data_path("raw", "_downloads", "hf")
 
 
 def hf_topic(split: str) -> pd.DataFrame:
+    """HF topic rows mapped to our classes; `hf_topic_conditional` topics (Politics) go to the
+    `if_cue` class only when a cross-border cue is present, else to `else` (D-044)."""
     tax = load_config("taxonomy")
     names = tax["hf_topic_labels"]
     m = {t: c for c, spec in tax["classes"].items() for t in spec["hf_topic_map"]}
     df = pd.read_csv(HF_DIR / f"topic_{split}.csv")
-    df["label"] = df["label"].map(names).map(m)
+    topic = df["label"].map(names)
+    df["label"] = topic.map(m)
+    for t, rule in (tax.get("hf_topic_conditional") or {}).items():
+        cues = [*tax["classes"][rule["if_cue"]]["keywords"], *rule["cues"]]
+        rx = re.compile(r"\b(?:" + "|".join(re.escape(c) for c in cues) + r")\b", re.I)
+        sel = topic == t
+        hit = df.loc[sel, "text"].str.contains(rx)
+        df.loc[sel, "label"] = np.where(hit, rule["if_cue"], rule["else"])
     return df.dropna(subset=["label"])[["text", "label"]].assign(source=f"hf_topic_{split}")
 
 
@@ -88,7 +99,11 @@ def keyword_labels(texts: pd.Series, cap: int, seed: int) -> pd.DataFrame:
 
 
 def zero_shot_labels(texts: pd.Series, min_conf: float) -> pd.DataFrame:
-    key = hashlib.sha1("\n".join(texts).encode()).hexdigest()[:16]
+    labels = json.dumps(
+        {c: v["zero_shot_label"] for c, v in load_config("taxonomy")["classes"].items()},
+        sort_keys=True,
+    )
+    key = hashlib.sha1(("\n".join(texts) + labels).encode()).hexdigest()[:16]
     cache = data_path("processed", "cache", f"zeroshot_feed_{key}.parquet")
     if cache.exists():
         z = pd.read_parquet(cache)
@@ -127,7 +142,8 @@ def _scores(gold: list[str], pred: list[str], labels: list[str]) -> dict:
     }
 
 
-def train_and_evaluate() -> dict:
+def training_data() -> tuple[pd.DataFrame, pd.DataFrame]:
+    """(training rows, weak hold-out rows); deterministic given the config seed."""
     cfg = load_config("app")["event_training"]
     seed = int(cfg["seed"])
     rng = np.random.default_rng(seed)
@@ -162,57 +178,123 @@ def train_and_evaluate() -> dict:
     weak_hold = weak_hold[~weak_hold["text"].isin(gold_texts)]
     log.info(f"Excluded {n_before - len(train)} gold texts from training")
     assert not train["text"].isin(gold_texts).any(), "gold text leaked into training"
-    train.to_parquet(data_path("processed", "event_training_set.parquet"), index=False)
-    by_src = train["source"].value_counts().to_dict()
-    log.info(f"Event training set: {len(train)} rows; by source {by_src}")
+    return train, weak_hold
 
+
+def train() -> EmbeddingClassifier:
+    """Fit the primary classifier on the weak-label set and save it (no evaluation)."""
+    seed = int(load_config("app")["event_training"]["seed"])
+    rows, _ = training_data()
+    rows.to_parquet(data_path("processed", "event_training_set.parquet"), index=False)
+    log.info(
+        f"Event training set: {len(rows)} rows; by source {rows['source'].value_counts().to_dict()}"
+    )
     clf = EmbeddingClassifier(Embedder()).fit(
-        train["text"].tolist(), train["label"].tolist(), seed=seed
+        rows["text"].tolist(), rows["label"].tolist(), seed=seed
     )
     clf.save(repo_root() / EVENT_MODEL_PATH)
+    return clf
+
+
+def _paired_ci(gold: np.ndarray, a: np.ndarray, b: np.ndarray, seed: int) -> list[float]:
+    """95% percentile CI of macro-F1(a) - macro-F1(b), paired bootstrap (2,000 resamples)."""
+    rng = np.random.default_rng(seed)
+    n, diffs = len(gold), []
+    for _ in range(2000):
+        i = rng.integers(0, n, n)
+        fa = f1_score(gold[i], a[i], labels=CLASSES, average="macro", zero_division=0)
+        fb = f1_score(gold[i], b[i], labels=CLASSES, average="macro", zero_division=0)
+        diffs.append(fa - fb)
+    lo, hi = np.percentile(diffs, [2.5, 97.5])
+    return [round(float(lo), 4), round(float(hi), 4)]
+
+
+def gold_results(clf: EmbeddingClassifier, seed: int) -> dict | None:
+    """Final evaluation on Arnav's gold labels (all 10 classes), overall and by source."""
+    path = data_path("gold", "labels.csv")
+    if not path.exists():
+        return None
+    g = pd.read_csv(path)
+    texts, gold = g["text"].tolist(), g["label_event_class"].str.strip().to_numpy()
+    preds = {
+        "primary_embed_lr": np.array([p.event_class for p in clf.predict(texts)]),
+        "keyword_baseline": np.array([p.event_class for p in KeywordClassifier().predict(texts)]),
+        "zero_shot": np.array([p.event_class for p in ZeroShotClassifier().predict(texts)]),
+    }
+    out: dict = {"n": len(g), "label_counts": pd.Series(gold).value_counts().to_dict()}
+    for subset, mask in (
+        ("all", np.ones(len(g), bool)),
+        ("news_headlines", (g["source"] == "gdelt").to_numpy()),
+        ("tweets", (g["source"] == "kaggle_tweets").to_numpy()),
+    ):
+        out[subset] = {
+            k: _scores(list(gold[mask]), list(p[mask]), CLASSES) for k, p in preds.items()
+        }
+    out["all"]["primary_minus_keyword_95ci"] = _paired_ci(
+        gold, preds["primary_embed_lr"], preds["keyword_baseline"], seed
+    )
+    out["all"]["primary_minus_zero_shot_95ci"] = _paired_ci(
+        gold, preds["primary_embed_lr"], preds["zero_shot"], seed
+    )
+    return out
+
+
+def evaluate() -> dict:
+    """Evaluate the saved classifier: gold set (final) plus the provisional sets for reference."""
+    cfg = load_config("app")["event_training"]
+    seed = int(cfg["seed"])
+    clf = EmbeddingClassifier.load(repo_root() / EVENT_MODEL_PATH)
+    rows, weak_hold = training_data()
 
     hf_va = hf_topic("valid")
     hf_labels = sorted(hf_va["label"].unique())
     kwc = KeywordClassifier()
     results: dict = {}
+    gold = gold_results(clf, seed)
+    if gold is not None:
+        results["gold"] = gold
     for name, df, labels in (
         ("hf_topic_valid", hf_va, hf_labels),
         ("weak_holdout", weak_hold, CLASSES),
     ):
-        gold = df["label"].tolist()
+        gl = df["label"].tolist()
         results[name] = {
             "keyword_baseline": _scores(
-                gold, [p.event_class for p in kwc.predict(df["text"].tolist())], labels
+                gl, [p.event_class for p in kwc.predict(df["text"].tolist())], labels
             ),
             "primary_embed_lr": _scores(
-                gold, [p.event_class for p in clf.predict(df["text"].tolist())], labels
+                gl, [p.event_class for p in clf.predict(df["text"].tolist())], labels
             ),
         }
     # Zero-shot is slow on CPU: scored on a stratified subsample of HF-topic valid.
     n_zs = int(cfg["zero_shot_eval_sample"])
     sub = sample_per_group(hf_va, "label", max(1, n_zs // len(hf_labels)), seed)
     zsc = ZeroShotClassifier()
-    gold = sub["label"].tolist()
+    gl = sub["label"].tolist()
     results["hf_topic_valid_subsample"] = {
         "zero_shot": _scores(
-            gold, [p.event_class for p in zsc.predict(sub["text"].tolist())], hf_labels
+            gl, [p.event_class for p in zsc.predict(sub["text"].tolist())], hf_labels
         ),
         "keyword_baseline": _scores(
-            gold, [p.event_class for p in kwc.predict(sub["text"].tolist())], hf_labels
+            gl, [p.event_class for p in kwc.predict(sub["text"].tolist())], hf_labels
         ),
         "primary_embed_lr": _scores(
-            gold, [p.event_class for p in clf.predict(sub["text"].tolist())], hf_labels
+            gl, [p.event_class for p in clf.predict(sub["text"].tolist())], hf_labels
         ),
     }
     payload = {
-        "status": "PROVISIONAL - final evaluation on Arnav's gold set pending",
-        "training_rows": int(len(train)),
-        "training_rows_by_source": train["source"].value_counts().to_dict(),
-        "training_rows_by_class": train["label"].value_counts().to_dict(),
+        "status": "FINAL on Arnav's gold set (results.gold); other sets are reference only"
+        if gold is not None
+        else "PROVISIONAL - gold labels not present",
+        "taxonomy_note": "GEOPOLITICAL is cross-border only (D-044)",
+        "training_rows": int(len(rows)),
+        "training_rows_by_source": rows["source"].value_counts().to_dict(),
+        "training_rows_by_class": rows["label"].value_counts().to_dict(),
         "model_version": clf.version,
         "min_confidence_for_non_other": clf.min_confidence,
         "results": results,
         "notes": [
+            "Gold: 300 replay items labelled by Arnav (237 news, 63 tweets), never trained on.",
             "hf_topic_valid covers 7 of 10 classes "
             "(no CREDIT_EVENT, PRODUCT_LAUNCH, OPERATIONAL_ESG).",
             "The primary model trains on hf_topic *train*, so hf_topic_valid is in-distribution "
@@ -223,3 +305,8 @@ def train_and_evaluate() -> dict:
     }
     update_metrics("events", payload, script="riskpulse eval events")
     return payload
+
+
+def train_and_evaluate() -> dict:
+    train()
+    return evaluate()
