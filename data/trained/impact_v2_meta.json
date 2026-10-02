@@ -1,0 +1,19 @@
+{
+  "tickers": 216,
+  "tickers_dropped_no_prices": 84,
+  "train_ticker_days": 124436,
+  "valid_ticker_days": 29079,
+  "best_iteration": 302,
+  "n_trees": 302,
+  "feature_importance_gain": {
+    "S": 749.7,
+    "T": 164.1,
+    "V": 1756.5,
+    "B": 0.0,
+    "N": 181.6,
+    "C": 0.0,
+    "R": 0.0,
+    "log_n": 3694.8
+  },
+  "json_evaluator_max_abs_diff_vs_lightgbm": 0.0
+}

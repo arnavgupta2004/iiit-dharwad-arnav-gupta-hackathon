@@ -121,9 +121,11 @@ No proprietary or client data is used. Synthetic records are labelled synthetic 
 | File | What it is | Trained on | Licence of training data |
 |---|---|---|---|
 | `event_clf_round2.pkl` (67 KB) | Event classifier: calibrated logistic regression on MiniLM embeddings (D-053) | Weak labels: `zeroshot/twitter-financial-news-topic` train split (MIT), taxonomy seed sentences (written for this project), keyword- and zero-shot-labelled replay headlines (GDELT GKG, source 2); plus Arnav's 300 gold-1 labels (this project) | MIT (HF topic data); GDELT open terms (source 2); own labels |
+| `impact_v2.json` (1.1 MB) | Impact v2 as a JSON tree dump, scored by `engine/gbm.py` at run time (D-049) | Benzinga headline ticker-days 2009-2018 (validation 2019 → 2020-07) vs market-model abs(CAR[0,+1]) from yfinance prices; features from FinBERT fine-tuned sentiment and the C1 event classifier | Benzinga headlines: CC0 (source 4); prices: Yahoo Finance terms, research use (source 7) |
+| `impact_v2.txt` (0.3 MB) | The same model in LightGBM's text format (parity test only) | as above | as above |
+| `impact_v2_meta.json` | Training metadata (sizes, best iteration, feature gains, evaluator parity) | n/a | n/a |
 
-The fine-tuned sentiment model (438 MB) is on the Hub (section 11). The impact-v2 model will be added here after
-the round-2 downstream rerun.
+The fine-tuned sentiment model (438 MB) is on the Hub (section 11).
 
 ### Rejected / not used
 - **thedevastator Tweet Sentiment's Impact** (the organisers' example): the CSV is structurally broken when parsed.
