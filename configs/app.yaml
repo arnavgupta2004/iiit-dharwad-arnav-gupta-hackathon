@@ -31,8 +31,10 @@ dashboard:
 
 sentiment:
   model: ProsusAI/finbert           # base model (and the last-resort fallback)
-  # Which weights the engine scores with (D-043): finbert | finetuned. Switched in the final rerun (D-046).
+  # Which weights score which text (D-058): tweets/social -> `variant`, news and everything else ->
+  # `variant_news`. Values: finbert | finetuned.
   variant: finetuned
+  variant_news: finbert
   finetuned:
     hub_repo: arnavguptas/riskpulse-finbert-tweets   # Arnav uploads it (D-043); until then: local copy
     local_dir: data/processed/models/finbert_tweets_ft   # written by scripts/build_finetuned_sentiment.py

@@ -49,6 +49,13 @@ def _has_weights(path) -> bool:
     )
 
 
+def variant_for(source_type: str) -> str:
+    """Sentiment weights for a document source type (D-058): social -> `variant`, else
+    `variant_news`."""
+    cfg = load_config("app")["sentiment"]
+    return cfg["variant"] if source_type == "social" else cfg.get("variant_news", cfg["variant"])
+
+
 @cache
 def resolve_model(variant: str | None = None) -> tuple[str, str]:
     """Weights to score with, as (name or path, origin). Logs the choice.

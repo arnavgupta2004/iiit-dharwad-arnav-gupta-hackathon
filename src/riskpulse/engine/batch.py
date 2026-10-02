@@ -97,9 +97,26 @@ def sentiment_stage(
     variant: str | None = None,
     batch_size: int = 128,
 ) -> pd.DataFrame:
-    """Document and entity sentiment per document, cached per sentiment weights (D-043), so the
-    cache survives event-model changes and can be precomputed for another variant."""
-    from riskpulse.engine.sentiment import FinBertScorer, weights_fingerprint
+    """Document and entity sentiment per document. With ``variant`` given: every document scored
+    by those weights, cached per weights (D-043). Without it (the engine): each document takes the
+    scores of the weights for its source type (D-058), composed from the per-weights caches."""
+    from riskpulse.engine.sentiment import FinBertScorer, variant_for, weights_fingerprint
+
+    if variant is None:
+        need = {variant_for(d.source_type) for d in docs}
+        per = {v: sentiment_stage(docs, base, feed_key, v, batch_size) for v in sorted(need)}
+        pick = [variant_for(d.source_type) for d in docs]
+        out = next(iter(per.values())).copy()
+        for v, frame in per.items():
+            mask = np.array([p == v for p in pick])
+            out.loc[mask, ["doc_sentiment", "entity_sentiment"]] = frame.loc[
+                mask, ["doc_sentiment", "entity_sentiment"]
+            ].to_numpy()
+        log.info(
+            "Stage 1 sentiment by source: "
+            + ", ".join(f"{v} {sum(p == v for p in pick):,} docs" for v in sorted(need))
+        )
+        return out
 
     path = _cache(f"stage1sent_{feed_key}_{weights_fingerprint(variant)}.parquet")
     if path.exists():

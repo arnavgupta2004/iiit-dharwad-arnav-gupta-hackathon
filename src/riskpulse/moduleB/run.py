@@ -78,6 +78,8 @@ def _blocked_reason(reason: str) -> str:
         return "low_event_confidence"
     if reason.startswith("only"):
         return "too_few_sources"
+    if reason.startswith("sentiment"):
+        return "not_adverse_sentiment"
     return reason.split(" ")[0]
 
 

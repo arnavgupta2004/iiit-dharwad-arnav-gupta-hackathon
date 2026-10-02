@@ -4,6 +4,9 @@ trigger:
   min_impact: 8                 # "Impact > 7" in the brief
   min_event_confidence: 0.6
   min_sources: 2
+  # Stress tests model adverse scenarios: the event's sentiment must be below the configured negative
+  # sentiment threshold (D-059). The June 2022 FOMC "relief rally" trigger revealed the gap.
+  require_negative_sentiment: true
   cooldown_hours: 24            # per (event_class, macro-region)  [GATE C, D-037]
   escalation: true              # within a cooldown, re-run only if impact exceeds the one that fired
   # Engine region tags -> 5 macro-regions. An event touching more than one macro-region, or only

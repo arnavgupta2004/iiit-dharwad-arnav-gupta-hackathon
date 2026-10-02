@@ -40,7 +40,7 @@ from riskpulse.engine.impact import (
     VelocityTracker,
     score_impact,
 )
-from riskpulse.engine.sentiment import FinBertScorer, entity_sentiment
+from riskpulse.engine.sentiment import FinBertScorer, entity_sentiment, variant_for
 
 EVENT_MODEL_PATH = "data/trained/event_clf_round2.pkl"  # committed (D-053, D-054)
 
@@ -118,7 +118,20 @@ class NLPScorer:
 
     @cached_property
     def finbert(self) -> FinBertScorer:
-        return self._finbert or FinBertScorer()
+        """Scorer for social text; also for all text when one scorer was passed explicitly."""
+        return self._finbert or FinBertScorer(variant=variant_for("social"))
+
+    @cached_property
+    def finbert_news(self) -> FinBertScorer:
+        """Scorer for news and other non-social text (D-058)."""
+        if self._finbert is not None:
+            return self._finbert
+        if variant_for("news") == variant_for("social"):
+            return self.finbert
+        return FinBertScorer(variant=variant_for("news"))
+
+    def scorer_for(self, source_type: str) -> FinBertScorer:
+        return self.finbert if source_type == "social" else self.finbert_news
 
     @cached_property
     def embedder(self) -> Embedder:
@@ -166,24 +179,32 @@ class NLPScorer:
         return links, regions
 
     def sentiments(
-        self, texts: list[str], links: list[dict[str, float]]
+        self,
+        texts: list[str],
+        links: list[dict[str, float]],
+        source_types: list[str] | None = None,
     ) -> list[tuple[float, dict[str, float]]]:
         """(document score, entity scores) per text; entity scores are clause-level when two or
-        more companies are linked, else the document score for every link."""
-        out = []
-        for s, text, lk in zip(self.finbert.score(texts), texts, links, strict=True):
-            companies = [t for t in lk if t != MKT]
-            if len(companies) >= 2:
-                ent = entity_sentiment(text, companies, self.finbert, self.linker, s.score)
-            else:
-                ent = dict.fromkeys(lk, s.score)
-            out.append((s.score, ent))
+        more companies are linked, else the document score for every link. Each text is scored by
+        the weights for its source type (D-058)."""
+        types = source_types or ["news"] * len(texts)
+        out: list = [None] * len(texts)
+        for st in sorted(set(types)):
+            idx = [i for i, t in enumerate(types) if t == st]
+            fb = self.scorer_for(st)
+            for i, s in zip(idx, fb.score([texts[i] for i in idx]), strict=True):
+                companies = [t for t in links[i] if t != MKT]
+                if len(companies) >= 2:
+                    ent = entity_sentiment(texts[i], companies, fb, self.linker, s.score)
+                else:
+                    ent = dict.fromkeys(links[i], s.score)
+                out[i] = (s.score, ent)
         return out
 
     def score(self, docs: list[Document]) -> list[DocScore]:
         texts = [d.title or d.text for d in docs]
         linked = [self.link(d) for d in docs]
-        sent = self.sentiments(texts, [lk for lk, _ in linked])
+        sent = self.sentiments(texts, [lk for lk, _ in linked], [d.source_type for d in docs])
         emb = self.embedder.encode(texts)
         clf = self.event_clf
         events = (
@@ -200,7 +221,8 @@ class NLPScorer:
 
     @property
     def versions(self) -> dict[str, str]:
-        return {"sentiment": self.finbert.version, "event": self.event_clf.version, "impact": "v1"}
+        sent = f"news:{self.finbert_news.version}; social:{self.finbert.version}"
+        return {"sentiment": sent, "event": self.event_clf.version, "impact": "v1"}
 
 
 class SignalEngine:
@@ -319,9 +341,11 @@ def model_origins() -> dict[str, str]:
 
     impact_cfg = load_config("impact").get("v2", {})
     v2_path = repo_root() / impact_cfg.get("model_path", "")
-    name, origin = resolve_model()
-    out = {
-        "sentiment": f"{origin}:{name}",
+    out = {}
+    for st in ("news", "social"):
+        name, origin = resolve_model(variant_for(st))
+        out[f"sentiment_{st}"] = f"{origin}:{name}"
+    out |= {
         "event_classifier": f"repo:{EVENT_MODEL_PATH}"
         if event_model_exists()
         else "FALLBACK:keyword-baseline",

@@ -65,3 +65,33 @@ def test_escalation_within_cooldown() -> None:
     assert d.fired and d.reason.startswith("escalation")
     assert not t.check(ev(impact=9, hours=4)).fired  # new reference is 9
     assert t.check(ev(impact=10, hours=5)).fired
+
+
+def test_non_adverse_sentiment_does_not_trigger() -> None:
+    """D-059: a high-impact story with neutral or positive tone (e.g. a relief rally) is blocked."""
+    from datetime import UTC, datetime
+
+    from riskpulse.common.schemas import EventClass, Signal
+    from riskpulse.moduleB.trigger import StressTrigger
+
+    def sig(sent: float) -> Signal:
+        return Signal(
+            signal_id=f"s{sent}",
+            signal_type="event",
+            as_of=datetime(2022, 6, 15, 21, tzinfo=UTC),
+            sentiment_score=sent,
+            sentiment_label="neutral",
+            event_class=EventClass.MACROECONOMIC,
+            event_confidence=0.9,
+            impact_score=9,
+            impact_raw=0.9,
+            confidence=0.8,
+            n_docs=5,
+            n_sources=3,
+            regions=["US"],
+        )
+
+    t = StressTrigger()
+    assert not t.check(sig(0.4)).fired and "not adverse" in t.log[-1].reason
+    assert not t.check(sig(-0.15)).fired  # the threshold itself is not adverse
+    assert t.check(sig(-0.5)).fired

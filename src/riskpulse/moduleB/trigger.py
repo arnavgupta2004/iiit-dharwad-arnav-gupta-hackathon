@@ -1,9 +1,10 @@
-"""Stress-test trigger (spec §7.1, GATE C D-037).
+"""Stress-test trigger (spec §7.1, GATE C D-037, D-059).
 
-Fires for an event signal with impact >= threshold, event confidence >= threshold and >= min
-distinct sources. Cooldown is per (event class, macro-region): within it, a signal re-runs the
-stress test only if its impact exceeds the impact that last fired for that key (escalation), and
-it then becomes the new reference.
+Fires for an event signal with impact >= threshold, event confidence >= threshold, >= min
+distinct sources and adverse sentiment (below the configured negative threshold, D-059).
+Cooldown is per (event class, macro-region): within it, a signal re-runs the stress test only if
+its impact exceeds the impact that last fired for that key (escalation), and it then becomes the
+new reference.
 """
 
 from __future__ import annotations
@@ -28,6 +29,9 @@ class StressTrigger:
     cfg: dict = field(default_factory=lambda: load_config("moduleB")["trigger"])
     last_fired: dict[str, tuple[datetime, int]] = field(default_factory=dict)
     log: list[TriggerDecision] = field(default_factory=list)
+    neg_threshold: float = field(
+        default_factory=lambda: float(load_config("app")["sentiment"]["negative_threshold"])
+    )
 
     def key_of(self, s: Signal) -> str:
         """(event class, macro-region); several macro-regions or EM only -> Global."""
@@ -50,6 +54,9 @@ class StressTrigger:
             d = TriggerDecision(False, f"event confidence {s.event_confidence:.2f} too low", key, s)
         elif s.n_sources < c["min_sources"]:
             d = TriggerDecision(False, f"only {s.n_sources} source(s)", key, s)
+        elif c.get("require_negative_sentiment", False) and s.sentiment_score >= self.neg_threshold:
+            why = f"sentiment {s.sentiment_score:+.2f} not adverse (needs < {self.neg_threshold})"
+            d = TriggerDecision(False, why, key, s)
         elif in_cooldown and not (c.get("escalation", False) and s.impact_score > prev[1]):
             d = TriggerDecision(False, f"cooldown active for {key}", key, s)
         else:

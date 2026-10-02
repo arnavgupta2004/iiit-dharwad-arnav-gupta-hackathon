@@ -104,8 +104,11 @@ def _base(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def sentiment(titles: list[str], variant: str | None = None) -> np.ndarray:
-    """Document score P(pos) - P(neg) per headline, cached per sentiment weights (D-043)."""
-    from riskpulse.engine.sentiment import FinBertScorer, weights_fingerprint
+    """Document score P(pos) - P(neg) per headline, cached per sentiment weights (D-043). Benzinga
+    is news, so the default is the news weights (D-058)."""
+    from riskpulse.engine.sentiment import FinBertScorer, variant_for, weights_fingerprint
+
+    variant = variant or variant_for("news")
 
     path = CACHE / f"sentiment_{_titles_key(titles)}_{weights_fingerprint(variant)}.npy"
     if path.exists():
