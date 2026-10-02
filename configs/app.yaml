@@ -34,7 +34,7 @@ sentiment:
   # Which weights the engine scores with (D-043): finbert | finetuned. Switched in the final rerun (D-046).
   variant: finbert
   finetuned:
-    hub_repo: null                  # "<hf-username>/riskpulse-finbert-tweets" once Arnav has uploaded it
+    hub_repo: arnavguptas/riskpulse-finbert-tweets   # Arnav uploads it (D-043); until then: local copy
     local_dir: data/processed/models/finbert_tweets_ft   # written by scripts/build_finetuned_sentiment.py
   positive_threshold: 0.15          # spec default; eval also reports a band tuned on HF train only
   negative_threshold: -0.15
