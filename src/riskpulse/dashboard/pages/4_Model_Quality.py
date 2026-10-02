@@ -153,8 +153,67 @@ if e:
 
 # ---------- impact ----------
 st.header("Impact score")
-imp = m.get("impact")
-if imp:
+imp, v2 = m.get("impact"), m.get("impact_v2")
+SCORES = [
+    ("impact_v2", "Impact v2 (learned on Benzinga ≤ 2018)", NAVY),
+    ("impact_v1", "Impact v1 (live, spec formula)", SERIES[0]),
+    ("abs_sent", "abs(sentiment) baseline", MUTED),
+]
+if v2:
+    car = v2["test_post_burn_in"]["abs_car01"]
+    vol = v2["test_post_burn_in"]["abn_volume"]
+    st.markdown(
+        f'<p class="rp-note">Does a higher score mean a bigger market reaction? Untouched 2021-22 test set: '
+        f"{car['n']:,} ticker-days after the burn-in; market-model CAR[0,+1] on SPY. Pre-registered rule: "
+        f"{v2['adoption_rule']}.</p>",
+        unsafe_allow_html=True,
+    )
+    st.dataframe(
+        pd.DataFrame(
+            [
+                {
+                    "score": label,
+                    "Spearman vs |CAR|": f"{car[k]['spearman_rho']:.3f}",
+                    "top-decile hit rate": f"{car[k]['top_decile_hit_rate'] * 100:.1f}%",
+                    "Spearman vs abnormal volume": f"{vol[k]['spearman_rho']:.3f}",
+                }
+                for k, label, _ in SCORES
+            ]
+        ),
+        use_container_width=True,
+        hide_index=True,
+    )
+    fig = go.Figure()
+    for k, label, color in SCORES:
+        fig.add_trace(
+            go.Bar(
+                x=list(range(1, 11)),
+                y=[x * 100 for x in car[k]["decile_means"]],
+                name=label,
+                marker_color=color,
+                hovertemplate="decile %{x}: mean |CAR| %{y:.2f}%<extra></extra>",
+            )
+        )
+    fig.update_layout(
+        barmode="group",
+        height=340,
+        title="Mean |CAR[0,+1]| by score decile (1 = lowest)",
+        yaxis_title="%",
+        xaxis={"dtick": 1},
+    )
+    st.plotly_chart(fig, use_container_width=True)
+    st.markdown(
+        f"95% bootstrap CI of the Spearman difference: v2 − v1 {car['rho_diff_v2_minus_v1_95ci']}, "
+        f"v2 − abs(sentiment) {car['rho_diff_v2_minus_abs_sent_95ci']}. "
+        f"**Adopted: {'yes' if v2['adopted'] else 'no'}.** v2 beats v1 but not the sentiment-only "
+        "baseline, so the live engine keeps v1 and this result is reported as is (D-039)."
+        if not v2["adopted"]
+        else "**Adopted.**"
+    )
+    for lim in v2.get("limitations", []):
+        st.markdown(f"- {lim}")
+    provenance(v2)
+elif imp:
     st.json(imp, expanded=False)
     provenance(imp)
 else:
