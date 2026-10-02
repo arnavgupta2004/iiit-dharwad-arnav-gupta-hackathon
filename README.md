@@ -144,15 +144,15 @@ The in-domain gain does not transfer: on live text the two models are statistica
 | **gold: tweets** | primary_embed_lr | 63 | 0.399 |
 | **gold: tweets** | keyword_baseline | 63 | 0.389 |
 | **gold: tweets** | zero_shot | 63 | 0.396 |
-| reference: hf_topic_valid | keyword_baseline | 2,900 | 0.538 |
-| reference: hf_topic_valid | primary_embed_lr | 2,900 | 0.712 |
-| reference: weak_holdout | keyword_baseline | 1,892 | 0.970 |
-| reference: weak_holdout | primary_embed_lr | 1,892 | 0.760 |
-| reference: hf_topic_valid_subsample | zero_shot | 516 | 0.697 |
-| reference: hf_topic_valid_subsample | keyword_baseline | 516 | 0.576 |
-| reference: hf_topic_valid_subsample | primary_embed_lr | 516 | 0.819 |
+| in-domain (HF topic data) | keyword_baseline | 2,900 | 0.538 |
+| in-domain (HF topic data) | primary_embed_lr | 2,900 | 0.712 |
+| weak-label hold-out (circular) | keyword_baseline | 1,892 | 0.970 |
+| weak-label hold-out (circular) | primary_embed_lr | 1,892 | 0.760 |
+| in-domain (HF topic data, subsample) | zero_shot | 516 | 0.697 |
+| in-domain (HF topic data, subsample) | keyword_baseline | 516 | 0.576 |
+| in-domain (HF topic data, subsample) | primary_embed_lr | 516 | 0.819 |
 
-On the gold set the trained classifier is not better than the keyword or zero-shot baselines (95% CI of primary − keyword [-0.0711, 0.033], primary − zero-shot [-0.073, 0.0341]). GEOPOLITICAL is cross-border only (D-044).
+On the gold set (live-feed text) the trained classifier is not better than the keyword or zero-shot baselines; paired-bootstrap 95% CIs of the macro-F1 difference: all: vs keyword [-0.0711, 0.033], vs zero-shot [-0.073, 0.0341]; news headlines: vs keyword [-0.0937, 0.0102], vs zero-shot [-0.0809, 0.0345]; tweets: vs keyword [-0.0858, 0.1208], vs zero-shot [-0.1016, 0.137]. Its higher score on HF topic data is in-domain (it trains on that dataset). The deployed model stays the trained classifier (the a-priori choice). GEOPOLITICAL is cross-border only (D-044).
 
 **Entity linking:** precision 82.0% on 100 hand-checked headline links (95% Wilson CI 73.3%–88.3%).
 
@@ -188,7 +188,7 @@ Turnover cap 5% one-way per day, set by policy for operational realism (D-045), 
 | 2021-10-12T18:00 | MACROECONOMIC:inflation_hawkish | 8 | 2 | -1.19% | 11.83% |
 | 2021-10-13T00:00 | MACROECONOMIC:inflation_hawkish | 8 | 2 | -1.19% | 11.83% |
 
-**Pipeline** (cpu, 10 cores): 107.4 docs/s batch; single-document latency p50 35.7 ms, p95 47.6 ms; dedup removed 39.0% of news and 5.3% of social items.
+**Pipeline** (cpu, 10 cores): 140.4 docs/s batch; single-document latency p50 29.5 ms, p95 33.0 ms; dedup removed 39.0% of news and 5.3% of social items.
 
 **Impact score vs realised market reaction** (2021-22 test set, every look at it listed in D-050: ticker-days after the burn-in, n = 3,538; market-model abnormal returns, CAR[0,+1])
 

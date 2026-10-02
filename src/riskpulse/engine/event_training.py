@@ -230,12 +230,18 @@ def gold_results(clf: EmbeddingClassifier, seed: int) -> dict | None:
         out[subset] = {
             k: _scores(list(gold[mask]), list(p[mask]), CLASSES) for k, p in preds.items()
         }
-    out["all"]["primary_minus_keyword_95ci"] = _paired_ci(
-        gold, preds["primary_embed_lr"], preds["keyword_baseline"], seed
-    )
-    out["all"]["primary_minus_zero_shot_95ci"] = _paired_ci(
-        gold, preds["primary_embed_lr"], preds["zero_shot"], seed
-    )
+    for subset, mask in (
+        ("all", np.ones(len(g), bool)),
+        ("news_headlines", (g["source"] == "gdelt").to_numpy()),
+        ("tweets", (g["source"] == "kaggle_tweets").to_numpy()),
+    ):
+        p = {k: v[mask] for k, v in preds.items()}
+        out[subset]["primary_minus_keyword_95ci"] = _paired_ci(
+            gold[mask], p["primary_embed_lr"], p["keyword_baseline"], seed
+        )
+        out[subset]["primary_minus_zero_shot_95ci"] = _paired_ci(
+            gold[mask], p["primary_embed_lr"], p["zero_shot"], seed
+        )
     return out
 
 

@@ -32,9 +32,16 @@ snapshot. Nothing was tuned on any result below.
   fight", inflation_hawkish from taper_tantrum_2013). But only 6 of 14 signs are right: it predicted +36 bp on the
   10y vs −39 bp realised, and equities down vs up. Book −USD 101.0 m predicted vs +USD 36.7 m realised.
   Both misses stay as written up (supply shock vs risk-off; surprise vs consensus).
-- **Pipeline:** 107.4 docs/s batch, p50 35.7 ms, p95 47.6 ms per document. This was measured on a machine hot from
-  hours of compute (the same process timed base FinBERT at 193 then 109 docs/s), so it is to be re-measured idle in
-  Phase 9.
+- **Pipeline (re-measured on an idle machine):** 140.4 docs/s batch; single-document latency p50 29.5 ms, p95
+  33.0 ms; models take 97.7% of the time. A first run straight after `eval all` gave 107.4 docs/s on a hot machine.
+- **Fresh clone (Phase 9):** clone of 88 MB; README Quickstart (`venv`, `pip install -r requirements.txt`) in 211 s;
+  `pytest -q` passed; `demo --fast` served 18,210 snapshot signals and the dashboard responded (HTTP 200). This used a
+  warm Hugging Face cache, so model downloads were not exercised.
+- **Reporting additions (Arnav):** gold CIs per subset for trained vs keyword and vs zero-shot. The events eval was
+  re-run once for this: the same models and predictions, so the macro-F1 values are unchanged. The trained classifier
+  stays deployed (the a-priori choice). HF-topic results are labelled "in-domain (HF topic data)". Impact v2's JSON
+  evaluator matches LightGBM exactly (`np.array_equal`) on the full validation set and on all 2021-22 test
+  ticker-days (`tests/test_impact_v2_parity.py`; LightGBM runs in a child process).
 
 ### D-050 Evaluation history: every look at the 2021-22 replay window (Arnav's item 5)
 The replay window (2021-09-30 → 2022-09-29) is both the demo window and the out-of-sample test period. Listed here,
@@ -52,6 +59,7 @@ attached are listed separately at the end.
 | 6 | GATE C | Module A with frozen κ (D-038): IC and returns from month 3 | next-day returns | No; τ change (D-045) justified by turnover, not returns |
 | 7 | GATE C | 2022 predicted vs realised (D-040) | realised factor moves | No; misses written up as limitations |
 | 8 | Final rerun (D-046) | Gold events (first time), sentiment gold (same numbers as D-048), all evals recomputed once with the final models | all | Reported as final (D-051) |
+| 9 | After D-051 | Gold events re-scored with identical predictions only to add per-subset CIs (Arnav) | gold labels | No; numbers unchanged |
 
 Not outcome looks (recorded for completeness): GKG pilot and linking rules (D-017, D-020) inspected texts and links;
 D-035 fitted bins on burn-in raw-impact distributions; the FOMC-day investigation in D-040 read impact values of
@@ -327,7 +335,7 @@ optimisation had silently changed the baseline to aligned buckets. Verification:
 
 ### D-030 Provisional event-classification results and how to read them
 `reports/metrics.json → events` (provisional until the gold set is labelled). On the human-labelled HF topic valid
-split (7 classes) the primary embedding classifier reaches macro-F1 0.800 against 0.502 for the keyword baseline; on a
+split (7 classes; **in-domain (HF topic data)**, 0.712 after D-044) the primary embedding classifier reaches macro-F1 0.800 against 0.502 for the keyword baseline; on a
 595-item subsample, zero-shot NLI scores 0.662. On the *weak* holdout the keyword baseline scores higher (0.897 vs
 0.760), but that holdout's labels come mainly from the same keyword rules, so the comparison is circular and not used
 as evidence. The primary model trains on HF topic *train*, so the HF valid split is in-distribution for it. The gold

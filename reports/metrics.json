@@ -1255,7 +1255,15 @@
                 ]
               ]
             }
-          }
+          },
+          "primary_minus_keyword_95ci": [
+            -0.0937,
+            0.0102
+          ],
+          "primary_minus_zero_shot_95ci": [
+            -0.0809,
+            0.0345
+          ]
         },
         "tweets": {
           "primary_embed_lr": {
@@ -1713,7 +1721,15 @@
                 ]
               ]
             }
-          }
+          },
+          "primary_minus_keyword_95ci": [
+            -0.0858,
+            0.1208
+          ],
+          "primary_minus_zero_shot_95ci": [
+            -0.1016,
+            0.137
+          ]
         }
       },
       "hf_topic_valid": {
@@ -2480,8 +2496,8 @@
     ],
     "_provenance": {
       "script": "riskpulse eval events",
-      "generated_at": "2026-10-02T12:22:06+00:00",
-      "git_commit": "afcd9da"
+      "generated_at": "2026-10-02T13:01:25+00:00",
+      "git_commit": "f3b2f8a"
     }
   },
   "moduleA": {
@@ -7848,10 +7864,10 @@
     "cpu": "arm",
     "n_cpu": 10,
     "batch_docs": 1024,
-    "batch_docs_per_sec": 107.4,
-    "stage1_models_share_of_time": 0.985,
-    "single_doc_latency_ms_p50": 35.7,
-    "single_doc_latency_ms_p95": 47.6,
+    "batch_docs_per_sec": 140.4,
+    "stage1_models_share_of_time": 0.977,
+    "single_doc_latency_ms_p50": 29.5,
+    "single_doc_latency_ms_p95": 33.0,
     "dedup_rate_news": 0.3897,
     "dedup_rate_social": 0.053,
     "feed_docs": 203363,
@@ -7859,8 +7875,8 @@
     "batch_size": 32,
     "_provenance": {
       "script": "riskpulse eval pipeline",
-      "generated_at": "2026-10-02T12:27:17+00:00",
-      "git_commit": "afcd9da"
+      "generated_at": "2026-10-02T13:22:47+00:00",
+      "git_commit": "f3b2f8a"
     }
   },
   "impact_v2": {

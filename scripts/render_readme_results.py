@@ -17,6 +17,13 @@ def pct(x: float | None, d: int = 1) -> str:
     return "TBD" if x is None else f"{x * 100:.{d}f}%"
 
 
+REF_LABELS = {
+    "hf_topic_valid": "in-domain (HF topic data)",
+    "hf_topic_valid_subsample": "in-domain (HF topic data, subsample)",
+    "weak_holdout": "weak-label hold-out (circular)",
+}
+
+
 def usd(x: float) -> str:
     a = abs(x)
     return (
@@ -84,13 +91,21 @@ def build(m: dict) -> str:
             if ds == "gold":
                 continue
             for meth, v in res.items():
-                out.append(f"| reference: {ds} | {meth} | {v['n']:,} | {v['macro_f1']:.3f} |")
+                out.append(
+                    f"| {REF_LABELS.get(ds, ds)} | {meth} | {v['n']:,} | {v['macro_f1']:.3f} |"
+                )
         out.append("")
         if g:
             out += [
-                f"On the gold set the trained classifier is not better than the keyword or zero-shot baselines (95% CI of "
-                f"primary − keyword {g['all']['primary_minus_keyword_95ci']}, primary − zero-shot "
-                f"{g['all']['primary_minus_zero_shot_95ci']}). GEOPOLITICAL is cross-border only (D-044).",
+                "On the gold set (live-feed text) the trained classifier is not better than the keyword or zero-shot "
+                "baselines; paired-bootstrap 95% CIs of the macro-F1 difference: "
+                + "; ".join(
+                    f"{sub.replace('_', ' ')}: vs keyword {g[sub]['primary_minus_keyword_95ci']}, vs zero-shot "
+                    f"{g[sub]['primary_minus_zero_shot_95ci']}"
+                    for sub in ("all", "news_headlines", "tweets")
+                )
+                + ". Its higher score on HF topic data is in-domain (it trains on that dataset). The deployed model stays "
+                "the trained classifier (the a-priori choice). GEOPOLITICAL is cross-border only (D-044).",
                 "",
             ]
     lk = m.get("entity_linking")

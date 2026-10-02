@@ -271,6 +271,14 @@ def train() -> dict:
     return meta
 
 
+def feature_matrices() -> dict[str, np.ndarray]:
+    """v2 inputs for the full validation set and the full 2021-22 test set (all ticker-days)."""
+    _, valid, _ = _benzinga()
+    rep = replay_item_features(pd.read_parquet(data_path("processed", "mentions.parquet")))
+    test = ticker_days(rep, trading_days())
+    return {"validation": valid[FEATS].to_numpy(), "test": test[FEATS].to_numpy()}
+
+
 def evaluate() -> dict:
     """Score the saved v2 on validation and on the 2021-22 replay test; write metrics."""
     booster = TreeEnsemble.load(JSON_PATH)

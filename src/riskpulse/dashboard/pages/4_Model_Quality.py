@@ -175,7 +175,11 @@ if e:
         for meth, r in res.items():
             rows.append(
                 {
-                    "evaluation set": f"reference: {ds}",
+                    "evaluation set": {
+                        "hf_topic_valid": "in-domain (HF topic data)",
+                        "hf_topic_valid_subsample": "in-domain (HF topic data, subsample)",
+                        "weak_holdout": "weak-label hold-out (circular)",
+                    }.get(ds, ds),
                     "method": meth,
                     "n": r["n"],
                     "macro-F1": r["macro_f1"],
@@ -184,9 +188,14 @@ if e:
     df = pd.DataFrame(rows)
     if gold:
         st.markdown(
-            f"**Gold set (Arnav's labels, n = {gold['n']}, cross-border GEOPOLITICAL):** 95% CI of "
-            f"macro-F1(primary) − macro-F1(keyword) {gold['all']['primary_minus_keyword_95ci']}, "
-            f"vs zero-shot {gold['all']['primary_minus_zero_shot_95ci']}."
+            f"**Gold set (Arnav's labels, n = {gold['n']}, cross-border GEOPOLITICAL):** paired-bootstrap "
+            "95% CIs of macro-F1(trained) − macro-F1(baseline): "
+            + "; ".join(
+                f"{sub.replace('_', ' ')} vs keyword {gold[sub]['primary_minus_keyword_95ci']}, "
+                f"vs zero-shot {gold[sub]['primary_minus_zero_shot_95ci']}"
+                for sub in ("all", "news_headlines", "tweets")
+            )
+            + ". HF-topic rows are in-domain for the trained model."
         )
     fig = go.Figure()
     for i, meth in enumerate(df["method"].unique()):

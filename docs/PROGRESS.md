@@ -45,8 +45,9 @@ Status legend: DONE · IN PROGRESS · NEXT · OPEN
   the engine logs a warning and uses the local copy.
 
 ## Next
-- Phase 9 hardening: fresh-clone test in a new venv (`demo --fast`, `pytest -q`); re-measure the pipeline benchmark on an
-  idle machine (the D-051 figure was taken on a loaded machine).
+- Phase 9 hardening: DONE for the fresh-clone test (README install, `pytest -q`, `demo --fast`) and the idle benchmark
+  (D-051). Baseline tagged `v1.0-baseline` (fallback submission).
+- Event classification round 2: plan proposed to Arnav; pre-registration in DECISIONS before gold-2 labelling.
 - Repo size: git history is about 90 MB (replay feed 32 MB plus three demo snapshot generations). Avoid further
   snapshot refreshes; trimming history needs Arnav's explicit OK (it requires a force-push).
 - Phase 10 (GATE D): fill `docs/drafts/deck_content.md` and `docs/drafts/video_script.md` from metrics.json; Arnav
