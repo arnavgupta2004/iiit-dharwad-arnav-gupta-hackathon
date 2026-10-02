@@ -41,15 +41,15 @@ Status legend: DONE · IN PROGRESS · NEXT · OPEN
   LightGBM and torch cannot share a process on macOS (D-049).
 
 ## Waiting on Arnav
-- Upload the fine-tuned weights to `arnavguptas/riskpulse-finbert-tweets` (commands in the session notes). Until then
-  the engine logs a warning and uses the local copy.
+- Decision: gold-2 sentiment (reported only) shows fine-tuned 0.383 vs FinBERT 0.553 on news; revisit the model?
 
 ## Next
 - Phase 9 hardening: DONE for the fresh-clone test (README install, `pytest -q`, `demo --fast`) and the idle benchmark
   (D-051). Baseline tagged `v1.0-baseline` (fallback submission).
-- Event classification round 2 (D-052): `data/gold/to_label_2.csv` generated and the protocol pre-registered. **Waiting on
-  Arnav's `labels_2.csv`.** Also waiting: the HF upload, then the empty-cache fresh-clone test.
-- Repo size: git history is about 90 MB (replay feed 32 MB plus three demo snapshot generations). Avoid further
-  snapshot refreshes; trimming history needs Arnav's explicit OK (it requires a force-push).
-- Phase 10 (GATE D): fill `docs/drafts/deck_content.md` and `docs/drafts/video_script.md` from metrics.json; Arnav
-  records the video and finalises the deck.
+- Event classification round 2: DONE (D-052 to D-055). CV on gold-1 selected C1 (committed blind, 6df41d5); gold-2
+  evaluated once (2677491): C1 within noise of all baselines, deployed as pre-registered. Downstream rerun done; v2
+  retrained and kept (validation check passed). Models committed under `data/trained/` (D-054).
+- HF weights uploaded by Arnav and verified byte-identical; empty-cache fresh-clone test re-run after round 2.
+- Repo size: history ~105 MB after the round-2 snapshot (rule: no file > 50 MB, history < ~150 MB).
+- Phase 10 (GATE D): drafts filled from metrics after round 2 (`docs/drafts/`); Arnav records the video and
+  finalises the deck.

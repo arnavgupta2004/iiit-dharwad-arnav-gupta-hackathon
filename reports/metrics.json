@@ -295,1443 +295,30 @@
     }
   },
   "events": {
-    "status": "FINAL on Arnav's gold set (results.gold); other sets are reference only",
+    "status": "reference sets only; final test = gold-2 (metrics.json -> events_gold2), selection = gold-1 cross-validation (events_round2_cv)",
     "taxonomy_note": "GEOPOLITICAL is cross-border only (D-044)",
-    "training_rows": 16450,
+    "training_rows": 16452,
     "training_rows_by_source": {
       "hf_topic_train": 8826,
-      "kw": 7360,
-      "zs": 212,
+      "kw": 7358,
+      "zs": 216,
       "seed": 52
     },
     "training_rows_by_class": {
-      "MACROECONOMIC": 4309,
-      "OTHER": 3027,
-      "EARNINGS": 2414,
+      "MACROECONOMIC": 4325,
+      "OTHER": 3016,
+      "EARNINGS": 2411,
       "REGULATORY_LEGAL": 1345,
-      "GEOPOLITICAL": 1292,
-      "MANAGEMENT_CHANGE": 1156,
-      "MERGER_ACQUISITION": 973,
-      "CREDIT_EVENT": 919,
-      "PRODUCT_LAUNCH": 561,
-      "OPERATIONAL_ESG": 454
+      "GEOPOLITICAL": 1289,
+      "MANAGEMENT_CHANGE": 1157,
+      "MERGER_ACQUISITION": 975,
+      "CREDIT_EVENT": 918,
+      "PRODUCT_LAUNCH": 560,
+      "OPERATIONAL_ESG": 456
     },
-    "model_version": "embed-lr@sentence-transformers/all-MiniLM-L6-v2",
+    "model_version": "embed-lr+gold1@sentence-transformers/all-MiniLM-L6-v2",
     "min_confidence_for_non_other": 0.5,
     "results": {
-      "gold": {
-        "n": 300,
-        "label_counts": {
-          "OTHER": 116,
-          "REGULATORY_LEGAL": 38,
-          "PRODUCT_LAUNCH": 36,
-          "MACROECONOMIC": 26,
-          "OPERATIONAL_ESG": 20,
-          "EARNINGS": 18,
-          "MERGER_ACQUISITION": 15,
-          "GEOPOLITICAL": 15,
-          "CREDIT_EVENT": 10,
-          "MANAGEMENT_CHANGE": 6
-        },
-        "all": {
-          "primary_embed_lr": {
-            "n": 300,
-            "macro_f1": 0.5933,
-            "f1_per_class": {
-              "GEOPOLITICAL": 0.6207,
-              "MACROECONOMIC": 0.75,
-              "CREDIT_EVENT": 0.4828,
-              "MERGER_ACQUISITION": 0.6667,
-              "PRODUCT_LAUNCH": 0.6479,
-              "EARNINGS": 0.6667,
-              "REGULATORY_LEGAL": 0.7714,
-              "MANAGEMENT_CHANGE": 0.3429,
-              "OPERATIONAL_ESG": 0.5581,
-              "OTHER": 0.4255
-            },
-            "confusion_matrix": {
-              "labels": [
-                "GEOPOLITICAL",
-                "MACROECONOMIC",
-                "CREDIT_EVENT",
-                "MERGER_ACQUISITION",
-                "PRODUCT_LAUNCH",
-                "EARNINGS",
-                "REGULATORY_LEGAL",
-                "MANAGEMENT_CHANGE",
-                "OPERATIONAL_ESG",
-                "OTHER"
-              ],
-              "matrix": [
-                [
-                  9,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  0,
-                  5
-                ],
-                [
-                  1,
-                  18,
-                  1,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  5
-                ],
-                [
-                  0,
-                  0,
-                  7,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  3
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  13,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  1
-                ],
-                [
-                  0,
-                  1,
-                  0,
-                  3,
-                  23,
-                  0,
-                  0,
-                  0,
-                  1,
-                  8
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  16,
-                  0,
-                  0,
-                  0,
-                  2
-                ],
-                [
-                  0,
-                  0,
-                  4,
-                  1,
-                  0,
-                  0,
-                  27,
-                  1,
-                  2,
-                  3
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  6,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  1,
-                  1,
-                  0,
-                  12,
-                  5
-                ],
-                [
-                  4,
-                  3,
-                  7,
-                  7,
-                  11,
-                  13,
-                  4,
-                  21,
-                  6,
-                  40
-                ]
-              ]
-            }
-          },
-          "keyword_baseline": {
-            "n": 300,
-            "macro_f1": 0.6117,
-            "f1_per_class": {
-              "GEOPOLITICAL": 0.6486,
-              "MACROECONOMIC": 0.8519,
-              "CREDIT_EVENT": 0.5405,
-              "MERGER_ACQUISITION": 0.7143,
-              "PRODUCT_LAUNCH": 0.6562,
-              "EARNINGS": 0.6087,
-              "REGULATORY_LEGAL": 0.7077,
-              "MANAGEMENT_CHANGE": 0.3529,
-              "OPERATIONAL_ESG": 0.5532,
-              "OTHER": 0.4828
-            },
-            "confusion_matrix": {
-              "labels": [
-                "GEOPOLITICAL",
-                "MACROECONOMIC",
-                "CREDIT_EVENT",
-                "MERGER_ACQUISITION",
-                "PRODUCT_LAUNCH",
-                "EARNINGS",
-                "REGULATORY_LEGAL",
-                "MANAGEMENT_CHANGE",
-                "OPERATIONAL_ESG",
-                "OTHER"
-              ],
-              "matrix": [
-                [
-                  12,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  2
-                ],
-                [
-                  2,
-                  23,
-                  1,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  10,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  15,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  2,
-                  21,
-                  0,
-                  0,
-                  1,
-                  3,
-                  9
-                ],
-                [
-                  0,
-                  0,
-                  3,
-                  0,
-                  0,
-                  14,
-                  0,
-                  1,
-                  0,
-                  0
-                ],
-                [
-                  2,
-                  0,
-                  3,
-                  3,
-                  0,
-                  0,
-                  23,
-                  2,
-                  2,
-                  3
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  6,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  1,
-                  0,
-                  2,
-                  0,
-                  2,
-                  13,
-                  2
-                ],
-                [
-                  6,
-                  5,
-                  10,
-                  6,
-                  7,
-                  12,
-                  4,
-                  16,
-                  8,
-                  42
-                ]
-              ]
-            }
-          },
-          "zero_shot": {
-            "n": 300,
-            "macro_f1": 0.612,
-            "f1_per_class": {
-              "GEOPOLITICAL": 0.6923,
-              "MACROECONOMIC": 0.7619,
-              "CREDIT_EVENT": 0.6897,
-              "MERGER_ACQUISITION": 0.4225,
-              "PRODUCT_LAUNCH": 0.6667,
-              "EARNINGS": 0.7059,
-              "REGULATORY_LEGAL": 0.7895,
-              "MANAGEMENT_CHANGE": 0.5455,
-              "OPERATIONAL_ESG": 0.6316,
-              "OTHER": 0.2143
-            },
-            "confusion_matrix": {
-              "labels": [
-                "GEOPOLITICAL",
-                "MACROECONOMIC",
-                "CREDIT_EVENT",
-                "MERGER_ACQUISITION",
-                "PRODUCT_LAUNCH",
-                "EARNINGS",
-                "REGULATORY_LEGAL",
-                "MANAGEMENT_CHANGE",
-                "OPERATIONAL_ESG",
-                "OTHER"
-              ],
-              "matrix": [
-                [
-                  9,
-                  1,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  0,
-                  0,
-                  4
-                ],
-                [
-                  0,
-                  24,
-                  1,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1
-                ],
-                [
-                  0,
-                  0,
-                  10,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  15,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  5,
-                  28,
-                  0,
-                  0,
-                  0,
-                  1,
-                  2
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  18,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  3,
-                  3,
-                  0,
-                  0,
-                  30,
-                  0,
-                  2,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  6,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  2,
-                  0,
-                  2,
-                  1,
-                  0,
-                  0,
-                  1,
-                  12,
-                  2
-                ],
-                [
-                  2,
-                  10,
-                  5,
-                  31,
-                  19,
-                  15,
-                  7,
-                  9,
-                  3,
-                  15
-                ]
-              ]
-            }
-          },
-          "primary_minus_keyword_95ci": [
-            -0.0711,
-            0.033
-          ],
-          "primary_minus_zero_shot_95ci": [
-            -0.073,
-            0.0341
-          ]
-        },
-        "news_headlines": {
-          "primary_embed_lr": {
-            "n": 237,
-            "macro_f1": 0.6161,
-            "f1_per_class": {
-              "GEOPOLITICAL": 0.6923,
-              "MACROECONOMIC": 0.75,
-              "CREDIT_EVENT": 0.5,
-              "MERGER_ACQUISITION": 0.6667,
-              "PRODUCT_LAUNCH": 0.6333,
-              "EARNINGS": 0.7742,
-              "REGULATORY_LEGAL": 0.8065,
-              "MANAGEMENT_CHANGE": 0.375,
-              "OPERATIONAL_ESG": 0.5946,
-              "OTHER": 0.368
-            },
-            "confusion_matrix": {
-              "labels": [
-                "GEOPOLITICAL",
-                "MACROECONOMIC",
-                "CREDIT_EVENT",
-                "MERGER_ACQUISITION",
-                "PRODUCT_LAUNCH",
-                "EARNINGS",
-                "REGULATORY_LEGAL",
-                "MANAGEMENT_CHANGE",
-                "OPERATIONAL_ESG",
-                "OTHER"
-              ],
-              "matrix": [
-                [
-                  9,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  0,
-                  3
-                ],
-                [
-                  1,
-                  15,
-                  1,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  5
-                ],
-                [
-                  0,
-                  0,
-                  7,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  3
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  11,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  1
-                ],
-                [
-                  0,
-                  1,
-                  0,
-                  3,
-                  19,
-                  0,
-                  0,
-                  0,
-                  1,
-                  7
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  12,
-                  0,
-                  0,
-                  0,
-                  1
-                ],
-                [
-                  0,
-                  0,
-                  4,
-                  1,
-                  0,
-                  0,
-                  25,
-                  1,
-                  2,
-                  2
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  6,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  0,
-                  1,
-                  0,
-                  11,
-                  5
-                ],
-                [
-                  3,
-                  1,
-                  6,
-                  5,
-                  9,
-                  6,
-                  1,
-                  18,
-                  3,
-                  23
-                ]
-              ]
-            }
-          },
-          "keyword_baseline": {
-            "n": 237,
-            "macro_f1": 0.6567,
-            "f1_per_class": {
-              "GEOPOLITICAL": 0.6667,
-              "MACROECONOMIC": 0.8889,
-              "CREDIT_EVENT": 0.625,
-              "MERGER_ACQUISITION": 0.7429,
-              "PRODUCT_LAUNCH": 0.6792,
-              "EARNINGS": 0.6857,
-              "REGULATORY_LEGAL": 0.75,
-              "MANAGEMENT_CHANGE": 0.4286,
-              "OPERATIONAL_ESG": 0.6,
-              "OTHER": 0.5
-            },
-            "confusion_matrix": {
-              "labels": [
-                "GEOPOLITICAL",
-                "MACROECONOMIC",
-                "CREDIT_EVENT",
-                "MERGER_ACQUISITION",
-                "PRODUCT_LAUNCH",
-                "EARNINGS",
-                "REGULATORY_LEGAL",
-                "MANAGEMENT_CHANGE",
-                "OPERATIONAL_ESG",
-                "OTHER"
-              ],
-              "matrix": [
-                [
-                  10,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  2
-                ],
-                [
-                  2,
-                  20,
-                  1,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  10,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  13,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  2,
-                  18,
-                  0,
-                  0,
-                  0,
-                  3,
-                  8
-                ],
-                [
-                  0,
-                  0,
-                  1,
-                  0,
-                  0,
-                  12,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  2,
-                  0,
-                  3,
-                  3,
-                  0,
-                  0,
-                  21,
-                  2,
-                  1,
-                  3
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  6,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  1,
-                  0,
-                  2,
-                  0,
-                  1,
-                  12,
-                  2
-                ],
-                [
-                  3,
-                  2,
-                  7,
-                  3,
-                  4,
-                  8,
-                  0,
-                  13,
-                  5,
-                  30
-                ]
-              ]
-            }
-          },
-          "zero_shot": {
-            "n": 237,
-            "macro_f1": 0.6404,
-            "f1_per_class": {
-              "GEOPOLITICAL": 0.6957,
-              "MACROECONOMIC": 0.8077,
-              "CREDIT_EVENT": 0.7143,
-              "MERGER_ACQUISITION": 0.4815,
-              "PRODUCT_LAUNCH": 0.6667,
-              "EARNINGS": 0.8125,
-              "REGULATORY_LEGAL": 0.8116,
-              "MANAGEMENT_CHANGE": 0.5714,
-              "OPERATIONAL_ESG": 0.6471,
-              "OTHER": 0.1957
-            },
-            "confusion_matrix": {
-              "labels": [
-                "GEOPOLITICAL",
-                "MACROECONOMIC",
-                "CREDIT_EVENT",
-                "MERGER_ACQUISITION",
-                "PRODUCT_LAUNCH",
-                "EARNINGS",
-                "REGULATORY_LEGAL",
-                "MANAGEMENT_CHANGE",
-                "OPERATIONAL_ESG",
-                "OTHER"
-              ],
-              "matrix": [
-                [
-                  8,
-                  1,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  0,
-                  0,
-                  3
-                ],
-                [
-                  0,
-                  21,
-                  1,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1
-                ],
-                [
-                  0,
-                  0,
-                  10,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  13,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  5,
-                  23,
-                  0,
-                  0,
-                  0,
-                  1,
-                  2
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  13,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  3,
-                  3,
-                  0,
-                  0,
-                  28,
-                  0,
-                  1,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  6,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  1,
-                  0,
-                  2,
-                  1,
-                  0,
-                  0,
-                  1,
-                  11,
-                  2
-                ],
-                [
-                  2,
-                  6,
-                  4,
-                  18,
-                  14,
-                  6,
-                  5,
-                  8,
-                  3,
-                  9
-                ]
-              ]
-            }
-          },
-          "primary_minus_keyword_95ci": [
-            -0.0937,
-            0.0102
-          ],
-          "primary_minus_zero_shot_95ci": [
-            -0.0809,
-            0.0345
-          ]
-        },
-        "tweets": {
-          "primary_embed_lr": {
-            "n": 63,
-            "macro_f1": 0.3988,
-            "f1_per_class": {
-              "GEOPOLITICAL": 0.0,
-              "MACROECONOMIC": 0.75,
-              "CREDIT_EVENT": 0.0,
-              "MERGER_ACQUISITION": 0.6667,
-              "PRODUCT_LAUNCH": 0.7273,
-              "EARNINGS": 0.4706,
-              "REGULATORY_LEGAL": 0.5,
-              "MANAGEMENT_CHANGE": 0.0,
-              "OPERATIONAL_ESG": 0.3333,
-              "OTHER": 0.5397
-            },
-            "confusion_matrix": {
-              "labels": [
-                "GEOPOLITICAL",
-                "MACROECONOMIC",
-                "CREDIT_EVENT",
-                "MERGER_ACQUISITION",
-                "PRODUCT_LAUNCH",
-                "EARNINGS",
-                "REGULATORY_LEGAL",
-                "MANAGEMENT_CHANGE",
-                "OPERATIONAL_ESG",
-                "OTHER"
-              ],
-              "matrix": [
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  2
-                ],
-                [
-                  0,
-                  3,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  2,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  4,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  4,
-                  0,
-                  0,
-                  0,
-                  1
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  2,
-                  0,
-                  0,
-                  1
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  0,
-                  0,
-                  1,
-                  0
-                ],
-                [
-                  1,
-                  2,
-                  1,
-                  2,
-                  2,
-                  7,
-                  3,
-                  3,
-                  3,
-                  17
-                ]
-              ]
-            }
-          },
-          "keyword_baseline": {
-            "n": 63,
-            "macro_f1": 0.3893,
-            "f1_per_class": {
-              "GEOPOLITICAL": 0.5714,
-              "MACROECONOMIC": 0.6667,
-              "CREDIT_EVENT": 0.0,
-              "MERGER_ACQUISITION": 0.5714,
-              "PRODUCT_LAUNCH": 0.5455,
-              "EARNINGS": 0.3636,
-              "REGULATORY_LEGAL": 0.4444,
-              "MANAGEMENT_CHANGE": 0.0,
-              "OPERATIONAL_ESG": 0.2857,
-              "OTHER": 0.4444
-            },
-            "confusion_matrix": {
-              "labels": [
-                "GEOPOLITICAL",
-                "MACROECONOMIC",
-                "CREDIT_EVENT",
-                "MERGER_ACQUISITION",
-                "PRODUCT_LAUNCH",
-                "EARNINGS",
-                "REGULATORY_LEGAL",
-                "MANAGEMENT_CHANGE",
-                "OPERATIONAL_ESG",
-                "OTHER"
-              ],
-              "matrix": [
-                [
-                  2,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  3,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  2,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  3,
-                  0,
-                  0,
-                  1,
-                  0,
-                  1
-                ],
-                [
-                  0,
-                  0,
-                  2,
-                  0,
-                  0,
-                  2,
-                  0,
-                  1,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  2,
-                  0,
-                  1,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  1,
-                  0
-                ],
-                [
-                  3,
-                  3,
-                  3,
-                  3,
-                  3,
-                  4,
-                  4,
-                  3,
-                  3,
-                  12
-                ]
-              ]
-            }
-          },
-          "zero_shot": {
-            "n": 63,
-            "macro_f1": 0.3962,
-            "f1_per_class": {
-              "GEOPOLITICAL": 0.6667,
-              "MACROECONOMIC": 0.5455,
-              "CREDIT_EVENT": 0.0,
-              "MERGER_ACQUISITION": 0.2353,
-              "PRODUCT_LAUNCH": 0.6667,
-              "EARNINGS": 0.5263,
-              "REGULATORY_LEGAL": 0.5714,
-              "MANAGEMENT_CHANGE": 0.0,
-              "OPERATIONAL_ESG": 0.5,
-              "OTHER": 0.25
-            },
-            "confusion_matrix": {
-              "labels": [
-                "GEOPOLITICAL",
-                "MACROECONOMIC",
-                "CREDIT_EVENT",
-                "MERGER_ACQUISITION",
-                "PRODUCT_LAUNCH",
-                "EARNINGS",
-                "REGULATORY_LEGAL",
-                "MANAGEMENT_CHANGE",
-                "OPERATIONAL_ESG",
-                "OTHER"
-              ],
-              "matrix": [
-                [
-                  1,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1
-                ],
-                [
-                  0,
-                  3,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  2,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  5,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  5,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  2,
-                  0,
-                  1,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  1,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  0
-                ],
-                [
-                  0,
-                  4,
-                  1,
-                  13,
-                  5,
-                  9,
-                  2,
-                  1,
-                  0,
-                  6
-                ]
-              ]
-            }
-          },
-          "primary_minus_keyword_95ci": [
-            -0.0858,
-            0.1208
-          ],
-          "primary_minus_zero_shot_95ci": [
-            -0.1016,
-            0.137
-          ]
-        }
-      },
       "hf_topic_valid": {
         "keyword_baseline": {
           "n": 2900,
@@ -1824,15 +411,15 @@
         },
         "primary_embed_lr": {
           "n": 2900,
-          "macro_f1": 0.7122,
+          "macro_f1": 0.7128,
           "f1_per_class": {
             "EARNINGS": 0.8551,
-            "GEOPOLITICAL": 0.3226,
-            "MACROECONOMIC": 0.8053,
-            "MANAGEMENT_CHANGE": 0.8033,
-            "MERGER_ACQUISITION": 0.641,
-            "OTHER": 0.8103,
-            "REGULATORY_LEGAL": 0.7479
+            "GEOPOLITICAL": 0.3125,
+            "MACROECONOMIC": 0.7989,
+            "MANAGEMENT_CHANGE": 0.8348,
+            "MERGER_ACQUISITION": 0.6311,
+            "OTHER": 0.8084,
+            "REGULATORY_LEGAL": 0.7489
           },
           "confusion_matrix": {
             "labels": [
@@ -1846,12 +433,12 @@
             ],
             "matrix": [
               [
-                304,
+                301,
+                0,
+                1,
                 0,
                 0,
-                0,
-                0,
-                34,
+                36,
                 0
               ],
               [
@@ -1864,49 +451,49 @@
                 0
               ],
               [
-                1,
-                5,
-                579,
-                5,
-                5,
-                104,
-                0
-              ],
-              [
-                0,
-                0,
-                1,
-                98,
-                0,
-                13,
-                0
-              ],
-              [
-                1,
-                0,
                 2,
-                2,
-                75,
-                34,
-                2
+                4,
+                572,
+                3,
+                4,
+                117,
+                0
               ],
               [
-                66,
+                0,
+                0,
+                1,
+                96,
+                0,
                 15,
-                149,
-                27,
-                35,
-                1166,
-                28
+                0
               ],
               [
                 0,
                 0,
-                1,
+                2,
+                0,
+                71,
+                42,
+                1
+              ],
+              [
+                62,
+                17,
+                148,
+                19,
+                31,
+                1179,
+                27
+              ],
+              [
+                0,
+                0,
+                2,
                 0,
                 3,
-                24,
-                89
+                25,
+                88
               ]
             ]
           }
@@ -1914,19 +501,19 @@
       },
       "weak_holdout": {
         "keyword_baseline": {
-          "n": 1892,
-          "macro_f1": 0.9699,
+          "n": 1893,
+          "macro_f1": 0.9466,
           "f1_per_class": {
-            "GEOPOLITICAL": 1.0,
-            "MACROECONOMIC": 0.9986,
-            "CREDIT_EVENT": 0.9976,
+            "GEOPOLITICAL": 0.9984,
+            "MACROECONOMIC": 1.0,
+            "CREDIT_EVENT": 1.0,
             "MERGER_ACQUISITION": 0.9935,
-            "PRODUCT_LAUNCH": 0.9967,
-            "EARNINGS": 0.998,
-            "REGULATORY_LEGAL": 1.0,
+            "PRODUCT_LAUNCH": 0.9803,
+            "EARNINGS": 0.996,
+            "REGULATORY_LEGAL": 0.9976,
             "MANAGEMENT_CHANGE": 1.0,
             "OPERATIONAL_ESG": 1.0,
-            "OTHER": 0.7143
+            "OTHER": 0.5
           },
           "confusion_matrix": {
             "labels": [
@@ -1943,7 +530,7 @@
             ],
             "matrix": [
               [
-                310,
+                305,
                 0,
                 0,
                 0,
@@ -1956,7 +543,7 @@
               ],
               [
                 0,
-                345,
+                346,
                 0,
                 0,
                 0,
@@ -1964,7 +551,7 @@
                 0,
                 0,
                 0,
-                1
+                0
               ],
               [
                 0,
@@ -2000,31 +587,31 @@
                 0,
                 0,
                 0,
+                6
+              ],
+              [
+                1,
+                0,
+                0,
+                0,
+                0,
+                251,
+                0,
+                0,
+                0,
                 1
               ],
               [
                 0,
                 0,
-                1,
-                0,
-                0,
-                252,
-                0,
-                0,
-                0,
-                0
-              ],
-              [
                 0,
                 0,
                 0,
                 0,
+                206,
                 0,
                 0,
-                205,
-                0,
-                0,
-                0
+                1
               ],
               [
                 0,
@@ -2047,7 +634,7 @@
                 0,
                 0,
                 0,
-                102,
+                101,
                 0
               ],
               [
@@ -2066,19 +653,19 @@
           }
         },
         "primary_embed_lr": {
-          "n": 1892,
-          "macro_f1": 0.7602,
+          "n": 1893,
+          "macro_f1": 0.7503,
           "f1_per_class": {
-            "GEOPOLITICAL": 0.9583,
-            "MACROECONOMIC": 0.9375,
-            "CREDIT_EVENT": 0.886,
-            "MERGER_ACQUISITION": 0.7353,
-            "PRODUCT_LAUNCH": 0.807,
-            "EARNINGS": 0.879,
-            "REGULATORY_LEGAL": 0.8491,
-            "MANAGEMENT_CHANGE": 0.8286,
-            "OPERATIONAL_ESG": 0.6988,
-            "OTHER": 0.0229
+            "GEOPOLITICAL": 0.9308,
+            "MACROECONOMIC": 0.9173,
+            "CREDIT_EVENT": 0.8177,
+            "MERGER_ACQUISITION": 0.7405,
+            "PRODUCT_LAUNCH": 0.8357,
+            "EARNINGS": 0.8652,
+            "REGULATORY_LEGAL": 0.8384,
+            "MANAGEMENT_CHANGE": 0.8195,
+            "OPERATIONAL_ESG": 0.7152,
+            "OTHER": 0.0227
           },
           "confusion_matrix": {
             "labels": [
@@ -2095,124 +682,124 @@
             ],
             "matrix": [
               [
-                287,
+                269,
+                5,
+                1,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                29
+              ],
+              [
+                0,
+                305,
+                1,
+                1,
+                0,
+                1,
+                2,
+                1,
+                0,
+                35
+              ],
+              [
+                2,
+                4,
+                148,
+                0,
+                0,
+                0,
                 3,
-                1,
-                0,
-                0,
                 0,
                 1,
-                0,
-                0,
-                18
+                54
               ],
               [
                 0,
-                315,
-                1,
                 0,
                 0,
+                97,
+                5,
+                2,
+                5,
                 0,
-                1,
-                1,
                 0,
-                28
+                47
               ],
               [
-                2,
-                2,
-                171,
+                0,
+                0,
+                0,
                 1,
-                0,
-                0,
+                117,
                 2,
-                1,
                 0,
+                1,
+                1,
                 33
               ],
               [
+                1,
+                1,
                 0,
+                2,
                 0,
+                199,
+                2,
                 0,
-                100,
-                7,
-                5,
-                2,
-                2,
-                2,
-                38
+                1,
+                47
               ],
               [
                 0,
-                1,
-                0,
-                3,
-                115,
                 2,
-                0,
-                2,
-                2,
-                25
-              ],
-              [
-                0,
-                3,
-                0,
-                4,
-                2,
-                207,
-                1,
-                1,
-                1,
-                34
-              ],
-              [
-                0,
-                0,
                 0,
                 4,
                 2,
                 1,
                 166,
-                2,
                 1,
+                2,
                 29
               ],
               [
+                1,
                 0,
+                0,
+                1,
                 0,
                 1,
                 4,
-                3,
-                1,
-                6,
-                116,
+                109,
                 0,
-                22
+                37
               ],
               [
                 0,
+                2,
+                0,
+                0,
                 1,
-                0,
-                0,
+                1,
                 5,
-                2,
-                7,
-                2,
-                58,
-                27
+                1,
+                59,
+                32
               ],
               [
                 0,
+                0,
+                0,
+                0,
+                0,
+                0,
                 1,
                 0,
                 0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                3
+                4
               ]
             ]
           }
@@ -2399,15 +986,15 @@
         },
         "primary_embed_lr": {
           "n": 516,
-          "macro_f1": 0.819,
+          "macro_f1": 0.8084,
           "f1_per_class": {
-            "EARNINGS": 0.9167,
+            "EARNINGS": 0.9157,
             "GEOPOLITICAL": 0.9091,
-            "MACROECONOMIC": 0.8538,
-            "MANAGEMENT_CHANGE": 0.908,
-            "MERGER_ACQUISITION": 0.7361,
-            "OTHER": 0.578,
-            "REGULATORY_LEGAL": 0.8312
+            "MACROECONOMIC": 0.8471,
+            "MANAGEMENT_CHANGE": 0.9114,
+            "MERGER_ACQUISITION": 0.7092,
+            "OTHER": 0.5532,
+            "REGULATORY_LEGAL": 0.8133
           },
           "confusion_matrix": {
             "labels": [
@@ -2421,9 +1008,9 @@
             ],
             "matrix": [
               [
-                77,
+                76,
                 0,
-                0,
+                1,
                 0,
                 0,
                 8,
@@ -2441,37 +1028,37 @@
               [
                 0,
                 0,
-                73,
-                2,
+                72,
+                0,
                 1,
-                9,
+                12,
                 0
               ],
               [
                 0,
                 0,
                 1,
-                74,
+                72,
                 0,
-                10,
+                12,
                 0
               ],
               [
-                1,
+                0,
                 0,
                 1,
-                1,
-                53,
-                27,
-                2
+                0,
+                50,
+                33,
+                1
               ],
               [
                 5,
                 0,
-                10,
+                9,
                 1,
                 2,
-                63,
+                65,
                 3
               ],
               [
@@ -2480,8 +1067,8 @@
                 1,
                 0,
                 3,
-                15,
-                64
+                19,
+                61
               ]
             ]
           }
@@ -2489,15 +1076,15 @@
       }
     },
     "notes": [
-      "Gold: 300 replay items labelled by Arnav (237 news, 63 tweets), never trained on.",
+      "Gold-1 (300) trains and selects the model (round 2); gold-2 (200) is the final test.",
       "hf_topic_valid covers 7 of 10 classes (no CREDIT_EVENT, PRODUCT_LAUNCH, OPERATIONAL_ESG).",
       "The primary model trains on hf_topic *train*, so hf_topic_valid is in-distribution for it but not for the keyword baseline or zero-shot.",
       "weak_holdout labels come from keyword rules and zero-shot, so they favour those methods' biases."
     ],
     "_provenance": {
       "script": "riskpulse eval events",
-      "generated_at": "2026-10-02T13:01:25+00:00",
-      "git_commit": "f3b2f8a"
+      "generated_at": "2026-10-02T16:40:13+00:00",
+      "git_commit": "2677491"
     }
   },
   "moduleA": {
@@ -2793,44 +1380,44 @@
     }
   },
   "moduleB_triggers": {
-    "n_event_signals_seen": 31159,
-    "n_high_impact_candidates": 2527,
-    "n_triggers_fired": 470,
+    "n_event_signals_seen": 31150,
+    "n_high_impact_candidates": 2613,
+    "n_triggers_fired": 464,
     "n_stress_runs": 349,
     "candidates_blocked_by": {
-      "low_event_confidence": 875,
-      "too_few_sources": 244,
-      "cooldown": 938
+      "low_event_confidence": 966,
+      "cooldown": 958,
+      "too_few_sources": 225
     },
     "n_escalations": 29,
     "triggers_per_month": {
       "2021-09": 2,
-      "2021-10": 41,
-      "2021-11": 22,
-      "2021-12": 23,
-      "2022-01": 46,
-      "2022-02": 35,
-      "2022-03": 35,
-      "2022-04": 58,
-      "2022-05": 35,
-      "2022-06": 40,
-      "2022-07": 61,
+      "2021-10": 44,
+      "2021-11": 19,
+      "2021-12": 26,
+      "2022-01": 47,
+      "2022-02": 38,
+      "2022-03": 32,
+      "2022-04": 51,
+      "2022-05": 36,
+      "2022-06": 44,
+      "2022-07": 53,
       "2022-08": 41,
       "2022-09": 31
     },
     "stress_runs_per_month": {
-      "2021-09": 1,
+      "2021-09": 2,
       "2021-10": 24,
-      "2021-11": 17,
-      "2021-12": 21,
-      "2022-01": 24,
+      "2021-11": 16,
+      "2021-12": 22,
+      "2022-01": 27,
       "2022-02": 22,
-      "2022-03": 31,
-      "2022-04": 37,
-      "2022-05": 30,
-      "2022-06": 38,
-      "2022-07": 35,
-      "2022-08": 38,
+      "2022-03": 28,
+      "2022-04": 33,
+      "2022-05": 31,
+      "2022-06": 40,
+      "2022-07": 34,
+      "2022-08": 39,
       "2022-09": 31
     },
     "runs": [
@@ -2849,16 +1436,18 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2021-10-04T11:00:00Z",
-        "event_class": "GEOPOLITICAL",
-        "scenario": "GEOPOLITICAL:default",
+        "as_of": "2021-09-30T16:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:growth_scare",
         "impact": 9,
-        "n_sources": 2,
-        "regions": [],
-        "headline": "CBUAE imposes financial sanctions on six exchange houses operating in the UAE",
-        "total_impact_usd": -10695833.61,
-        "total_impact_pct": -0.001258,
-        "cet1_after": 0.129801
+        "n_sources": 3,
+        "regions": [
+          "US"
+        ],
+        "headline": "WRAPUP 1-U.S. weekly jobless claims rise; second quarter GDP revised higher",
+        "total_impact_usd": -122344471.35,
+        "total_impact_pct": -0.014391,
+        "cet1_after": 0.117249
       },
       {
         "as_of": "2021-10-04T14:00:00Z",
@@ -2890,18 +1479,16 @@
         "cet1_after": 0.095043
       },
       {
-        "as_of": "2021-10-05T15:00:00Z",
-        "event_class": "OPERATIONAL_ESG",
-        "scenario": "OPERATIONAL_ESG:default",
+        "as_of": "2021-10-06T05:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:inflation_hawkish",
         "impact": 8,
         "n_sources": 2,
-        "regions": [
-          "US"
-        ],
-        "headline": "Africa's businesses count losses after Facebook outage",
-        "total_impact_usd": -320136604.22,
-        "total_impact_pct": -0.037658,
-        "cet1_after": 0.095043
+        "regions": [],
+        "headline": "Philippines' inflation eases to 4.8 pct in September",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
       },
       {
         "as_of": "2021-10-06T08:00:00Z",
@@ -2994,6 +1581,20 @@
         "total_impact_usd": -101004496.29,
         "total_impact_pct": -0.011881,
         "cet1_after": 0.118311
+      },
+      {
+        "as_of": "2021-10-14T20:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:growth_scare",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [
+          "US"
+        ],
+        "headline": "US weekly jobless claims drop below 300,000; producer inflation rising",
+        "total_impact_usd": -91854467.91,
+        "total_impact_pct": -0.010805,
+        "cet1_after": 0.120502
       },
       {
         "as_of": "2021-10-15T01:00:00Z",
@@ -3197,39 +1798,23 @@
         "cet1_after": 0.129842
       },
       {
-        "as_of": "2021-11-02T03:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:default",
-        "impact": 8,
-        "n_sources": 2,
-        "regions": [
-          "CHINA"
-        ],
-        "headline": "China-Based Developer Says Bond Default Triggers Earlier Repayment Deadlines, Pulls Dividend",
-        "total_impact_usd": -95225915.07,
-        "total_impact_pct": -0.011201,
-        "cet1_after": 0.121177
-      },
-      {
-        "as_of": "2021-11-02T22:00:00Z",
+        "as_of": "2021-11-03T04:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:default",
         "impact": 8,
         "n_sources": 2,
-        "regions": [
-          "US"
-        ],
-        "headline": "Dow closes above 36,000 for first time as investors await Fed decision",
+        "regions": [],
+        "headline": "New Zealand unemployment rate drops to record low in Q3",
         "total_impact_usd": -101004496.29,
         "total_impact_pct": -0.011881,
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2021-11-04T01:00:00Z",
+        "as_of": "2021-11-03T19:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
         "impact": 8,
-        "n_sources": 4,
+        "n_sources": 2,
         "regions": [
           "US"
         ],
@@ -3279,13 +1864,13 @@
         "cet1_after": 0.073424
       },
       {
-        "as_of": "2021-11-11T17:00:00Z",
+        "as_of": "2021-11-11T11:00:00Z",
         "event_class": "MACROECONOMIC",
-        "scenario": "MACROECONOMIC:inflation_hawkish",
+        "scenario": "MACROECONOMIC:default",
         "impact": 8,
         "n_sources": 2,
         "regions": [],
-        "headline": "PRECIOUS-Gold nears 5-month peak as inflation worries boost appeal",
+        "headline": "Australian unemployment rate jumps to 5.2 per cent",
         "total_impact_usd": -101004496.29,
         "total_impact_pct": -0.011881,
         "cet1_after": 0.118311
@@ -3345,32 +1930,18 @@
         "cet1_after": 0.129842
       },
       {
-        "as_of": "2021-11-22T18:00:00Z",
-        "event_class": "MACROECONOMIC",
-        "scenario": "MACROECONOMIC:default",
-        "impact": 8,
-        "n_sources": 3,
-        "regions": [
-          "US"
-        ],
-        "headline": "US stocks rise after Biden taps Powell for a new Fed term",
-        "total_impact_usd": -101004496.29,
-        "total_impact_pct": -0.011881,
-        "cet1_after": 0.118311
-      },
-      {
         "as_of": "2021-11-22T23:00:00Z",
         "event_class": "GEOPOLITICAL",
         "scenario": "GEOPOLITICAL:default",
-        "impact": 8,
+        "impact": 9,
         "n_sources": 2,
         "regions": [
           "US"
         ],
         "headline": "U.S. imposes further sanctions in connection with Nord Stream 2 gas pipeline",
-        "total_impact_usd": -8091231.32,
-        "total_impact_pct": -0.000952,
-        "cet1_after": 0.129842
+        "total_impact_usd": -10695833.61,
+        "total_impact_pct": -0.001258,
+        "cet1_after": 0.129801
       },
       {
         "as_of": "2021-11-23T01:00:00Z",
@@ -3386,6 +1957,20 @@
         "total_impact_usd": -10695833.61,
         "total_impact_pct": -0.001258,
         "cet1_after": 0.129801
+      },
+      {
+        "as_of": "2021-11-30T13:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:default",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [
+          "INDIA"
+        ],
+        "headline": "India's GDP growth expands 8.4% in July-September quarter",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
       },
       {
         "as_of": "2021-11-30T21:00:00Z",
@@ -3426,6 +2011,22 @@
         "total_impact_usd": -91854467.91,
         "total_impact_pct": -0.010805,
         "cet1_after": 0.120502
+      },
+      {
+        "as_of": "2021-12-03T02:00:00Z",
+        "event_class": "GEOPOLITICAL",
+        "scenario": "GEOPOLITICAL:default",
+        "impact": 8,
+        "n_sources": 8,
+        "regions": [
+          "EUROPE",
+          "UK",
+          "US"
+        ],
+        "headline": "US, EU, UK and Canada announce new sanctions on BelarusNews",
+        "total_impact_usd": -9089235.99,
+        "total_impact_pct": -0.001069,
+        "cet1_after": 0.129707
       },
       {
         "as_of": "2021-12-03T07:00:00Z",
@@ -3482,23 +2083,35 @@
         "cet1_after": 0.118167
       },
       {
-        "as_of": "2021-12-08T00:00:00Z",
+        "as_of": "2021-12-07T20:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:default",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [],
+        "headline": "Elon Musk: Declining birth rate one of 'biggest' threats to civilization",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
+      },
+      {
+        "as_of": "2021-12-07T20:00:00Z",
         "event_class": "OPERATIONAL_ESG",
         "scenario": "OPERATIONAL_ESG:default",
         "impact": 8,
-        "n_sources": 16,
+        "n_sources": 7,
         "regions": [],
-        "headline": "Amazon Web Services hit by major outage affecting many sites",
+        "headline": "Amazon outage is causing significant problems for sites and apps across the internet",
         "total_impact_usd": -320136604.22,
         "total_impact_pct": -0.037658,
         "cet1_after": 0.095043
       },
       {
-        "as_of": "2021-12-09T01:00:00Z",
+        "as_of": "2021-12-08T23:00:00Z",
         "event_class": "OPERATIONAL_ESG",
         "scenario": "OPERATIONAL_ESG:default",
         "impact": 8,
-        "n_sources": 3,
+        "n_sources": 2,
         "regions": [],
         "headline": "Explainer: What caused Amazon's outage? Will there be more? - Netscape Money & Business",
         "total_impact_usd": -320136604.22,
@@ -3548,7 +2161,7 @@
         "cet1_after": 0.095043
       },
       {
-        "as_of": "2021-12-09T13:00:00Z",
+        "as_of": "2021-12-09T18:00:00Z",
         "event_class": "CREDIT_EVENT",
         "scenario": "CREDIT_EVENT:default",
         "impact": 9,
@@ -3556,7 +2169,7 @@
         "regions": [
           "CHINA"
         ],
-        "headline": "China's Evergrande defaults on dollar debt | Property",
+        "headline": "Chinese real estate giant Evergrande defaults Fitch",
         "total_impact_usd": -126461738.82,
         "total_impact_pct": -0.014876,
         "cet1_after": 0.118167
@@ -3668,30 +2281,18 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2021-12-31T09:00:00Z",
-        "event_class": "GEOPOLITICAL",
-        "scenario": "GEOPOLITICAL:default",
+        "as_of": "2022-01-03T14:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:inflation_hawkish",
         "impact": 8,
-        "n_sources": 3,
+        "n_sources": 6,
         "regions": [
-          "US"
+          "EM"
         ],
-        "headline": "Huawei's revenue drops as US sanctions bite",
-        "total_impact_usd": -8091231.32,
-        "total_impact_pct": -0.000952,
-        "cet1_after": 0.129842
-      },
-      {
-        "as_of": "2022-01-04T18:00:00Z",
-        "event_class": "GEOPOLITICAL",
-        "scenario": "GEOPOLITICAL:default",
-        "impact": 8,
-        "n_sources": 2,
-        "regions": [],
-        "headline": "World Bank Group (via Public) / World Bank Group sanctions Bouygues B\u00e2timent International",
-        "total_impact_usd": -8091231.32,
-        "total_impact_pct": -0.000952,
-        "cet1_after": 0.129842
+        "headline": "Turkey's inflation hits 36% amid financial turmoil",
+        "total_impact_usd": -105486896.66,
+        "total_impact_pct": -0.012408,
+        "cet1_after": 0.117699
       },
       {
         "as_of": "2022-01-05T03:00:00Z",
@@ -3750,16 +2351,16 @@
       {
         "as_of": "2022-01-07T17:00:00Z",
         "event_class": "MACROECONOMIC",
-        "scenario": "MACROECONOMIC:default",
+        "scenario": "MACROECONOMIC:growth_scare",
         "impact": 8,
-        "n_sources": 5,
+        "n_sources": 2,
         "regions": [
           "US"
         ],
-        "headline": "The Day - US employers add 199,000 jobs as unemployment falls to 3.9% - News from southeastern Connecticut",
-        "total_impact_usd": -101004496.29,
-        "total_impact_pct": -0.011881,
-        "cet1_after": 0.118311
+        "headline": "US jobless rate sinks to 3.9%; '2021 one of the best years for American workers in decades'",
+        "total_impact_usd": -91854467.91,
+        "total_impact_pct": -0.010805,
+        "cet1_after": 0.120502
       },
       {
         "as_of": "2022-01-10T18:00:00Z",
@@ -3889,6 +2490,32 @@
         "cet1_after": 0.118177
       },
       {
+        "as_of": "2022-01-20T18:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:growth_scare",
+        "impact": 8,
+        "n_sources": 10,
+        "regions": [
+          "US"
+        ],
+        "headline": "US weekly jobless claims rise to 286,000",
+        "total_impact_usd": -91854467.91,
+        "total_impact_pct": -0.010805,
+        "cet1_after": 0.120502
+      },
+      {
+        "as_of": "2022-01-21T17:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:default",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [],
+        "headline": "PA UNEMPLOYMENT RATE DROPS IN DECEMBER",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
+      },
+      {
         "as_of": "2022-01-25T09:00:00Z",
         "event_class": "GEOPOLITICAL",
         "scenario": "GEOPOLITICAL:default",
@@ -3905,9 +2532,9 @@
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
         "impact": 8,
-        "n_sources": 3,
+        "n_sources": 2,
         "regions": [],
-        "headline": "IMF cuts world growth forecasts as Omicron, inflation take an economic toll",
+        "headline": "IMF slashes global growth output as inflation, omicron threaten recovery",
         "total_impact_usd": -101004496.29,
         "total_impact_pct": -0.011881,
         "cet1_after": 0.118311
@@ -3941,20 +2568,6 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2022-01-26T19:00:00Z",
-        "event_class": "OPERATIONAL_ESG",
-        "scenario": "OPERATIONAL_ESG:default",
-        "impact": 8,
-        "n_sources": 4,
-        "regions": [
-          "UK"
-        ],
-        "headline": "Boeing reports large loss on $3.8 bn costs tied to 787 woes",
-        "total_impact_usd": -320136604.22,
-        "total_impact_pct": -0.037658,
-        "cet1_after": 0.095043
-      },
-      {
         "as_of": "2022-01-27T04:00:00Z",
         "event_class": "CREDIT_EVENT",
         "scenario": "CREDIT_EVENT:default",
@@ -3967,6 +2580,32 @@
         "total_impact_usd": -126461738.82,
         "total_impact_pct": -0.014876,
         "cet1_after": 0.118167
+      },
+      {
+        "as_of": "2022-01-27T05:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:default",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [
+          "EUROPE"
+        ],
+        "headline": "Germany cuts 2022 GDP growth forecast on virus woes",
+        "total_impact_usd": -101986825.48,
+        "total_impact_pct": -0.011997,
+        "cet1_after": 0.118177
+      },
+      {
+        "as_of": "2022-01-27T09:00:00Z",
+        "event_class": "OPERATIONAL_ESG",
+        "scenario": "OPERATIONAL_ESG:default",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [],
+        "headline": "Elon Musk launched a rocket seven years ago, now it's going to crash on the Moon",
+        "total_impact_usd": -320136604.22,
+        "total_impact_pct": -0.037658,
+        "cet1_after": 0.095043
       },
       {
         "as_of": "2022-01-27T17:00:00Z",
@@ -4012,18 +2651,6 @@
         "cet1_after": 0.120502
       },
       {
-        "as_of": "2022-02-02T13:00:00Z",
-        "event_class": "OPERATIONAL_ESG",
-        "scenario": "OPERATIONAL_ESG:default",
-        "impact": 8,
-        "n_sources": 2,
-        "regions": [],
-        "headline": "Google Cloud lost $3.1 billion in 2021",
-        "total_impact_usd": -320136604.22,
-        "total_impact_pct": -0.037658,
-        "cet1_after": 0.095043
-      },
-      {
         "as_of": "2022-02-02T17:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:default",
@@ -4038,51 +2665,39 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2022-02-03T16:00:00Z",
+        "as_of": "2022-02-03T22:00:00Z",
+        "event_class": "CREDIT_EVENT",
+        "scenario": "CREDIT_EVENT:default",
+        "impact": 9,
+        "n_sources": 8,
+        "regions": [],
+        "headline": "Historic Dutch bridge will be dismantled for Jeff Bezos' giant superyacht to pass through",
+        "total_impact_usd": -126461738.82,
+        "total_impact_pct": -0.014876,
+        "cet1_after": 0.118167
+      },
+      {
+        "as_of": "2022-02-09T12:00:00Z",
         "event_class": "CREDIT_EVENT",
         "scenario": "CREDIT_EVENT:default",
         "impact": 8,
-        "n_sources": 3,
+        "n_sources": 2,
         "regions": [],
-        "headline": "Jeff Bezos' superyacht won't fit through a historic bridge. So the town is dismantling it.",
+        "headline": "Sri Lanka on brink of sovereign bond default, warn investors",
         "total_impact_usd": -95225915.07,
         "total_impact_pct": -0.011201,
         "cet1_after": 0.121177
       },
       {
-        "as_of": "2022-02-03T22:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:severe",
-        "impact": 10,
-        "n_sources": 8,
-        "regions": [],
-        "headline": "Historic Dutch bridge will be dismantled for Jeff Bezos' giant superyacht to pass through",
-        "total_impact_usd": -483176550.88,
-        "total_impact_pct": -0.056836,
-        "cet1_after": 0.073424
-      },
-      {
-        "as_of": "2022-02-04T22:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:severe",
-        "impact": 10,
-        "n_sources": 5,
-        "regions": [],
-        "headline": "No Request To Dismantle the Vintage Bridge Yet to Make Room for Jeff Bezos' Superyacht",
-        "total_impact_usd": -483176550.88,
-        "total_impact_pct": -0.056836,
-        "cet1_after": 0.073424
-      },
-      {
-        "as_of": "2022-02-10T09:00:00Z",
+        "as_of": "2022-02-10T20:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
         "impact": 8,
-        "n_sources": 2,
+        "n_sources": 16,
         "regions": [
           "US"
         ],
-        "headline": "Stocks lose steam in Asia before U.S. inflation test",
+        "headline": "US inflation climbs 7.5% to hit 40-year high",
         "total_impact_usd": -101004496.29,
         "total_impact_pct": -0.011881,
         "cet1_after": 0.118311
@@ -4173,6 +2788,18 @@
         "n_sources": 2,
         "regions": [],
         "headline": "SA inflation eases, retail sales surge",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
+      },
+      {
+        "as_of": "2022-02-18T05:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:inflation_hawkish",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [],
+        "headline": "Walmart reports strong 4Q results, defying inflation",
         "total_impact_usd": -101004496.29,
         "total_impact_pct": -0.011881,
         "cet1_after": 0.118311
@@ -4311,6 +2938,20 @@
         "cet1_after": 0.129842
       },
       {
+        "as_of": "2022-02-28T17:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:default",
+        "impact": 8,
+        "n_sources": 3,
+        "regions": [
+          "INDIA"
+        ],
+        "headline": "India's GDP growth slows to 5.4 per cent in Q3",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
+      },
+      {
         "as_of": "2022-03-01T19:00:00Z",
         "event_class": "GEOPOLITICAL",
         "scenario": "GEOPOLITICAL:default",
@@ -4356,15 +2997,15 @@
         "as_of": "2022-03-04T12:00:00Z",
         "event_class": "CREDIT_EVENT",
         "scenario": "CREDIT_EVENT:default",
-        "impact": 8,
+        "impact": 9,
         "n_sources": 2,
         "regions": [
           "RUSSIA_UKRAINE"
         ],
         "headline": "Yandex: Russian search engine warns it could default",
-        "total_impact_usd": -95225915.07,
-        "total_impact_pct": -0.011201,
-        "cet1_after": 0.121177
+        "total_impact_usd": -126461738.82,
+        "total_impact_pct": -0.014876,
+        "cet1_after": 0.118167
       },
       {
         "as_of": "2022-03-04T23:00:00Z",
@@ -4418,33 +3059,31 @@
         "event_class": "GEOPOLITICAL",
         "scenario": "GEOPOLITICAL:default",
         "impact": 8,
-        "n_sources": 2,
+        "n_sources": 11,
         "regions": [
-          "RUSSIA_UKRAINE"
-        ],
-        "headline": "Commodities Continue To Soar As Ukraine War Rages",
-        "total_impact_usd": -8091231.32,
-        "total_impact_pct": -0.000952,
-        "cet1_after": 0.129842
-      },
-      {
-        "as_of": "2022-03-09T04:00:00Z",
-        "event_class": "GEOPOLITICAL",
-        "scenario": "GEOPOLITICAL:default",
-        "impact": 8,
-        "n_sources": 83,
-        "regions": [
-          "CHINA",
           "EUROPE",
-          "MIDDLE_EAST",
           "RUSSIA_UKRAINE",
           "UK",
           "US"
         ],
-        "headline": "Markets stagger as Russia sanctions intensify",
+        "headline": "Ukraine crisis: US slaps sanctions on Russian oil",
         "total_impact_usd": -9089235.99,
         "total_impact_pct": -0.001069,
         "cet1_after": 0.129707
+      },
+      {
+        "as_of": "2022-03-09T07:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:inflation_hawkish",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [
+          "CHINA"
+        ],
+        "headline": "China's Feb PPI +8.8% y/y, CPI +0.9% y/y | WSAU News/Talk 550 AM \u00b7 99.9 FM",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
       },
       {
         "as_of": "2022-03-09T07:00:00Z",
@@ -4459,20 +3098,6 @@
         "total_impact_usd": -126461738.82,
         "total_impact_pct": -0.014876,
         "cet1_after": 0.118167
-      },
-      {
-        "as_of": "2022-03-09T08:00:00Z",
-        "event_class": "MACROECONOMIC",
-        "scenario": "MACROECONOMIC:inflation_hawkish",
-        "impact": 8,
-        "n_sources": 2,
-        "regions": [
-          "CHINA"
-        ],
-        "headline": "1st LD: China's CPI up 0.9 pct in February",
-        "total_impact_usd": -101004496.29,
-        "total_impact_pct": -0.011881,
-        "cet1_after": 0.118311
       },
       {
         "as_of": "2022-03-10T16:00:00Z",
@@ -4574,20 +3199,6 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2022-03-16T12:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:default",
-        "impact": 8,
-        "n_sources": 7,
-        "regions": [
-          "RUSSIA_UKRAINE"
-        ],
-        "headline": "Russia faces debt payment amid default fears",
-        "total_impact_usd": -95225915.07,
-        "total_impact_pct": -0.011201,
-        "cet1_after": 0.121177
-      },
-      {
         "as_of": "2022-03-16T19:00:00Z",
         "event_class": "GEOPOLITICAL",
         "scenario": "GEOPOLITICAL:default",
@@ -4614,20 +3225,6 @@
         "total_impact_usd": -101004496.29,
         "total_impact_pct": -0.011881,
         "cet1_after": 0.118311
-      },
-      {
-        "as_of": "2022-03-17T13:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:default",
-        "impact": 8,
-        "n_sources": 12,
-        "regions": [
-          "RUSSIA_UKRAINE"
-        ],
-        "headline": "Russia faces debt payment amid default fears",
-        "total_impact_usd": -95225915.07,
-        "total_impact_pct": -0.011201,
-        "cet1_after": 0.121177
       },
       {
         "as_of": "2022-03-23T16:00:00Z",
@@ -4817,15 +3414,15 @@
         "as_of": "2022-04-06T06:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
-        "impact": 8,
+        "impact": 9,
         "n_sources": 2,
         "regions": [
           "US"
         ],
         "headline": "Asia-Pacific Stocks Slip as 10-Year U.S. Treasury Yield Surges",
-        "total_impact_usd": -101004496.29,
-        "total_impact_pct": -0.011881,
-        "cet1_after": 0.118311
+        "total_impact_usd": -134092042.48,
+        "total_impact_pct": -0.015773,
+        "cet1_after": 0.114405
       },
       {
         "as_of": "2022-04-06T07:00:00Z",
@@ -4915,20 +3512,6 @@
         "cet1_after": 0.120502
       },
       {
-        "as_of": "2022-04-11T21:00:00Z",
-        "event_class": "GEOPOLITICAL",
-        "scenario": "GEOPOLITICAL:default",
-        "impact": 8,
-        "n_sources": 2,
-        "regions": [
-          "RUSSIA_UKRAINE"
-        ],
-        "headline": "Russo-Ukrainian War Projected to Slash Ukraine's GDP by 45 Percent",
-        "total_impact_usd": -8091231.32,
-        "total_impact_pct": -0.000952,
-        "cet1_after": 0.129842
-      },
-      {
         "as_of": "2022-04-12T08:00:00Z",
         "event_class": "CREDIT_EVENT",
         "scenario": "CREDIT_EVENT:default",
@@ -4941,6 +3524,18 @@
         "cet1_after": 0.121177
       },
       {
+        "as_of": "2022-04-12T09:00:00Z",
+        "event_class": "CREDIT_EVENT",
+        "scenario": "CREDIT_EVENT:default",
+        "impact": 9,
+        "n_sources": 5,
+        "regions": [],
+        "headline": "Sri Lanka warns it will default on its foreign debt amid crisis",
+        "total_impact_usd": -126461738.82,
+        "total_impact_pct": -0.014876,
+        "cet1_after": 0.118167
+      },
+      {
         "as_of": "2022-04-12T18:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
@@ -4951,33 +3546,6 @@
         "total_impact_usd": -101004496.29,
         "total_impact_pct": -0.011881,
         "cet1_after": 0.118311
-      },
-      {
-        "as_of": "2022-04-12T19:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:default",
-        "impact": 9,
-        "n_sources": 9,
-        "regions": [],
-        "headline": "Sri Lanka defaults on $51-B debt",
-        "total_impact_usd": -126461738.82,
-        "total_impact_pct": -0.014876,
-        "cet1_after": 0.118167
-      },
-      {
-        "as_of": "2022-04-13T00:00:00Z",
-        "event_class": "GEOPOLITICAL",
-        "scenario": "GEOPOLITICAL:default",
-        "impact": 8,
-        "n_sources": 2,
-        "regions": [
-          "JAPAN",
-          "RUSSIA_UKRAINE"
-        ],
-        "headline": "Japan dental fees to jump as palladium prices surge on Ukraine war",
-        "total_impact_usd": -8091231.32,
-        "total_impact_pct": -0.000952,
-        "cet1_after": 0.129842
       },
       {
         "as_of": "2022-04-13T06:00:00Z",
@@ -4994,6 +3562,18 @@
         "cet1_after": 0.118311
       },
       {
+        "as_of": "2022-04-13T13:00:00Z",
+        "event_class": "CREDIT_EVENT",
+        "scenario": "CREDIT_EVENT:default",
+        "impact": 9,
+        "n_sources": 16,
+        "regions": [],
+        "headline": "Sri Lanka defaults on $51-B debt",
+        "total_impact_usd": -126461738.82,
+        "total_impact_pct": -0.014876,
+        "cet1_after": 0.118167
+      },
+      {
         "as_of": "2022-04-15T07:00:00Z",
         "event_class": "CREDIT_EVENT",
         "scenario": "CREDIT_EVENT:default",
@@ -5004,21 +3584,6 @@
         "total_impact_usd": -126461738.82,
         "total_impact_pct": -0.014876,
         "cet1_after": 0.118167
-      },
-      {
-        "as_of": "2022-04-15T19:00:00Z",
-        "event_class": "GEOPOLITICAL",
-        "scenario": "GEOPOLITICAL:default",
-        "impact": 8,
-        "n_sources": 2,
-        "regions": [
-          "EUROPE",
-          "RUSSIA_UKRAINE"
-        ],
-        "headline": "Russian Rubles-for-Gas Demand Would Break Sanctions, EU Says",
-        "total_impact_usd": -9089235.99,
-        "total_impact_pct": -0.001069,
-        "cet1_after": 0.129707
       },
       {
         "as_of": "2022-04-18T17:00:00Z",
@@ -5033,18 +3598,6 @@
         "total_impact_usd": -8091231.32,
         "total_impact_pct": -0.000952,
         "cet1_after": 0.129842
-      },
-      {
-        "as_of": "2022-04-18T17:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:default",
-        "impact": 8,
-        "n_sources": 9,
-        "regions": [],
-        "headline": "InfoWars Files For Bankruptcy As Alex Jones Faces Mounting Sandy Hook Lawsuits",
-        "total_impact_usd": -95225915.07,
-        "total_impact_pct": -0.011201,
-        "cet1_after": 0.121177
       },
       {
         "as_of": "2022-04-19T09:00:00Z",
@@ -5090,14 +3643,14 @@
       {
         "as_of": "2022-04-20T14:00:00Z",
         "event_class": "OPERATIONAL_ESG",
-        "scenario": "OPERATIONAL_ESG:severe",
-        "impact": 10,
+        "scenario": "OPERATIONAL_ESG:default",
+        "impact": 9,
         "n_sources": 13,
         "regions": [],
         "headline": "Netflix lost viewers for the first time in 10 years, says password sharing is to blame",
-        "total_impact_usd": -518637767.05,
-        "total_impact_pct": -0.061008,
-        "cet1_after": 0.070059
+        "total_impact_usd": -420879509.64,
+        "total_impact_pct": -0.049508,
+        "cet1_after": 0.082728
       },
       {
         "as_of": "2022-04-20T17:00:00Z",
@@ -5126,18 +3679,44 @@
         "cet1_after": 0.118311
       },
       {
+        "as_of": "2022-04-20T19:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:growth_scare",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [
+          "US"
+        ],
+        "headline": "Fannie Mae cuts origination projection, forecasts recession in 2023",
+        "total_impact_usd": -91854467.91,
+        "total_impact_pct": -0.010805,
+        "cet1_after": 0.120502
+      },
+      {
+        "as_of": "2022-04-20T19:00:00Z",
+        "event_class": "OPERATIONAL_ESG",
+        "scenario": "OPERATIONAL_ESG:severe",
+        "impact": 10,
+        "n_sources": 23,
+        "regions": [],
+        "headline": "Freeloaders Beware: Netflix Warns of Massive Crackdown on Password Sharing",
+        "total_impact_usd": -518637767.05,
+        "total_impact_pct": -0.061008,
+        "cet1_after": 0.070059
+      },
+      {
         "as_of": "2022-04-21T11:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
-        "impact": 10,
+        "impact": 9,
         "n_sources": 2,
         "regions": [
           "US"
         ],
         "headline": "Elon Musk Says Govt Figures Understate Magnitude of Inflation",
-        "total_impact_usd": -166889279.04,
-        "total_impact_pct": -0.019631,
-        "cet1_after": 0.110494
+        "total_impact_usd": -134092042.48,
+        "total_impact_pct": -0.015773,
+        "cet1_after": 0.114405
       },
       {
         "as_of": "2022-04-21T13:00:00Z",
@@ -5169,18 +3748,6 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2022-04-25T20:00:00Z",
-        "event_class": "GEOPOLITICAL",
-        "scenario": "GEOPOLITICAL:default",
-        "impact": 8,
-        "n_sources": 4,
-        "regions": [],
-        "headline": "World Military Spending Hits All-Time High \u2013 Report",
-        "total_impact_usd": -8091231.32,
-        "total_impact_pct": -0.000952,
-        "cet1_after": 0.129842
-      },
-      {
         "as_of": "2022-04-25T23:00:00Z",
         "event_class": "GEOPOLITICAL",
         "scenario": "GEOPOLITICAL:default",
@@ -5194,18 +3761,6 @@
         "total_impact_usd": -11704288.59,
         "total_impact_pct": -0.001377,
         "cet1_after": 0.129664
-      },
-      {
-        "as_of": "2022-04-28T16:00:00Z",
-        "event_class": "OPERATIONAL_ESG",
-        "scenario": "OPERATIONAL_ESG:default",
-        "impact": 8,
-        "n_sources": 2,
-        "regions": [],
-        "headline": "Three billion Google Chrome users issued urgent warning over 'danger'",
-        "total_impact_usd": -320136604.22,
-        "total_impact_pct": -0.037658,
-        "cet1_after": 0.095043
       },
       {
         "as_of": "2022-04-28T20:00:00Z",
@@ -5237,20 +3792,6 @@
         "cet1_after": 0.118177
       },
       {
-        "as_of": "2022-04-29T14:00:00Z",
-        "event_class": "GEOPOLITICAL",
-        "scenario": "GEOPOLITICAL:default",
-        "impact": 8,
-        "n_sources": 2,
-        "regions": [
-          "RUSSIA_UKRAINE"
-        ],
-        "headline": "War in Ukraine Brings Commodity Traders Uncomfortable Windfall",
-        "total_impact_usd": -8091231.32,
-        "total_impact_pct": -0.000952,
-        "cet1_after": 0.129842
-      },
-      {
         "as_of": "2022-04-29T18:00:00Z",
         "event_class": "OPERATIONAL_ESG",
         "scenario": "OPERATIONAL_ESG:default",
@@ -5263,30 +3804,15 @@
         "cet1_after": 0.095043
       },
       {
-        "as_of": "2022-05-02T23:00:00Z",
-        "event_class": "GEOPOLITICAL",
-        "scenario": "GEOPOLITICAL:default",
-        "impact": 8,
-        "n_sources": 4,
-        "regions": [
-          "EUROPE",
-          "RUSSIA_UKRAINE"
-        ],
-        "headline": "EU population can expect economic pain from Russian oil embargo, Germany warns",
-        "total_impact_usd": -9089235.99,
-        "total_impact_pct": -0.001069,
-        "cet1_after": 0.129707
-      },
-      {
-        "as_of": "2022-05-03T02:00:00Z",
+        "as_of": "2022-05-03T17:00:00Z",
         "event_class": "MACROECONOMIC",
-        "scenario": "MACROECONOMIC:default",
+        "scenario": "MACROECONOMIC:inflation_hawkish",
         "impact": 8,
         "n_sources": 2,
         "regions": [
           "US"
         ],
-        "headline": "'Bubble' Hitting 50% of Market, Top Investor Warns as Fed Gets Ready to Meet \u2013 NBC Los Angeles",
+        "headline": "Stocks Up, US Yields at 3 Percent as Markets Ready for Fed Hike",
         "total_impact_usd": -101004496.29,
         "total_impact_pct": -0.011881,
         "cet1_after": 0.118311
@@ -5306,11 +3832,11 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2022-05-04T15:00:00Z",
+        "as_of": "2022-05-04T18:00:00Z",
         "event_class": "GEOPOLITICAL",
         "scenario": "GEOPOLITICAL:default",
         "impact": 9,
-        "n_sources": 2,
+        "n_sources": 4,
         "regions": [
           "EUROPE",
           "RUSSIA_UKRAINE"
@@ -5335,7 +3861,7 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2022-05-05T02:00:00Z",
+        "as_of": "2022-05-05T03:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
         "impact": 9,
@@ -5343,7 +3869,7 @@
         "regions": [
           "US"
         ],
-        "headline": "Wall Street closes with sharp gains after Fed's interest rate hike",
+        "headline": "The Dow rallies to its best day since 2020 after the Fed rules out larger rate hikes",
         "total_impact_usd": -134092042.48,
         "total_impact_pct": -0.015773,
         "cet1_after": 0.114405
@@ -5378,7 +3904,35 @@
         "cet1_after": 0.129801
       },
       {
-        "as_of": "2022-05-10T08:00:00Z",
+        "as_of": "2022-05-06T08:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:inflation_hawkish",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [
+          "US"
+        ],
+        "headline": "US hiring was likely strong again in April despite inflation",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
+      },
+      {
+        "as_of": "2022-05-10T04:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:inflation_hawkish",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [
+          "INDIA"
+        ],
+        "headline": "Inflation hits spirits companies' margins",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
+      },
+      {
+        "as_of": "2022-05-11T04:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
         "impact": 8,
@@ -5386,7 +3940,7 @@
         "regions": [
           "CHINA"
         ],
-        "headline": "Asian shares drop to lowest in 2-years on rate hike worries",
+        "headline": "China's CPI up 2.1% in April - China.org.cn",
         "total_impact_usd": -101004496.29,
         "total_impact_pct": -0.011881,
         "cet1_after": 0.118311
@@ -5408,14 +3962,14 @@
       {
         "as_of": "2022-05-11T14:00:00Z",
         "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:default",
-        "impact": 9,
+        "scenario": "CREDIT_EVENT:severe",
+        "impact": 10,
         "n_sources": 2,
         "regions": [],
         "headline": "Colstrip operator Talen Energy files for bankruptcy",
-        "total_impact_usd": -126461738.82,
-        "total_impact_pct": -0.014876,
-        "cet1_after": 0.118167
+        "total_impact_usd": -483176550.88,
+        "total_impact_pct": -0.056836,
+        "cet1_after": 0.073424
       },
       {
         "as_of": "2022-05-11T19:00:00Z",
@@ -5473,6 +4027,18 @@
         "cet1_after": 0.117699
       },
       {
+        "as_of": "2022-05-18T00:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:inflation_hawkish",
+        "impact": 8,
+        "n_sources": 5,
+        "regions": [],
+        "headline": "Walmart's profits take a hit as fuel spikes and consumers react to inflation",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
+      },
+      {
         "as_of": "2022-05-18T12:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
@@ -5482,18 +4048,6 @@
           "UK"
         ],
         "headline": "UK inflation rate hits 40-year high at 9%",
-        "total_impact_usd": -101004496.29,
-        "total_impact_pct": -0.011881,
-        "cet1_after": 0.118311
-      },
-      {
-        "as_of": "2022-05-18T13:00:00Z",
-        "event_class": "MACROECONOMIC",
-        "scenario": "MACROECONOMIC:inflation_hawkish",
-        "impact": 8,
-        "n_sources": 2,
-        "regions": [],
-        "headline": "Target feels inflation's sting in first quarter, shares slip",
         "total_impact_usd": -101004496.29,
         "total_impact_pct": -0.011881,
         "cet1_after": 0.118311
@@ -5527,18 +4081,6 @@
         "cet1_after": 0.121177
       },
       {
-        "as_of": "2022-05-19T18:00:00Z",
-        "event_class": "MACROECONOMIC",
-        "scenario": "MACROECONOMIC:growth_scare",
-        "impact": 8,
-        "n_sources": 2,
-        "regions": [],
-        "headline": "FTSE 100 falls 2.5% as recession fears weigh on markets \u2013 business live",
-        "total_impact_usd": -91854467.91,
-        "total_impact_pct": -0.010805,
-        "cet1_after": 0.120502
-      },
-      {
         "as_of": "2022-05-20T00:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
@@ -5565,6 +4107,20 @@
         "total_impact_usd": -8091231.32,
         "total_impact_pct": -0.000952,
         "cet1_after": 0.129842
+      },
+      {
+        "as_of": "2022-05-20T22:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:growth_scare",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [
+          "US"
+        ],
+        "headline": "Stock market falls into bear market as Americans fear recession",
+        "total_impact_usd": -91854467.91,
+        "total_impact_pct": -0.010805,
+        "cet1_after": 0.120502
       },
       {
         "as_of": "2022-05-23T13:00:00Z",
@@ -5598,20 +4154,20 @@
         "as_of": "2022-05-27T22:00:00Z",
         "event_class": "CREDIT_EVENT",
         "scenario": "CREDIT_EVENT:default",
-        "impact": 8,
+        "impact": 9,
         "n_sources": 2,
         "regions": [],
         "headline": "Akerna (KERN) Announces Corporate Restructuring, Plans Workforce Reduction",
-        "total_impact_usd": -95225915.07,
-        "total_impact_pct": -0.011201,
-        "cet1_after": 0.121177
+        "total_impact_usd": -126461738.82,
+        "total_impact_pct": -0.014876,
+        "cet1_after": 0.118167
       },
       {
-        "as_of": "2022-05-30T09:00:00Z",
+        "as_of": "2022-05-30T17:00:00Z",
         "event_class": "GEOPOLITICAL",
         "scenario": "GEOPOLITICAL:default",
         "impact": 8,
-        "n_sources": 5,
+        "n_sources": 8,
         "regions": [
           "EUROPE",
           "RUSSIA_UKRAINE"
@@ -5677,6 +4233,18 @@
         "cet1_after": 0.118311
       },
       {
+        "as_of": "2022-06-01T06:00:00Z",
+        "event_class": "GEOPOLITICAL",
+        "scenario": "GEOPOLITICAL:default",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [],
+        "headline": "NEPRA hikes power tariff by Rs3.99 per unit",
+        "total_impact_usd": -8091231.32,
+        "total_impact_pct": -0.000952,
+        "cet1_after": 0.129842
+      },
+      {
         "as_of": "2022-06-01T20:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
@@ -5689,13 +4257,13 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2022-06-03T15:00:00Z",
+        "as_of": "2022-06-03T05:00:00Z",
         "event_class": "GEOPOLITICAL",
         "scenario": "GEOPOLITICAL:default",
         "impact": 8,
-        "n_sources": 2,
+        "n_sources": 3,
         "regions": [],
-        "headline": "Power tariff hike jolts business circles",
+        "headline": "NEPRA hikes power tariff by Rs3.99 per unit",
         "total_impact_usd": -8091231.32,
         "total_impact_pct": -0.000952,
         "cet1_after": 0.129842
@@ -5725,6 +4293,20 @@
         "total_impact_usd": -101004496.29,
         "total_impact_pct": -0.011881,
         "cet1_after": 0.118311
+      },
+      {
+        "as_of": "2022-06-07T15:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:growth_scare",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [
+          "UK"
+        ],
+        "headline": "Cazoo axing 15% of workforce to cut costs in face of recession fears",
+        "total_impact_usd": -91854467.91,
+        "total_impact_pct": -0.010805,
+        "cet1_after": 0.120502
       },
       {
         "as_of": "2022-06-08T04:00:00Z",
@@ -5777,6 +4359,46 @@
         "total_impact_usd": -8091231.32,
         "total_impact_pct": -0.000952,
         "cet1_after": 0.129842
+      },
+      {
+        "as_of": "2022-06-09T07:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:inflation_hawkish",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [
+          "US"
+        ],
+        "headline": "UAE: Gold Prices Slip Ahead Of US Inflation Data",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
+      },
+      {
+        "as_of": "2022-06-09T11:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:inflation_hawkish",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [],
+        "headline": "Ghana inflation over 27% in May, hits new 18-year peak",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
+      },
+      {
+        "as_of": "2022-06-09T18:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:inflation_hawkish",
+        "impact": 8,
+        "n_sources": 5,
+        "regions": [
+          "UK"
+        ],
+        "headline": "Johnson warns of 'wage-price spiral' if pay packets rise with inflation | Wilts and Gloucestershire Standard",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
       },
       {
         "as_of": "2022-06-10T07:00:00Z",
@@ -5837,30 +4459,44 @@
         "as_of": "2022-06-10T20:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
-        "impact": 8,
+        "impact": 9,
         "n_sources": 2,
         "regions": [
           "US"
         ],
         "headline": "Dollar up as hot U.S. inflation data backs case for Fed rate hikes",
-        "total_impact_usd": -101004496.29,
-        "total_impact_pct": -0.011881,
-        "cet1_after": 0.118311
+        "total_impact_usd": -134092042.48,
+        "total_impact_pct": -0.015773,
+        "cet1_after": 0.114405
       },
       {
         "as_of": "2022-06-11T18:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
-        "impact": 8,
+        "impact": 9,
         "n_sources": 2,
         "regions": [
           "CHINA",
           "US"
         ],
         "headline": "Oil falls as U.S. inflation data surges, China imposes lockdowns",
-        "total_impact_usd": -101004496.29,
-        "total_impact_pct": -0.011881,
-        "cet1_after": 0.118311
+        "total_impact_usd": -134092042.48,
+        "total_impact_pct": -0.015773,
+        "cet1_after": 0.114405
+      },
+      {
+        "as_of": "2022-06-13T11:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:growth_scare",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [
+          "UK"
+        ],
+        "headline": "UK economy shrinks in April amid fears of severe recession",
+        "total_impact_usd": -91854467.91,
+        "total_impact_pct": -0.010805,
+        "cet1_after": 0.120502
       },
       {
         "as_of": "2022-06-13T12:00:00Z",
@@ -5916,21 +4552,6 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2022-06-15T00:00:00Z",
-        "event_class": "GEOPOLITICAL",
-        "scenario": "GEOPOLITICAL:default",
-        "impact": 8,
-        "n_sources": 2,
-        "regions": [
-          "EUROPE",
-          "RUSSIA_UKRAINE"
-        ],
-        "headline": "Brent Bulls Get a Boost from EU Sanctions on",
-        "total_impact_usd": -9089235.99,
-        "total_impact_pct": -0.001069,
-        "cet1_after": 0.129707
-      },
-      {
         "as_of": "2022-06-15T14:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
@@ -5943,6 +4564,20 @@
         "total_impact_usd": -101004496.29,
         "total_impact_pct": -0.011881,
         "cet1_after": 0.118311
+      },
+      {
+        "as_of": "2022-06-15T21:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:default",
+        "impact": 9,
+        "n_sources": 2,
+        "regions": [
+          "US"
+        ],
+        "headline": "Wall Street rallies in relief after Fed's assurance on rates",
+        "total_impact_usd": -134092042.48,
+        "total_impact_pct": -0.015773,
+        "cet1_after": 0.114405
       },
       {
         "as_of": "2022-06-16T12:00:00Z",
@@ -5983,11 +4618,11 @@
         "cet1_after": 0.118167
       },
       {
-        "as_of": "2022-06-16T17:00:00Z",
+        "as_of": "2022-06-16T21:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:default",
         "impact": 8,
-        "n_sources": 3,
+        "n_sources": 4,
         "regions": [
           "US"
         ],
@@ -6035,20 +4670,6 @@
         "total_impact_usd": -91854467.91,
         "total_impact_pct": -0.010805,
         "cet1_after": 0.120502
-      },
-      {
-        "as_of": "2022-06-17T17:00:00Z",
-        "event_class": "MACROECONOMIC",
-        "scenario": "MACROECONOMIC:inflation_hawkish",
-        "impact": 8,
-        "n_sources": 2,
-        "regions": [
-          "US"
-        ],
-        "headline": "Dow drops over 800 points as investors worry about Fed's rate hikes to slow inflation",
-        "total_impact_usd": -101004496.29,
-        "total_impact_pct": -0.011881,
-        "cet1_after": 0.118311
       },
       {
         "as_of": "2022-06-22T11:00:00Z",
@@ -6105,20 +4726,6 @@
         "cet1_after": 0.129842
       },
       {
-        "as_of": "2022-06-27T14:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:default",
-        "impact": 9,
-        "n_sources": 4,
-        "regions": [
-          "RUSSIA_UKRAINE"
-        ],
-        "headline": "Russia slips into default zone as payment deadline up",
-        "total_impact_usd": -126461738.82,
-        "total_impact_pct": -0.014876,
-        "cet1_after": 0.118167
-      },
-      {
         "as_of": "2022-06-27T16:00:00Z",
         "event_class": "GEOPOLITICAL",
         "scenario": "GEOPOLITICAL:default",
@@ -6131,21 +4738,6 @@
         "total_impact_usd": -10695833.61,
         "total_impact_pct": -0.001258,
         "cet1_after": 0.129801
-      },
-      {
-        "as_of": "2022-06-28T10:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:default",
-        "impact": 9,
-        "n_sources": 17,
-        "regions": [
-          "RUSSIA_UKRAINE",
-          "US"
-        ],
-        "headline": "Fears of first Russian debt default for a century as interest payments deadline missed",
-        "total_impact_usd": -126461738.82,
-        "total_impact_pct": -0.014876,
-        "cet1_after": 0.118167
       },
       {
         "as_of": "2022-06-28T16:00:00Z",
@@ -6161,21 +4753,6 @@
         "total_impact_usd": -8091231.32,
         "total_impact_pct": -0.000952,
         "cet1_after": 0.129842
-      },
-      {
-        "as_of": "2022-06-30T11:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:default",
-        "impact": 9,
-        "n_sources": 20,
-        "regions": [
-          "RUSSIA_UKRAINE",
-          "US"
-        ],
-        "headline": "Fears of first Russian debt default for a century as interest payments deadline missed",
-        "total_impact_usd": -126461738.82,
-        "total_impact_pct": -0.014876,
-        "cet1_after": 0.118167
       },
       {
         "as_of": "2022-06-30T17:00:00Z",
@@ -6214,20 +4791,6 @@
         "total_impact_usd": -126461738.82,
         "total_impact_pct": -0.014876,
         "cet1_after": 0.118167
-      },
-      {
-        "as_of": "2022-07-05T06:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:default",
-        "impact": 9,
-        "n_sources": 2,
-        "regions": [
-          "EUROPE"
-        ],
-        "headline": "ECB's Nagel Warns Crisis-Tool Use Can Lead to 'Dire Straits'",
-        "total_impact_usd": -127603957.76,
-        "total_impact_pct": -0.01501,
-        "cet1_after": 0.118006
       },
       {
         "as_of": "2022-07-05T10:00:00Z",
@@ -6335,13 +4898,13 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2022-07-08T03:00:00Z",
+        "as_of": "2022-07-07T21:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:growth_scare",
         "impact": 8,
-        "n_sources": 2,
+        "n_sources": 3,
         "regions": [],
-        "headline": "Oil up $5 as tight supply outweighs recession fears",
+        "headline": "Canada headed toward \"moderate\" recession: RBC",
         "total_impact_usd": -91854467.91,
         "total_impact_pct": -0.010805,
         "cet1_after": 0.120502
@@ -6357,6 +4920,20 @@
         "total_impact_usd": -126461738.82,
         "total_impact_pct": -0.014876,
         "cet1_after": 0.118167
+      },
+      {
+        "as_of": "2022-07-08T16:00:00Z",
+        "event_class": "GEOPOLITICAL",
+        "scenario": "GEOPOLITICAL:default",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [
+          "RUSSIA_UKRAINE"
+        ],
+        "headline": "Russia's War in Ukraine Is Driving Global Inflation and Hitting Markets",
+        "total_impact_usd": -8091231.32,
+        "total_impact_pct": -0.000952,
+        "cet1_after": 0.129842
       },
       {
         "as_of": "2022-07-13T09:00:00Z",
@@ -6425,20 +5002,6 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2022-07-15T03:00:00Z",
-        "event_class": "MACROECONOMIC",
-        "scenario": "MACROECONOMIC:default",
-        "impact": 8,
-        "n_sources": 2,
-        "regions": [
-          "CHINA"
-        ],
-        "headline": "Chinese Markets Slip as Asia Stocks Fall Ahead of China GDP Data",
-        "total_impact_usd": -101004496.29,
-        "total_impact_pct": -0.011881,
-        "cet1_after": 0.118311
-      },
-      {
         "as_of": "2022-07-15T05:00:00Z",
         "event_class": "CREDIT_EVENT",
         "scenario": "CREDIT_EVENT:default",
@@ -6451,28 +5014,30 @@
         "cet1_after": 0.121177
       },
       {
-        "as_of": "2022-07-20T00:00:00Z",
+        "as_of": "2022-07-15T10:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:default",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [
+          "CHINA"
+        ],
+        "headline": "China Q2 GDP Growth Seen Dipping To 1% On COVID Hit, 2022 Growth At 4%",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
+      },
+      {
+        "as_of": "2022-07-20T04:00:00Z",
         "event_class": "OPERATIONAL_ESG",
         "scenario": "OPERATIONAL_ESG:default",
         "impact": 8,
-        "n_sources": 4,
+        "n_sources": 7,
         "regions": [],
         "headline": "Netflix loses nearly 1 million subscribers, and its stock soars",
         "total_impact_usd": -320136604.22,
         "total_impact_pct": -0.037658,
         "cet1_after": 0.095043
-      },
-      {
-        "as_of": "2022-07-20T07:00:00Z",
-        "event_class": "OPERATIONAL_ESG",
-        "scenario": "OPERATIONAL_ESG:default",
-        "impact": 9,
-        "n_sources": 10,
-        "regions": [],
-        "headline": "Netflix Lost Nearly a Million Subscribers Last Quarter",
-        "total_impact_usd": -420879509.64,
-        "total_impact_pct": -0.049508,
-        "cet1_after": 0.082728
       },
       {
         "as_of": "2022-07-20T08:00:00Z",
@@ -6505,13 +5070,13 @@
         "as_of": "2022-07-21T08:00:00Z",
         "event_class": "OPERATIONAL_ESG",
         "scenario": "OPERATIONAL_ESG:default",
-        "impact": 9,
+        "impact": 8,
         "n_sources": 15,
         "regions": [],
         "headline": "Netflix Lost Nearly a Million Subscribers Last Quarter",
-        "total_impact_usd": -420879509.64,
-        "total_impact_pct": -0.049508,
-        "cet1_after": 0.082728
+        "total_impact_usd": -320136604.22,
+        "total_impact_pct": -0.037658,
+        "cet1_after": 0.095043
       },
       {
         "as_of": "2022-07-25T13:00:00Z",
@@ -6528,16 +5093,16 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2022-07-25T22:00:00Z",
+        "as_of": "2022-07-25T23:00:00Z",
         "event_class": "MACROECONOMIC",
-        "scenario": "MACROECONOMIC:inflation_hawkish",
+        "scenario": "MACROECONOMIC:growth_scare",
         "impact": 8,
-        "n_sources": 3,
+        "n_sources": 2,
         "regions": [],
-        "headline": "Walmart Cuts Profit Guidance as It Sees Slower Growth Due to Inflation",
-        "total_impact_usd": -101004496.29,
-        "total_impact_pct": -0.011881,
-        "cet1_after": 0.118311
+        "headline": "Midwest supply managers, bankers fear recession; June indexes across region fall",
+        "total_impact_usd": -91854467.91,
+        "total_impact_pct": -0.010805,
+        "cet1_after": 0.120502
       },
       {
         "as_of": "2022-07-26T21:00:00Z",
@@ -6566,18 +5131,6 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2022-07-27T09:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:severe",
-        "impact": 10,
-        "n_sources": 2,
-        "regions": [],
-        "headline": "Lloyds profits fall as it sets aside \u00a3377m for loan defaults over living costs",
-        "total_impact_usd": -483176550.88,
-        "total_impact_pct": -0.056836,
-        "cet1_after": 0.073424
-      },
-      {
         "as_of": "2022-07-28T01:00:00Z",
         "event_class": "GEOPOLITICAL",
         "scenario": "GEOPOLITICAL:default",
@@ -6592,6 +5145,18 @@
         "total_impact_usd": -8091231.32,
         "total_impact_pct": -0.000952,
         "cet1_after": 0.129842
+      },
+      {
+        "as_of": "2022-07-28T05:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:inflation_hawkish",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [],
+        "headline": "Stock market: Investor confidence falls as inflation soars",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
       },
       {
         "as_of": "2022-07-28T10:00:00Z",
@@ -6718,16 +5283,28 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2022-08-06T18:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:default",
+        "as_of": "2022-08-05T15:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:growth_scare",
         "impact": 8,
         "n_sources": 2,
         "regions": [],
+        "headline": "Instant View: Canada loses 30,600 jobs in July, jobless rate remains at record low 4.9%",
+        "total_impact_usd": -91854467.91,
+        "total_impact_pct": -0.010805,
+        "cet1_after": 0.120502
+      },
+      {
+        "as_of": "2022-08-06T18:00:00Z",
+        "event_class": "CREDIT_EVENT",
+        "scenario": "CREDIT_EVENT:default",
+        "impact": 9,
+        "n_sources": 2,
+        "regions": [],
         "headline": "Credit Suisse at big risk from Credito Real bankruptcy \u2013 media",
-        "total_impact_usd": -95225915.07,
-        "total_impact_pct": -0.011201,
-        "cet1_after": 0.121177
+        "total_impact_usd": -126461738.82,
+        "total_impact_pct": -0.014876,
+        "cet1_after": 0.118167
       },
       {
         "as_of": "2022-08-09T04:00:00Z",
@@ -6800,16 +5377,16 @@
       {
         "as_of": "2022-08-10T21:00:00Z",
         "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:default",
-        "impact": 9,
+        "scenario": "CREDIT_EVENT:severe",
+        "impact": 10,
         "n_sources": 2,
         "regions": [
           "INDIA"
         ],
         "headline": "New Credit Rating Rules Could See 100 Firms Downgraded Ratings Bodies",
-        "total_impact_usd": -126461738.82,
-        "total_impact_pct": -0.014876,
-        "cet1_after": 0.118167
+        "total_impact_usd": -483176550.88,
+        "total_impact_pct": -0.056836,
+        "cet1_after": 0.073424
       },
       {
         "as_of": "2022-08-11T15:00:00Z",
@@ -6919,20 +5496,6 @@
         "cet1_after": 0.118311
       },
       {
-        "as_of": "2022-08-18T00:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:severe",
-        "impact": 10,
-        "n_sources": 2,
-        "regions": [
-          "US"
-        ],
-        "headline": "Weighed Down by Opioid Litigation, Endo International Files for Bankruptcy",
-        "total_impact_usd": -483176550.88,
-        "total_impact_pct": -0.056836,
-        "cet1_after": 0.073424
-      },
-      {
         "as_of": "2022-08-18T06:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
@@ -6960,6 +5523,20 @@
         "total_impact_usd": -126461738.82,
         "total_impact_pct": -0.014876,
         "cet1_after": 0.118167
+      },
+      {
+        "as_of": "2022-08-22T08:00:00Z",
+        "event_class": "CREDIT_EVENT",
+        "scenario": "CREDIT_EVENT:default",
+        "impact": 8,
+        "n_sources": 3,
+        "regions": [
+          "US"
+        ],
+        "headline": "Cineworld (LON:CINE) Says It Considers Filing for Bankruptcy in the US",
+        "total_impact_usd": -95225915.07,
+        "total_impact_pct": -0.011201,
+        "cet1_after": 0.121177
       },
       {
         "as_of": "2022-08-22T08:00:00Z",
@@ -7014,13 +5591,13 @@
         "cet1_after": 0.120361
       },
       {
-        "as_of": "2022-08-24T05:00:00Z",
+        "as_of": "2022-08-24T00:00:00Z",
         "event_class": "CREDIT_EVENT",
         "scenario": "CREDIT_EVENT:default",
         "impact": 8,
         "n_sources": 2,
         "regions": [],
-        "headline": "Aha! airlines files for bankruptcy",
+        "headline": "Regional airline operator ExpressJet files for bankruptcy",
         "total_impact_usd": -95225915.07,
         "total_impact_pct": -0.011201,
         "cet1_after": 0.121177
@@ -7052,7 +5629,7 @@
         "cet1_after": 0.129842
       },
       {
-        "as_of": "2022-08-25T18:00:00Z",
+        "as_of": "2022-08-25T16:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:growth_scare",
         "impact": 8,
@@ -7060,21 +5637,21 @@
         "regions": [
           "US"
         ],
-        "headline": "US economy contracts in second quarter; underlying data show no recession",
+        "headline": "US:  Weekly Initial Jobless Claims decline to 243K vs. 253K expected",
         "total_impact_usd": -91854467.91,
         "total_impact_pct": -0.010805,
         "cet1_after": 0.120502
       },
       {
-        "as_of": "2022-08-26T18:00:00Z",
+        "as_of": "2022-08-26T16:00:00Z",
         "event_class": "MACROECONOMIC",
-        "scenario": "MACROECONOMIC:default",
+        "scenario": "MACROECONOMIC:inflation_hawkish",
         "impact": 9,
         "n_sources": 2,
         "regions": [
           "US"
         ],
-        "headline": "Stocks slump after Fed dashes hopes for easing up on rates",
+        "headline": "US consumer spending misses expectation in July; inflation slows",
         "total_impact_usd": -134092042.48,
         "total_impact_pct": -0.015773,
         "cet1_after": 0.114405
@@ -7158,16 +5735,18 @@
         "cet1_after": 0.120502
       },
       {
-        "as_of": "2022-09-01T19:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:default",
-        "impact": 9,
-        "n_sources": 6,
-        "regions": [],
-        "headline": "Zambia gets US$1.3 bln IMF bailout in progress for G-20 debt relief plan; Kwacha surges in value on 'amazing' deal",
-        "total_impact_usd": -126461738.82,
-        "total_impact_pct": -0.014876,
-        "cet1_after": 0.118167
+        "as_of": "2022-09-02T16:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:default",
+        "impact": 8,
+        "n_sources": 4,
+        "regions": [
+          "US"
+        ],
+        "headline": "US Economy Adds 315,000 New Jobs, Unemployment Rate Rises in Sign of Slowing Labor Market",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
       },
       {
         "as_of": "2022-09-07T18:00:00Z",
@@ -7292,15 +5871,15 @@
         "cet1_after": 0.121177
       },
       {
-        "as_of": "2022-09-12T22:00:00Z",
+        "as_of": "2022-09-12T21:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:inflation_hawkish",
         "impact": 8,
-        "n_sources": 3,
+        "n_sources": 2,
         "regions": [
           "US"
         ],
-        "headline": "Wall Street Extended 4-day Rally Ahead of Inflation Report",
+        "headline": "Wall Street rallies ahead of high-stakes inflation report",
         "total_impact_usd": -101004496.29,
         "total_impact_pct": -0.011881,
         "cet1_after": 0.118311
@@ -7467,18 +6046,6 @@
         "cet1_after": 0.120502
       },
       {
-        "as_of": "2022-09-19T12:00:00Z",
-        "event_class": "CREDIT_EVENT",
-        "scenario": "CREDIT_EVENT:default",
-        "impact": 8,
-        "n_sources": 2,
-        "regions": [],
-        "headline": "Ola lays off 200 engineers in a major restructuring exercise",
-        "total_impact_usd": -95225915.07,
-        "total_impact_pct": -0.011201,
-        "cet1_after": 0.121177
-      },
-      {
         "as_of": "2022-09-19T13:00:00Z",
         "event_class": "MACROECONOMIC",
         "scenario": "MACROECONOMIC:growth_scare",
@@ -7491,6 +6058,20 @@
         "total_impact_usd": -91854467.91,
         "total_impact_pct": -0.010805,
         "cet1_after": 0.120502
+      },
+      {
+        "as_of": "2022-09-19T21:00:00Z",
+        "event_class": "MACROECONOMIC",
+        "scenario": "MACROECONOMIC:inflation_hawkish",
+        "impact": 8,
+        "n_sources": 2,
+        "regions": [
+          "US"
+        ],
+        "headline": "US stocks rise ahead of expected interest rate hike by Fed",
+        "total_impact_usd": -101004496.29,
+        "total_impact_pct": -0.011881,
+        "cet1_after": 0.118311
       },
       {
         "as_of": "2022-09-21T06:00:00Z",
@@ -7536,18 +6117,18 @@
         "cet1_after": 0.114405
       },
       {
-        "as_of": "2022-09-22T14:00:00Z",
+        "as_of": "2022-09-22T10:00:00Z",
         "event_class": "MACROECONOMIC",
-        "scenario": "MACROECONOMIC:default",
+        "scenario": "MACROECONOMIC:growth_scare",
         "impact": 8,
-        "n_sources": 3,
+        "n_sources": 2,
         "regions": [
-          "UK"
+          "EUROPE"
         ],
-        "headline": "UK 'in recession' as Bank of England announces highest interest rates hike since 2008",
-        "total_impact_usd": -101004496.29,
-        "total_impact_pct": -0.011881,
-        "cet1_after": 0.118311
+        "headline": "German Deutsche Bank economists predict long and deep recession in Europe",
+        "total_impact_usd": -92883823.51,
+        "total_impact_pct": -0.010926,
+        "cet1_after": 0.120361
       },
       {
         "as_of": "2022-09-23T19:00:00Z",
@@ -7578,8 +6159,8 @@
     ],
     "_provenance": {
       "script": "riskpulse stress --replay",
-      "generated_at": "2026-10-02T12:25:42+00:00",
-      "git_commit": "afcd9da"
+      "generated_at": "2026-10-02T16:19:17+00:00",
+      "git_commit": "2677491"
     }
   },
   "entity_linking": {
@@ -7686,21 +6267,21 @@
       "n_tickers": 20,
       "abs_car01": {
         "impact_v1": {
-          "spearman_rho": 0.0577,
-          "p_value": 0.000593,
+          "spearman_rho": 0.0618,
+          "p_value": 0.000237,
           "decile_means": [
-            0.017006,
-            0.015757,
-            0.016132,
-            0.018141,
-            0.017342,
-            0.017338,
-            0.018445,
-            0.022337,
-            0.020426,
-            0.024674
+            0.014854,
+            0.018075,
+            0.01485,
+            0.017309,
+            0.018674,
+            0.018685,
+            0.016881,
+            0.019895,
+            0.023017,
+            0.025352
           ],
-          "top_decile_hit_rate": 0.1667
+          "top_decile_hit_rate": 0.161
         },
         "abs_sent": {
           "spearman_rho": 0.1289,
@@ -7720,27 +6301,27 @@
           "top_decile_hit_rate": 0.2486
         },
         "rho_diff_v1_minus_abs_sent_95ci": [
-          -0.097,
-          -0.0426
+          -0.0951,
+          -0.0376
         ]
       },
       "abn_volume": {
         "impact_v1": {
-          "spearman_rho": 0.0988,
-          "p_value": 3.82e-09,
+          "spearman_rho": 0.1092,
+          "p_value": 7.52e-11,
           "decile_means": [
-            -0.053573,
-            -0.098545,
-            -0.136778,
-            -0.036487,
-            -0.081446,
-            -0.046266,
-            -0.042657,
-            0.000176,
-            0.029013,
-            0.078825
+            -0.07175,
+            -0.082525,
+            -0.107481,
+            -0.103874,
+            -0.068022,
+            -0.054574,
+            -0.020388,
+            -0.005287,
+            0.055157,
+            0.070878
           ],
-          "top_decile_hit_rate": 0.1412
+          "top_decile_hit_rate": 0.1384
         },
         "abs_sent": {
           "spearman_rho": 0.1304,
@@ -7760,8 +6341,8 @@
           "top_decile_hit_rate": 0.1977
         },
         "rho_diff_v1_minus_abs_sent_95ci": [
-          -0.0589,
-          -0.0044
+          -0.0481,
+          0.0076
         ]
       }
     },
@@ -7770,21 +6351,21 @@
       "n_tickers": 20,
       "abs_car01": {
         "impact_v1": {
-          "spearman_rho": 0.0729,
-          "p_value": 4.8e-07,
+          "spearman_rho": 0.0693,
+          "p_value": 1.75e-06,
           "decile_means": [
-            0.01572,
-            0.015889,
-            0.014954,
-            0.016979,
-            0.016508,
-            0.01658,
-            0.017382,
-            0.020815,
-            0.021224,
-            0.024123
+            0.014431,
+            0.017207,
+            0.014528,
+            0.016468,
+            0.017222,
+            0.017485,
+            0.016699,
+            0.018897,
+            0.022339,
+            0.024902
           ],
-          "top_decile_hit_rate": 0.1702
+          "top_decile_hit_rate": 0.1723
         },
         "abs_sent": {
           "spearman_rho": 0.1202,
@@ -7804,27 +6385,27 @@
           "top_decile_hit_rate": 0.2437
         },
         "rho_diff_v1_minus_abs_sent_95ci": [
-          -0.0717,
-          -0.0249
+          -0.076,
+          -0.0267
         ]
       },
       "abn_volume": {
         "impact_v1": {
-          "spearman_rho": 0.1091,
-          "p_value": 4.5e-14,
+          "spearman_rho": 0.1127,
+          "p_value": 6.34e-15,
           "decile_means": [
-            -0.068024,
-            -0.089385,
-            -0.122453,
-            -0.036091,
-            -0.08557,
-            -0.052507,
-            -0.03282,
-            -0.003461,
-            0.029776,
-            0.106374
+            -0.065637,
+            -0.085748,
+            -0.09606,
+            -0.105658,
+            -0.061899,
+            -0.046542,
+            -0.030791,
+            0.000165,
+            0.036401,
+            0.101498
           ],
-          "top_decile_hit_rate": 0.1744
+          "top_decile_hit_rate": 0.1786
         },
         "abs_sent": {
           "spearman_rho": 0.1338,
@@ -7844,8 +6425,8 @@
           "top_decile_hit_rate": 0.2185
         },
         "rho_diff_v1_minus_abs_sent_95ci": [
-          -0.0479,
-          0.0004
+          -0.0453,
+          0.0045
         ]
       }
     },
@@ -7854,8 +6435,8 @@
     "note": "v1 raw score has no fitted parameters (weights set a priori).",
     "_provenance": {
       "script": "riskpulse eval impact",
-      "generated_at": "2026-10-02T12:22:20+00:00",
-      "git_commit": "afcd9da"
+      "generated_at": "2026-10-02T16:16:56+00:00",
+      "git_commit": "2677491"
     }
   },
   "pipeline": {
@@ -7892,53 +6473,53 @@
       "tickers_dropped_no_prices": 84,
       "train_ticker_days": 124436,
       "valid_ticker_days": 29079,
-      "best_iteration": 134,
-      "n_trees": 134,
+      "best_iteration": 302,
+      "n_trees": 302,
       "feature_importance_gain": {
-        "S": 721.5,
-        "T": 148.3,
-        "V": 1725.7,
+        "S": 749.7,
+        "T": 164.1,
+        "V": 1756.5,
         "B": 0.0,
-        "N": 177.4,
+        "N": 181.6,
         "C": 0.0,
         "R": 0.0,
-        "log_n": 3740.4
+        "log_n": 3694.8
       },
       "json_evaluator_max_abs_diff_vs_lightgbm": 0.0,
       "validation_abs_car01": {
         "n": 29079,
         "impact_v2": {
-          "spearman_rho": 0.1915,
-          "p_value": 2.68e-238,
-          "top_decile_hit_rate": 0.2424,
+          "spearman_rho": 0.1922,
+          "p_value": 6.36e-240,
+          "top_decile_hit_rate": 0.2445,
           "decile_means": [
-            0.018337,
-            0.020298,
-            0.022818,
-            0.022144,
-            0.02381,
-            0.02631,
-            0.027322,
-            0.028918,
-            0.033341,
-            0.048457
+            0.018328,
+            0.020334,
+            0.022265,
+            0.0231,
+            0.023859,
+            0.025548,
+            0.027748,
+            0.028708,
+            0.033217,
+            0.048648
           ]
         },
         "impact_v1": {
-          "spearman_rho": 0.0747,
-          "p_value": 3.07e-37,
-          "top_decile_hit_rate": 0.1403,
+          "spearman_rho": 0.073,
+          "p_value": 1.15e-35,
+          "top_decile_hit_rate": 0.132,
           "decile_means": [
-            0.021432,
-            0.021358,
-            0.028783,
-            0.031139,
-            0.027537,
-            0.025124,
-            0.021818,
-            0.024606,
-            0.036439,
-            0.033518
+            0.020992,
+            0.018399,
+            0.029151,
+            0.031503,
+            0.032215,
+            0.025807,
+            0.023405,
+            0.022994,
+            0.034866,
+            0.032425
           ]
         },
         "abs_sent": {
@@ -7959,12 +6540,12 @@
           ]
         },
         "rho_diff_v2_minus_abs_sent_95ci": [
-          -0.0324,
-          -0.0144
+          -0.0317,
+          -0.014
         ],
         "rho_diff_v2_minus_v1_95ci": [
-          0.108,
-          0.1256
+          0.1101,
+          0.1285
         ]
       }
     },
@@ -7972,37 +6553,37 @@
       "abs_car01": {
         "n": 3538,
         "impact_v2": {
-          "spearman_rho": 0.1287,
-          "p_value": 1.54e-14,
-          "top_decile_hit_rate": 0.2486,
+          "spearman_rho": 0.129,
+          "p_value": 1.35e-14,
+          "top_decile_hit_rate": 0.2542,
           "decile_means": [
-            0.015454,
-            0.016396,
-            0.015929,
-            0.016936,
-            0.015062,
-            0.01578,
-            0.017701,
-            0.019418,
-            0.024067,
-            0.030849
+            0.014965,
+            0.016993,
+            0.015767,
+            0.016579,
+            0.015595,
+            0.015926,
+            0.017524,
+            0.019866,
+            0.022815,
+            0.031563
           ]
         },
         "impact_v1": {
-          "spearman_rho": 0.0577,
-          "p_value": 0.000593,
-          "top_decile_hit_rate": 0.1667,
+          "spearman_rho": 0.0618,
+          "p_value": 0.000237,
+          "top_decile_hit_rate": 0.161,
           "decile_means": [
-            0.017006,
-            0.015757,
-            0.016132,
-            0.018141,
-            0.017342,
-            0.017338,
-            0.018445,
-            0.022337,
-            0.020426,
-            0.024674
+            0.014854,
+            0.018075,
+            0.01485,
+            0.017309,
+            0.018674,
+            0.018685,
+            0.016881,
+            0.019895,
+            0.023017,
+            0.025352
           ]
         },
         "abs_sent": {
@@ -8023,48 +6604,48 @@
           ]
         },
         "rho_diff_v2_minus_abs_sent_95ci": [
-          -0.0221,
+          -0.0219,
           0.0242
         ],
         "rho_diff_v2_minus_v1_95ci": [
-          0.0443,
-          0.0964
+          0.0406,
+          0.0954
         ]
       },
       "abn_volume": {
         "n": 3538,
         "impact_v2": {
-          "spearman_rho": 0.1154,
-          "p_value": 5.87e-12,
-          "top_decile_hit_rate": 0.2655,
+          "spearman_rho": 0.117,
+          "p_value": 2.94e-12,
+          "top_decile_hit_rate": 0.2682,
           "decile_means": [
-            -0.071211,
-            -0.080573,
-            -0.064396,
-            -0.097282,
-            -0.114718,
-            -0.078428,
-            -0.048764,
-            -0.018719,
-            -0.008933,
-            0.195098
+            -0.072432,
+            -0.077168,
+            -0.065756,
+            -0.101632,
+            -0.116304,
+            -0.066859,
+            -0.049045,
+            -0.026308,
+            -0.01606,
+            0.203623
           ]
         },
         "impact_v1": {
-          "spearman_rho": 0.0988,
-          "p_value": 3.82e-09,
-          "top_decile_hit_rate": 0.1412,
+          "spearman_rho": 0.1092,
+          "p_value": 7.52e-11,
+          "top_decile_hit_rate": 0.1384,
           "decile_means": [
-            -0.053573,
-            -0.098545,
-            -0.136778,
-            -0.036487,
-            -0.081446,
-            -0.046266,
-            -0.042657,
-            0.000176,
-            0.029013,
-            0.078825
+            -0.07175,
+            -0.082525,
+            -0.107481,
+            -0.103874,
+            -0.068022,
+            -0.054574,
+            -0.020388,
+            -0.005287,
+            0.055157,
+            0.070878
           ]
         },
         "abs_sent": {
@@ -8085,12 +6666,12 @@
           ]
         },
         "rho_diff_v2_minus_abs_sent_95ci": [
-          -0.0379,
-          0.008
+          -0.0362,
+          0.0099
         ],
         "rho_diff_v2_minus_v1_95ci": [
-          -0.0094,
-          0.0423
+          -0.0192,
+          0.0345
         ]
       }
     },
@@ -8098,37 +6679,37 @@
       "abs_car01": {
         "n": 4755,
         "impact_v2": {
-          "spearman_rho": 0.1247,
-          "p_value": 5.96e-18,
-          "top_decile_hit_rate": 0.2416,
+          "spearman_rho": 0.1241,
+          "p_value": 8.66e-18,
+          "top_decile_hit_rate": 0.2563,
           "decile_means": [
-            0.014519,
-            0.015801,
-            0.015473,
-            0.01562,
-            0.015273,
-            0.015684,
-            0.016711,
-            0.018591,
-            0.023265,
-            0.029237
+            0.014391,
+            0.015943,
+            0.015143,
+            0.016009,
+            0.015135,
+            0.015991,
+            0.016531,
+            0.018857,
+            0.021992,
+            0.030179
           ]
         },
         "impact_v1": {
-          "spearman_rho": 0.0729,
-          "p_value": 4.8e-07,
-          "top_decile_hit_rate": 0.1702,
+          "spearman_rho": 0.0693,
+          "p_value": 1.75e-06,
+          "top_decile_hit_rate": 0.1723,
           "decile_means": [
-            0.01572,
-            0.015889,
-            0.014954,
-            0.016979,
-            0.016508,
-            0.01658,
-            0.017382,
-            0.020815,
-            0.021224,
-            0.024123
+            0.014431,
+            0.017207,
+            0.014528,
+            0.016468,
+            0.017222,
+            0.017485,
+            0.016699,
+            0.018897,
+            0.022339,
+            0.024902
           ]
         },
         "abs_sent": {
@@ -8149,12 +6730,12 @@
           ]
         },
         "rho_diff_v2_minus_abs_sent_95ci": [
-          -0.0157,
-          0.0244
+          -0.0164,
+          0.0239
         ],
         "rho_diff_v2_minus_v1_95ci": [
-          0.0292,
-          0.0748
+          0.0301,
+          0.0779
         ]
       }
     },
@@ -8166,8 +6747,8 @@
     ],
     "_provenance": {
       "script": "riskpulse eval impact_v2",
-      "generated_at": "2026-10-02T12:25:23+00:00",
-      "git_commit": "afcd9da"
+      "generated_at": "2026-10-02T16:19:04+00:00",
+      "git_commit": "2677491"
     }
   },
   "moduleB_validation": {
@@ -8309,16 +6890,15 @@
         "class": "MACROECONOMIC",
         "status": "stress test fired on the event date",
         "trigger": {
-          "as_of": "2022-06-15T00:00:00Z",
-          "impact_score": 8,
+          "as_of": "2022-06-15T21:00:00Z",
+          "impact_score": 9,
           "n_sources": 2,
           "regions": [
-            "UK",
             "US"
           ]
         },
-        "headline": "Sterling slides as US ramps up inflation fight",
-        "scenario": "MACROECONOMIC:inflation_hawkish",
+        "headline": "Wall Street rallies in relief after Fed's assurance on rates",
+        "scenario": "MACROECONOMIC:default",
         "analogues": [
           "taper_tantrum_2013"
         ],
@@ -8329,44 +6909,44 @@
         "factors": [
           {
             "factor": "eq_SPY",
-            "predicted": -0.033304,
+            "predicted": -0.044405,
             "realised": 0.0217,
-            "error": -0.055004,
+            "error": -0.066105,
             "same_sign": false
           },
           {
             "factor": "eq_Energy",
-            "predicted": -0.041374,
+            "predicted": -0.055165,
             "realised": -0.12311,
-            "error": 0.081736,
+            "error": 0.067945,
             "same_sign": true
           },
           {
             "factor": "eq_Financials",
-            "predicted": -0.035458,
+            "predicted": -0.047278,
             "realised": 0.019467,
-            "error": -0.054925,
+            "error": -0.066745,
             "same_sign": false
           },
           {
             "factor": "eq_Information Technology",
-            "predicted": -0.033791,
+            "predicted": -0.045054,
             "realised": 0.024628,
-            "error": -0.058419,
+            "error": -0.069682,
             "same_sign": false
           },
           {
             "factor": "eq_EUROPE",
-            "predicted": -0.052647,
+            "predicted": -0.070196,
             "realised": 0.016452,
-            "error": -0.069099,
+            "error": -0.086648,
             "same_sign": false
           },
           {
             "factor": "rates_10y_bp",
-            "predicted": 36.240005,
+            "predicted": 48.320007,
             "realised": -39.00001,
-            "error": 75.240015,
+            "error": 87.320017,
             "same_sign": false
           },
           {
@@ -8378,68 +6958,68 @@
           },
           {
             "factor": "credit_bbb_bp",
-            "predicted": 3.0,
+            "predicted": 4.0,
             "realised": 25.0,
-            "error": -22.0,
+            "error": -21.0,
             "same_sign": true
           },
           {
             "factor": "oil",
-            "predicted": -0.006115,
+            "predicted": -0.008153,
             "realised": -0.076936,
-            "error": 0.070821,
+            "error": 0.068783,
             "same_sign": true
           },
           {
             "factor": "fx_EUR",
-            "predicted": 0.009971,
+            "predicted": 0.013294,
             "realised": 0.010408,
-            "error": -0.000437,
+            "error": 0.002886,
             "same_sign": true
           },
           {
             "factor": "fx_GBP",
-            "predicted": 0.004986,
+            "predicted": 0.006648,
             "realised": 0.003706,
-            "error": 0.00128,
+            "error": 0.002942,
             "same_sign": true
           },
           {
             "factor": "fx_JPY",
-            "predicted": 0.022818,
+            "predicted": 0.030424,
             "realised": -0.013392,
-            "error": 0.03621,
+            "error": 0.043816,
             "same_sign": false
           },
           {
             "factor": "usd_index",
-            "predicted": -0.010231,
+            "predicted": -0.013642,
             "realised": -0.003885,
-            "error": -0.006346,
+            "error": -0.009757,
             "same_sign": true
           },
           {
             "factor": "vol_vix_pts",
-            "predicted": 4.044001,
+            "predicted": 5.392001,
             "realised": -4.529999,
-            "error": 8.574,
+            "error": 9.922,
             "same_sign": false
           }
         ],
         "sign_agreement": 0.429,
-        "book_total_impact_predicted": -101004590.25,
+        "book_total_impact_predicted": -134092070.48,
         "book_total_impact_realised": 36709417.96,
-        "capital_losses_predicted": 101004590.254132,
+        "capital_losses_predicted": 134092070.484478,
         "capital_losses_realised": -36709417.96379,
-        "cet1_after_predicted": 0.118311,
+        "cet1_after_predicted": 0.114404,
         "cet1_after_realised": 0.134238
       }
     },
     "note": "Out-of-sample: calibration used only episodes ending before 2021-09-30. Reported, not tuned.",
     "_provenance": {
       "script": "riskpulse eval predicted_vs_realised",
-      "generated_at": "2026-10-02T12:25:42+00:00",
-      "git_commit": "afcd9da"
+      "generated_at": "2026-10-02T16:19:18+00:00",
+      "git_commit": "2677491"
     }
   },
   "sentiment_finetune": {
@@ -8566,48 +7146,53 @@
       "2022-09-30"
     ],
     "vs_abs_spy_return": {
-      "spearman_rho": -0.0334,
-      "p_value": 0.649,
+      "spearman_rho": -0.0155,
+      "p_value": 0.833,
       "ci95": [
-        -0.1653,
-        0.0988
+        -0.1514,
+        0.1194
       ]
     },
     "vs_abs_dvix": {
-      "spearman_rho": -0.0368,
-      "p_value": 0.616,
+      "spearman_rho": -0.0316,
+      "p_value": 0.667,
       "ci95": [
-        -0.1703,
-        0.1077
+        -0.1694,
+        0.1158
       ]
     },
     "by_max_impact": {
+      "6": {
+        "n_days": 1,
+        "mean_abs_spy_ret": 0.0155,
+        "mean_abs_dvix_pts": 0.22
+      },
       "7": {
-        "n_days": 36,
-        "mean_abs_spy_ret": 0.0114,
-        "mean_abs_dvix_pts": 1.2133
+        "n_days": 26,
+        "mean_abs_spy_ret": 0.011,
+        "mean_abs_dvix_pts": 1.1931
       },
       "8": {
-        "n_days": 84,
-        "mean_abs_spy_ret": 0.0121,
-        "mean_abs_dvix_pts": 1.5305
+        "n_days": 94,
+        "mean_abs_spy_ret": 0.0118,
+        "mean_abs_dvix_pts": 1.5077
       },
       "9": {
-        "n_days": 61,
-        "mean_abs_spy_ret": 0.0123,
-        "mean_abs_dvix_pts": 1.6436
+        "n_days": 58,
+        "mean_abs_spy_ret": 0.0129,
+        "mean_abs_dvix_pts": 1.7009
       },
       "10": {
-        "n_days": 7,
-        "mean_abs_spy_ret": 0.0092,
-        "mean_abs_dvix_pts": 0.5171
+        "n_days": 9,
+        "mean_abs_spy_ret": 0.0089,
+        "mean_abs_dvix_pts": 0.5011
       }
     },
     "note": "Descriptive only (D-042); nothing is tuned on it.",
     "_provenance": {
       "script": "riskpulse eval impact_market_check",
-      "generated_at": "2026-10-02T12:25:26+00:00",
-      "git_commit": "afcd9da"
+      "generated_at": "2026-10-02T16:19:08+00:00",
+      "git_commit": "2677491"
     }
   },
   "events_round2_cv": {

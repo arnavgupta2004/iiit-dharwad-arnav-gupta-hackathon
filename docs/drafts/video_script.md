@@ -1,7 +1,7 @@
 # RiskPulse: 5-minute demo video script (DRAFT)
 
 Status: DRAFT v2, numbers filled from `reports/metrics.json` after the final rerun (D-051, tag `v1.0-baseline`).
-Lines marked **[R2]** depend on event classification and are refreshed once after round 2 (gold-2). Target length 4:30 to 5:00 (spec §2). Record at 1440p or
+Updated after round 2 (D-055). Target length 4:30 to 5:00 (spec §2). Record at 1440p or
 1080p, browser at 100% zoom, light theme, terminal font at least 16 pt. Upload as YouTube **Unlisted** and test
 the link in an incognito window.
 
@@ -87,7 +87,7 @@ On screen: Module B page.
 Actions:
 1. Trigger timeline: point to the cluster on 2022-02-24.
 2. Select the triggered run of 2022-02-24 06:00 UTC ("Global market plunges, stocks dive after Vladimir Putin
-   launches military operations in Ukraine") **[R2]**: show total impact, CET1 before/after,
+   launches military operations in Ukraine"): show total impact, CET1 before/after,
    top-10 worst positions, the scenario explainer (analogues and severity).
 3. Scroll to "Out-of-sample check: 2022 predicted vs realised".
 4. (Optional, if time) Inject demo event (labelled synthetic) to show a live trigger.
@@ -98,8 +98,8 @@ Voice-over:
 > USD 10 billion synthetic book: loans, bonds, swaps, FX, options and CDS. Here is the invasion morning: a loss of
 > about USD 10.7 million and CET1 from 13.00% to 12.98%. Then the honest part: on the 2022 episodes, which we
 > never trained on, the invasion scenario got 9 of 14 factor directions right but badly underestimated the oil
-> shock, and the June FOMC scenario predicted a sell-off into what became a relief rally. Both are listed as next
-> steps, not tuned away." **[R2]**
+> shock. On FOMC day it even fired on a 'relief rally' headline but applied a stress scenario: our scenarios don't
+> yet read direction or surprise. Both are listed as next steps, not tuned away."
 
 ---
 
@@ -110,11 +110,11 @@ On screen: Model Quality page (sentiment table, event classifier, impact compari
 Voice-over:
 > "All results are produced by one command, `riskpulse eval all`, and every number in the README comes from it.
 > Sentiment: fine-tuning reached 0.84 macro-F1 in-domain, but on hand-labelled live headlines it scores 0.55, level
-> with base FinBERT at 0.59 and ahead of the VADER lexicon at 0.47. Event classification: 0.59 on the gold set, level
-> with keyword and zero-shot baselines at 0.61 [R2]. Impact: the learned model beats the hand-set formula, 0.13
+> with base FinBERT at 0.59 and ahead of the VADER lexicon at 0.47. Event classification: on a blind test of 200 new
+> labels it scores 0.56, within noise of the keyword and zero-shot baselines. Impact: the learned model beats the hand-set formula, 0.13
 > against 0.06 Spearman, and is on par with sentiment strength alone for predicting the market reaction. The
-> pipeline scores 140 items per second on a laptop CPU and filters 2,527 high-impact items down to 349 stress tests
-> a year." [R2]
+> pipeline scores 140 items per second on a laptop CPU and filters 2,613 high-impact items down to 349 stress tests
+> a year."
 
 ---
 

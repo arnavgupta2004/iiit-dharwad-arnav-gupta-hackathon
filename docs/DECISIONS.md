@@ -4,6 +4,42 @@ Newest first within each date. Each entry: decision, rationale, and status (acce
 
 ## 2026-10-02 (event classification round 2, approved by Arnav)
 
+### D-055 Round 2 outcome: gold-2 test (once) and the downstream rerun
+**Gold-2** (`reports/events_gold2.json`, predictions in `reports/events_gold2_predictions.csv`; n = 200, 160 news / 40
+tweets; evaluated once, commit 2677491). Macro-F1 over 10 classes; last column = 95% paired-bootstrap CI of
+F1(C1) − F1(method), for all / news / tweets:
+
+| Method | All | News | Tweets | Accuracy (all) | CI of C1 − method (all / news / tweets) |
+|---|---|---|---|---|---|
+| C1 (deployed) | 0.559 | 0.610 | 0.197 | 0.640 | - |
+| Previous model | 0.577 | 0.625 | 0.207 | 0.635 | [-0.0801, 0.032] / [-0.0822, 0.0407] / [-0.0475, 0.0168] |
+| Keyword | 0.595 | 0.660 | 0.216 | 0.700 | [-0.1261, 0.0487] / [-0.1487, 0.0562] / [-0.0505, 0.0043] |
+| Zero-shot base | 0.578 | 0.662 | 0.035 | 0.545 | [-0.0804, 0.0983] / [-0.13, 0.0744] / [0.0428, 0.1853] |
+| Zero-shot large (ref.) | 0.513 | 0.568 | 0.079 | 0.575 | [-0.0566, 0.1374] / [-0.0792, 0.1414] / [-0.0112, 0.1512] |
+
+**Reading.** On an independent test the deployed C1 is **statistically indistinguishable** from the previous model,
+the keyword baseline and both zero-shot models on all items and on news (every CI includes 0). The point estimates
+put the keyword baseline highest (0.595). The only CI excluding 0 is tweets vs zero-shot base, in C1's favour.
+Tweets have 40 items over 10 classes, so their macro-F1 is unstable. **Round 2 did not improve event classification.**
+C1 is deployed as pre-registered. Label mix: OTHER 98, GEOPOLITICAL 33, MACRO 27, and 1 MANAGEMENT_CHANGE item.
+**Reported only (D-052):** gold-2 sentiment with the deployed rule: news fine-tuned 0.383 vs
+FinBERT 0.553; tweets 0.430 vs 0.429
+(no CI computed; no decision taken). Entity-link precision on gold-2: 89.8%
+(Wilson 95% CI 82.7-94.2%,
+n = 108).
+**Downstream (mechanical, D-052 step 6).** Benzinga class features recomputed with C1; v2 retrained (302 trees).
+The validation check passed: ρ v2 0.192 vs v1 0.073,
+CI of v2 − v1 [0.1101, 0.1285], so **v2 stays for company signals**. Test (n 3,538): v2
+0.129, v1 0.062, abs(sentiment) 0.129;
+v2 − v1 [0.0406, 0.0954], v2 − abs(s) [-0.0219, 0.0242]. Market-wide check: ρ
+-0.015 with abs(SPY), -0.032 with abs(ΔVIX) (CIs span 0).
+Module B: 2,613 candidates, 464 triggers, **349 stress runs**.
+2022 check: the invasion is unchanged (06:00 UTC, 9 of 14 signs). FOMC fires at 21:00 UTC on 2022-06-15 on "Wall
+Street rallies in relief after Fed's assurance on rates" (impact 9), but the macro scenario is a stress by
+construction: −USD 134.1 m predicted vs +USD 36.7 m realised, 6 of 14 signs. This illustrates the direction and
+surprise limitation. Committed models (D-054): `data/trained/event_clf_round2.pkl`, `data/trained/impact_v2.json`
+(+ `.txt`, meta).
+
 ### D-054 Model-file policy: small trained artifacts are committed (Arnav)
 Large model weights (> 20 MB) are never committed; they are hosted on the Hugging Face Hub (the fine-tuned sentiment
 model, 438 MB, `arnavguptas/riskpulse-finbert-tweets`). Small trained artifacts that the reported system needs
@@ -137,6 +173,9 @@ attached are listed separately at the end.
 | 7 | GATE C | 2022 predicted vs realised (D-040) | realised factor moves | No; misses written up as limitations |
 | 8 | Final rerun (D-046) | Gold events (first time), sentiment gold (same numbers as D-048), all evals recomputed once with the final models | all | Reported as final (D-051) |
 | 9 | After D-051 | Gold events re-scored with identical predictions only to add per-subset CIs (Arnav) | gold labels | No; numbers unchanged |
+| 10 | Round 2 (D-053) | Gold-1 cross-validation for selection (gold-1 = training data from here on) | gold-1 labels | Yes: selected C1, by the pre-registered rule |
+| 11 | Round 2 (D-055) | Gold-2 evaluated once | gold-2 labels | No; C1 deployed as pre-registered |
+| 12 | Round 2 downstream (D-055) | v2 retrained (validation check), impact evals, triggers, Module B and 2022 check rerun with C1 | abnormal returns, trigger counts, realised factor moves | No parameter changed from them |
 
 Not outcome looks (recorded for completeness): GKG pilot and linking rules (D-017, D-020) inspected texts and links;
 D-035 fitted bins on burn-in raw-impact distributions; the FOMC-day investigation in D-040 read impact values of

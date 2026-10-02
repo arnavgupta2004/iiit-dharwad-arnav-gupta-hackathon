@@ -141,28 +141,29 @@ All figures below are generated from `reports/metrics.json` by `scripts/render_r
 
 The in-domain gain does not transfer: on live text the two models are statistically indistinguishable (point estimates favour FinBERT); the pre-registered rule therefore keeps the fine-tuned model.
 
-**Event classification** (FINAL on Arnav's gold set (results.gold); other sets are reference only)
+**Event classification: final test on gold-2** (n = 200, Arnav's labels, evaluated once; model fixed before the labels were read, D-052/D-053). Macro-F1 over 10 classes:
+
+| Method | All (n 200) | News (n 160) | Tweets (n 40) | C1 − method, 95% CI (all) |
+|---|---|---|---|---|
+| **Deployed: C1** (weak labels + gold-1) | 0.559 | 0.610 | 0.197 | - |
+| Previous model (weak labels only) | 0.577 | 0.625 | 0.207 | [-0.0801, 0.032] |
+| Keyword baseline | 0.595 | 0.660 | 0.216 | [-0.1261, 0.0487] |
+| Zero-shot NLI (base) | 0.578 | 0.662 | 0.035 | [-0.0804, 0.0983] |
+| Zero-shot NLI (large, reference; too slow for the feed on CPU) | 0.513 | 0.568 | 0.079 | [-0.0566, 0.1374] |
+
+Selection by cross-validation on gold-1 (15 folds): C1 0.600, C2 0.606, C3 0.605; the one-SE rule chose C1 (D-053). GEOPOLITICAL is cross-border only (D-044).
+
+In-domain reference sets (not the final test):
 
 | Evaluation set | Method | n | Macro-F1 |
 |---|---|---|---|
-| **gold: all** | primary_embed_lr | 300 | 0.593 |
-| **gold: all** | keyword_baseline | 300 | 0.612 |
-| **gold: all** | zero_shot | 300 | 0.612 |
-| **gold: news headlines** | primary_embed_lr | 237 | 0.616 |
-| **gold: news headlines** | keyword_baseline | 237 | 0.657 |
-| **gold: news headlines** | zero_shot | 237 | 0.640 |
-| **gold: tweets** | primary_embed_lr | 63 | 0.399 |
-| **gold: tweets** | keyword_baseline | 63 | 0.389 |
-| **gold: tweets** | zero_shot | 63 | 0.396 |
 | in-domain (HF topic data) | keyword_baseline | 2,900 | 0.538 |
-| in-domain (HF topic data) | primary_embed_lr | 2,900 | 0.712 |
-| weak-label hold-out (circular) | keyword_baseline | 1,892 | 0.970 |
-| weak-label hold-out (circular) | primary_embed_lr | 1,892 | 0.760 |
+| in-domain (HF topic data) | primary_embed_lr | 2,900 | 0.713 |
+| weak-label hold-out (circular) | keyword_baseline | 1,893 | 0.947 |
+| weak-label hold-out (circular) | primary_embed_lr | 1,893 | 0.750 |
 | in-domain (HF topic data, subsample) | zero_shot | 516 | 0.697 |
 | in-domain (HF topic data, subsample) | keyword_baseline | 516 | 0.576 |
-| in-domain (HF topic data, subsample) | primary_embed_lr | 516 | 0.819 |
-
-On the gold set (live-feed text) the trained classifier is not better than the keyword or zero-shot baselines; paired-bootstrap 95% CIs of the macro-F1 difference: all: vs keyword [-0.0711, 0.033], vs zero-shot [-0.073, 0.0341]; news headlines: vs keyword [-0.0937, 0.0102], vs zero-shot [-0.0809, 0.0345]; tweets: vs keyword [-0.0858, 0.1208], vs zero-shot [-0.1016, 0.137]. Its higher score on HF topic data is in-domain (it trains on that dataset). The deployed model stays the trained classifier (the a-priori choice). GEOPOLITICAL is cross-border only (D-044).
+| in-domain (HF topic data, subsample) | primary_embed_lr | 516 | 0.808 |
 
 **Entity linking:** precision 82.0% on 100 hand-checked headline links (95% Wilson CI 73.3%–88.3%).
 
@@ -181,15 +182,15 @@ Returns (secondary; net of 5 bps costs; a sentiment-tilt demonstration, not an a
 
 Turnover cap 5% one-way per day, set by policy for operational realism (D-045), not optimised on returns.
 
-**Module B** (replay 2021-09 to 2022-09): 2,527 high-impact candidates, 470 triggers fired (29 escalations), 349 stress runs. Cooldown: 24 h per event class and macro-region, re-run within it only on higher impact. Stress runs per month: 2021-09 1, 2021-10 24, 2021-11 17, 2021-12 21, 2022-01 24, 2022-02 22, 2022-03 31, 2022-04 37, 2022-05 30, 2022-06 38, 2022-07 35, 2022-08 38, 2022-09 31. First runs:
+**Module B** (replay 2021-09 to 2022-09): 2,613 high-impact candidates, 464 triggers fired (29 escalations), 349 stress runs. Cooldown: 24 h per event class and macro-region, re-run within it only on higher impact. Stress runs per month: 2021-09 2, 2021-10 24, 2021-11 16, 2021-12 22, 2022-01 27, 2022-02 22, 2022-03 28, 2022-04 33, 2022-05 31, 2022-06 40, 2022-07 34, 2022-08 39, 2022-09 31. First runs:
 
 | Trigger time (UTC) | Scenario | Impact | Sources | Total impact | CET1 after |
 |---|---|---|---|---|---|
 | 2021-09-30T14:00 | MACROECONOMIC:default | 8 | 2 | -1.19% | 11.83% |
-| 2021-10-04T11:00 | GEOPOLITICAL:default | 9 | 2 | -0.13% | 12.98% |
+| 2021-09-30T16:00 | MACROECONOMIC:growth_scare | 9 | 3 | -1.44% | 11.72% |
 | 2021-10-04T14:00 | GEOPOLITICAL:default | 8 | 4 | -0.10% | 12.98% |
 | 2021-10-05T14:00 | OPERATIONAL_ESG:default | 8 | 78 | -3.77% | 9.50% |
-| 2021-10-05T15:00 | OPERATIONAL_ESG:default | 8 | 2 | -3.77% | 9.50% |
+| 2021-10-06T05:00 | MACROECONOMIC:inflation_hawkish | 8 | 2 | -1.19% | 11.83% |
 | 2021-10-06T08:00 | CREDIT_EVENT:default | 9 | 2 | -1.49% | 11.82% |
 | 2021-10-06T16:00 | CREDIT_EVENT:default | 9 | 2 | -1.49% | 11.82% |
 | 2021-10-06T20:00 | CREDIT_EVENT:default | 8 | 2 | -1.12% | 12.12% |
@@ -204,20 +205,20 @@ Turnover cap 5% one-way per day, set by policy for operational realism (D-045), 
 
 | Score | Spearman vs abs(CAR) | Top-decile hit rate (10% by chance) | Spearman vs abnormal volume |
 |---|---|---|---|
-| Impact v2 (learned on Benzinga ≤ 2018) | 0.129 | 24.9% | 0.115 |
-| Impact v1 (spec formula; live for market-wide items) | 0.058 | 16.7% | 0.099 |
+| Impact v2 (learned on Benzinga ≤ 2018) | 0.129 | 25.4% | 0.117 |
+| Impact v1 (spec formula; live for market-wide items) | 0.062 | 16.1% | 0.109 |
 | abs(sentiment) only (baseline) | 0.129 | 24.9% | 0.130 |
 
-95% bootstrap CI of the Spearman difference: v2 − v1 [0.0443, 0.0964], v2 − abs(sentiment) [-0.0221, 0.0242]. **Impact v2 is on par with abs(sentiment) for predicting the market reaction and adds explainable drivers; it clearly beats the hand-set v1.** It scores company mentions live; market-wide items keep v1. Adoption: the stricter rule written before the first test (beat both v1 and abs(sentiment)) was not met; the rule was revised after that test to the spec's "beats v1" on validation and test (D-039), which is met.
+95% bootstrap CI of the Spearman difference: v2 − v1 [0.0406, 0.0954], v2 − abs(sentiment) [-0.0219, 0.0242]. **Impact v2 is on par with abs(sentiment) for predicting the market reaction and adds explainable drivers; it clearly beats the hand-set v1.** It scores company mentions live; market-wide items keep v1. Adoption: the stricter rule written before the first test (beat both v1 and abs(sentiment)) was not met; the rule was revised after that test to the spec's "beats v1" on validation and test (D-039), which is met.
 
-**Market-wide impact (v1), descriptive check (D-042):** over 188 sessions the day's maximum market-wide impact has Spearman -0.033 with abs(SPY return) (CI [-0.1653, 0.0988]) and -0.037 with abs(ΔVIX) (CI [-0.1703, 0.1077]): no measurable relation.
+**Market-wide impact (v1), descriptive check (D-042):** over 188 sessions the day's maximum market-wide impact has Spearman -0.015 with abs(SPY return) (CI [-0.1514, 0.1194]) and -0.032 with abs(ΔVIX) (CI [-0.1694, 0.1158]): no measurable relation.
 
 **Module B out-of-sample check (2022 episodes; scenarios calibrated before Sep 2021 only)**
 
 | Episode | Status | Sign agreement | Book impact predicted | Book impact realised |
 |---|---|---|---|---|
 | russia_ukraine_2022 (2022-02-24) | fired on the day | 64.3% | -USD 10.7 m | +USD 1.6 m |
-| fomc_june_2022 (2022-06-15) | fired on the day | 42.9% | -USD 101.0 m | +USD 36.7 m |
+| fomc_june_2022 (2022-06-15) | fired on the day | 42.9% | -USD 134.1 m | +USD 36.7 m |
 
 **Sentiment fine-tune experiment** (FinBERT on tweet train split only, 45-min CPU budget): test macro-F1 0.844 vs bar 0.661; kept (beats FinBERT 0.661).
 
@@ -231,8 +232,9 @@ to a named historical episode.
 **Limitations (measured, not assumed).**
 - Fine-tuning helped in-domain (0.844) but not on live-feed text, where it is statistically indistinguishable from
   base FinBERT (gold check above).
-- The trained event classifier is not better than keyword or zero-shot baselines on the gold set; its weak labels lean
-  on tweet-style text.
+- Event classification: two rounds, including adding 300 hand labels (selected by cross-validation, then tested
+  once on 200 new labels), did not beat the keyword or zero-shot baselines. On the independent test all differences
+  are within noise, and the keyword baseline has the highest point estimate.
 - Impact v2 matches abs(sentiment) for predicting the market reaction, without beating it. Market-wide impact (v1)
   shows no measurable relation to SPY or VIX moves.
 - Geopolitical scenarios average risk-off and supply-shock analogues, so the 2022 invasion's oil move was badly
