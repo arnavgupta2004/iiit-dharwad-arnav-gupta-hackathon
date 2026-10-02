@@ -4,6 +4,20 @@ Newest first within each date. Each entry: decision, rationale, and status (acce
 
 ## 2026-10-02 (event classification round 2, approved by Arnav)
 
+### D-057 PRE-REGISTERED before computing: pooled news check of the sentiment model (Arnav)
+Prompted by new evidence: on gold-2 news, which D-055 reported only, the fine-tuned model scored 0.383 against 0.553 for
+FinBERT. Recorded and committed before the pooled statistic is computed.
+- **Items:** all NEWS items of gold-1 and gold-2 (`source == gdelt`): 237 + 160 = **397**.
+- **Prediction, identical for both models:** the deployed rule of D-041 (entity-level score for the first linked
+  ticker, clause-level when 2+ companies are linked, ±0.15 band).
+- **Statistic:** macro-F1 over {negative, neutral, positive}; paired bootstrap of F1(fine-tuned) − F1(FinBERT),
+  2,000 resamples, seed 20261002, 95% percentile CI. Computed **once** (`riskpulse eval sentiment_news_pooled`).
+- **Rule:** if the CI lies entirely below 0, apply D-041's pre-specified alternative branch: **FinBERT for news, the
+  fine-tuned model for tweets** (by document source type: social → fine-tuned, everything else → FinBERT, including the
+  Benzinga event study). Otherwise keep the current setup (fine-tuned everywhere).
+- **If the switch happens,** it is recorded as a post-hoc revision prompted by new evidence (as in D-039), because
+  the pooled test was defined after gold-2 sentiment had been seen.
+
 ### D-056 Large local caches on an external drive (Arnav, disk space)
 The internal disk fell to 315 MB free (floor: 3 GB). Deleted: the large zero-shot model (879 MB, a one-off reference),
 the pip cache and the superseded combined stage-1 cache. Moved to a local external drive (exFAT,
