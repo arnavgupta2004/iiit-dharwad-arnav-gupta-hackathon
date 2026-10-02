@@ -1,8 +1,9 @@
 """Batch mode: run the engine over the whole replay feed and persist outputs.
 
-Stage 1 (models) is cached in ``data/processed/cache/stage1_*`` keyed by the feed file's hash,
-so re-runs (e.g. re-binning impact) only repeat stage 2. Impact bins are fitted on the burn-in
-period (configs/impact.yaml) from a first stage-2 pass, then stage 2 runs again with them.
+Stage 1 (models) is cached in ``data/processed/cache/stage1_*`` keyed by the feed file's hash and a
+fingerprint of the sentiment and event models, so re-runs (e.g. re-binning impact) only repeat
+stage 2. Impact bins are fitted on the burn-in period (configs/impact.yaml) from a first stage-2
+pass, then stage 2 runs again with them.
 """
 
 from __future__ import annotations
@@ -41,9 +42,23 @@ def _feed_hash() -> str:
     return h.hexdigest()[:12]
 
 
+def _models_key() -> str:
+    """Fingerprint of the stage-1 models, so a model change never reuses stale cached scores."""
+    from riskpulse.engine.pipeline import EVENT_MODEL_PATH
+    from riskpulse.engine.sentiment import resolve_model
+
+    h = hashlib.sha1()
+    name, origin = resolve_model()
+    h.update(f"{origin}|{name if origin in ('base', 'base_fallback') else 'finetuned'}".encode())
+    event_model = repo_root() / EVENT_MODEL_PATH
+    if event_model.exists():
+        h.update(event_model.read_bytes())
+    return h.hexdigest()[:8]
+
+
 def run_stage1(batch_size: int = 128, limit: int | None = None) -> list[DocScore]:
-    """Score every feed document with the models (cached)."""
-    key = _feed_hash() + (f"_n{limit}" if limit else "")
+    """Score every feed document with the models (cached by feed and model fingerprint)."""
+    key = f"{_feed_hash()}_{_models_key()}" + (f"_n{limit}" if limit else "")
     meta_path = data_path("processed", "cache", f"stage1_{key}.parquet")
     emb_path = data_path("processed", "cache", f"stage1_{key}_emb.npy")
     docs = list(iter_feed())

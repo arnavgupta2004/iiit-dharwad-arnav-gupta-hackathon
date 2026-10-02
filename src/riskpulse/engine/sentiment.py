@@ -15,8 +15,11 @@ from functools import cache, cached_property
 
 import numpy as np
 
-from riskpulse.common.config import load_config
+from riskpulse.common.config import load_config, repo_root
+from riskpulse.common.logging import get_logger
 from riskpulse.engine.entities import MKT, EntityLinker
+
+log = get_logger()
 
 LABELS = ("positive", "negative", "neutral")
 
@@ -40,6 +43,54 @@ def label_from_score(score: float, pos: float | None = None, neg: float | None =
     return "neutral"
 
 
+def _has_weights(path) -> bool:
+    return (path / "config.json").exists() and any(path.glob("*.safetensors"))
+
+
+@cache
+def resolve_model(variant: str | None = None) -> tuple[str, str]:
+    """Weights to score with, as (name or path, origin). Logs the choice.
+
+    ``finbert``: the base model. ``finetuned`` (D-043): Hugging Face Hub repo, else the local copy
+    built by ``scripts/build_finetuned_sentiment.py`` (run automatically if
+    ``RISKPULSE_BUILD_SENTIMENT=1``; about 25 CPU minutes), else the base model with a warning.
+    """
+    cfg = load_config("app")["sentiment"]
+    variant = variant or cfg.get("variant", "finbert")
+    base = cfg["model"]
+    if variant == "finbert":
+        log.info(f"sentiment model: base {base}")
+        return base, "base"
+    if variant != "finetuned":
+        raise ValueError(f"unknown sentiment variant {variant!r}")
+    ft = cfg["finetuned"]
+    if ft.get("hub_repo"):
+        try:
+            from huggingface_hub import snapshot_download
+
+            path = snapshot_download(ft["hub_repo"])
+            log.info(f"sentiment model: fine-tuned from the Hub ({ft['hub_repo']})")
+            return path, "hub"
+        except Exception as exc:  # offline, missing repo, rate limit
+            log.warning(
+                f"sentiment model: Hub download failed ({type(exc).__name__}); trying local"
+            )
+    local = repo_root() / ft["local_dir"]
+    if not _has_weights(local) and os.environ.get("RISKPULSE_BUILD_SENTIMENT") == "1":
+        from riskpulse.eval.finetune_sentiment import build
+
+        log.info("sentiment model: rebuilding the fine-tuned model locally (train split only)")
+        build()
+    if _has_weights(local):
+        log.info(f"sentiment model: fine-tuned, local copy {ft['local_dir']}")
+        return str(local), "local"
+    log.warning(
+        "sentiment model: fine-tuned weights unavailable; FALLING BACK to base FinBERT. "
+        "Run `python scripts/build_finetuned_sentiment.py` to rebuild them."
+    )
+    return base, "base_fallback"
+
+
 @dataclass(frozen=True)
 class SentimentResult:
     score: float
@@ -52,9 +103,12 @@ class SentimentResult:
 class FinBertScorer:
     """Batched CPU FinBERT scorer (ProsusAI/finbert, id2label verified as pos/neg/neu)."""
 
-    def __init__(self, model_name: str | None = None) -> None:
+    def __init__(self, model_name: str | None = None, variant: str | None = None) -> None:
         cfg = load_config("app")["sentiment"]
-        self.model_name = model_name or cfg["model"]
+        if model_name:
+            self.model_name, self.origin = model_name, "explicit"
+        else:
+            self.model_name, self.origin = resolve_model(variant)
         self.batch_size = int(cfg["batch_size"])
         self.max_length = int(cfg["max_length"])
         self.device = torch_device()
@@ -74,6 +128,8 @@ class FinBertScorer:
 
     @property
     def version(self) -> str:
+        if self.origin in ("hub", "local"):
+            return "finbert-tweets-ft"
         return f"finbert@{self.model_name}"
 
     def probs(self, texts: list[str]) -> np.ndarray:

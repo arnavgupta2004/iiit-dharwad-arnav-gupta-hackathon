@@ -30,7 +30,12 @@ dashboard:
   port: 8501
 
 sentiment:
-  model: ProsusAI/finbert
+  model: ProsusAI/finbert           # base model (and the last-resort fallback)
+  # Which weights the engine scores with (D-043): finbert | finetuned. Switched in the final rerun (D-046).
+  variant: finbert
+  finetuned:
+    hub_repo: null                  # "<hf-username>/riskpulse-finbert-tweets" once Arnav has uploaded it
+    local_dir: data/processed/models/finbert_tweets_ft   # written by scripts/build_finetuned_sentiment.py
   positive_threshold: 0.15          # spec default; eval also reports a band tuned on HF train only
   negative_threshold: -0.15
   batch_size: 32

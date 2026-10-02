@@ -8,7 +8,9 @@ budget. The fine-tuned model is kept only if its test macro-F1 beats FinBERT's 0
 
 from __future__ import annotations
 
+import os
 import time
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -25,7 +27,11 @@ OUT_DIR = data_path("processed", "models", "finbert_tweets_ft")
 HP = {"lr": 2e-5, "batch": 32, "max_len": 64, "epochs": 3, "warmup_frac": 0.1, "seed": 20261002}
 
 
-def run() -> dict:
+def _train() -> tuple:
+    """Fine-tune on 90% of train with the remaining 10% as dev; returns the best-dev model.
+
+    Returns (model, tokenizer, predict_fn, base_name, n_train, n_dev, history, stop_reason).
+    """
     import torch
     from torch.utils.data import DataLoader, TensorDataset
     from transformers import (
@@ -35,13 +41,13 @@ def run() -> dict:
     )
 
     torch.manual_seed(HP["seed"])
-    torch.set_num_threads(max(1, (__import__("os").cpu_count() or 2) - 1))
+    torch.set_num_threads(max(1, (os.cpu_count() or 2) - 1))
     name = load_config("app")["sentiment"]["model"]
     tok = AutoTokenizer.from_pretrained(name)
     model = AutoModelForSequenceClassification.from_pretrained(name)
     label2id = {v.lower(): k for k, v in model.config.id2label.items()}
 
-    train_all, test = load_split("train"), load_split("valid")
+    train_all = load_split("train")
     rng = np.random.default_rng(HP["seed"])
     dev_mask = rng.random(len(train_all)) < 0.10
     tr, dev = train_all[~dev_mask], train_all[dev_mask]
@@ -100,6 +106,23 @@ def run() -> dict:
         if stopped != "completed":
             break
     model.load_state_dict(best_state)
+    return model, tok, predict, name, len(tr), len(dev), history, stopped
+
+
+def build(out_dir: Path = OUT_DIR) -> Path:
+    """Rebuild the fine-tuned weights from the train split only (no test evaluation)."""
+    model, tok, *_ = _train()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    model.save_pretrained(out_dir)
+    tok.save_pretrained(out_dir)
+    log.info(f"fine-tuned sentiment model written to {out_dir}")
+    return out_dir
+
+
+def run() -> dict:
+    """Train, evaluate once on the held-out split, keep the weights only if they beat the bar."""
+    model, tok, predict, name, n_tr, n_dev, history, stopped = _train()
+    test = load_split("valid")
     test_pred = predict(test)
     test_f1 = round(float(f1_score(test["gold"], test_pred, labels=CLASSES, average="macro")), 4)
     base = load_metrics()["sentiment"]["results"]["finbert"]
@@ -111,8 +134,8 @@ def run() -> dict:
         tok.save_pretrained(OUT_DIR)
     payload = {
         "base_model": name,
-        "train_rows": int(len(tr)),
-        "dev_rows_from_train": int(len(dev)),
+        "train_rows": int(n_tr),
+        "dev_rows_from_train": int(n_dev),
         "test_split": "valid (touched once)",
         "hyperparameters": HP,
         "budget_minutes": BUDGET_SECONDS / 60,
