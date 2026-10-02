@@ -46,3 +46,22 @@ def test_cooldown_per_class_and_region() -> None:
     assert t.check(ev(hours=5, regions=("US",))).fired  # different region key
     assert t.check(ev(hours=25)).fired  # cooldown elapsed
     assert any("cooldown" in d.reason for d in t.log)
+
+
+def test_macro_region_keys() -> None:
+    t = StressTrigger()
+    assert t.key_of(ev(regions=("RUSSIA_UKRAINE",))) == "GEOPOLITICAL|Europe"
+    assert t.key_of(ev(regions=("UK", "EUROPE"))) == "GEOPOLITICAL|Europe"
+    assert t.key_of(ev(regions=("US", "CHINA"))) == "GEOPOLITICAL|Global"  # cross-regional
+    assert t.key_of(ev(regions=("EM",))) == "GEOPOLITICAL|Global"
+    assert t.key_of(ev(regions=())) == "GEOPOLITICAL|Global"
+
+
+def test_escalation_within_cooldown() -> None:
+    t = StressTrigger()
+    assert t.check(ev(impact=8)).fired
+    assert not t.check(ev(impact=8, hours=2)).fired  # same impact: cooldown
+    d = t.check(ev(impact=9, hours=3))
+    assert d.fired and d.reason.startswith("escalation")
+    assert not t.check(ev(impact=9, hours=4)).fired  # new reference is 9
+    assert t.check(ev(impact=10, hours=5)).fired

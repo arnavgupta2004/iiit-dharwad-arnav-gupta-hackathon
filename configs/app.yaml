@@ -98,9 +98,8 @@ replay_feed:
 aggregation:
   entity_half_life_hours: 6       # EWMA half-life H for entity sentiment (Module A input)
   entity_confidence_w0: 3.0       # confidence = 1 - exp(-W / w0), W = decayed evidence weight
-  event_breadth_bonus:            # story impact = max doc impact + bonus by distinct outlets
-    - {min_sources: 5, bonus: 1}
-    - {min_sources: 15, bonus: 2}
+  # Story breadth bonus removed at GATE C (D-037): breadth already enters the impact score (B).
+  event_breadth_bonus: []
   event_emit_min_docs: 2          # emit/refresh an event signal once a story has this many docs
   entity_emit_every_minutes: 60   # stream-time cadence for entity signals (touched tickers only)
   evidence_max: 5

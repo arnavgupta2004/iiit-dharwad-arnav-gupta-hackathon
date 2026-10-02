@@ -4,7 +4,20 @@ trigger:
   min_impact: 8                 # "Impact > 7" in the brief
   min_event_confidence: 0.6
   min_sources: 2
-  cooldown_hours: 24            # per (event_class, region)
+  cooldown_hours: 24            # per (event_class, macro-region)  [GATE C, D-037]
+  escalation: true              # within a cooldown, re-run only if impact exceeds the one that fired
+  # Engine region tags -> 5 macro-regions. An event touching more than one macro-region, or only
+  # the cross-continent EM tag, is keyed as Global.
+  macro_regions:
+    US: Americas
+    EUROPE: Europe
+    UK: Europe
+    RUSSIA_UKRAINE: Europe
+    CHINA: Asia-Pacific
+    JAPAN: Asia-Pacific
+    INDIA: Asia-Pacific
+    MIDDLE_EAST: Middle East & Africa
+    EM: Global
 
 portfolio:
   seed: 20261001

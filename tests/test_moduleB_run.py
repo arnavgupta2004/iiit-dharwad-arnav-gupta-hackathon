@@ -48,13 +48,14 @@ def test_replay_triggers_runs_stress_once_per_cooldown(tmp_path, monkeypatch) ->
             ev(1, EventClass.GEOPOLITICAL, 7, 5, 0),  # below threshold
             ev(2, EventClass.GEOPOLITICAL, 9, 1, 1),  # single source
             ev(3, EventClass.GEOPOLITICAL, 9, 4, 2),  # fires
-            ev(4, EventClass.GEOPOLITICAL, 10, 9, 3),  # cooldown
+            ev(4, EventClass.GEOPOLITICAL, 10, 9, 3),  # escalation (10 > 9)
             ev(5, EventClass.EARNINGS, 9, 4, 4),  # fires but no market-wide scenario
+            ev(6, EventClass.GEOPOLITICAL, 9, 9, 5),  # cooldown (9 < 10)
         ]
     )
     monkeypatch.setattr(runmod, "RUNS_PATH", tmp_path / "runs.jsonl")
     summ = runmod.replay_triggers(StorePollingSubscriber(path, signal_type="event"), write=False)
-    assert summ["n_triggers_fired"] == 2 and summ["n_stress_runs"] == 1
+    assert summ["n_triggers_fired"] == 3 and summ["n_stress_runs"] == 2
     r = summ["runs"][0]
     assert r["scenario"].startswith("GEOPOLITICAL") and r["impact"] == 9
     assert r["cet1_after"] < 0.13
