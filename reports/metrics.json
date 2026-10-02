@@ -8609,5 +8609,215 @@
       "generated_at": "2026-10-02T12:25:26+00:00",
       "git_commit": "afcd9da"
     }
+  },
+  "events_round2_cv": {
+    "protocol": "D-052: StratifiedGroupKFold 5 folds x seeds (1, 2, 3) on gold-1 only, grouped by story; macro-F1 over 10 classes; highest mean, then one-SE rule toward simpler (C1, C3, C2); must beat the deployed model's CV mean",
+    "n_gold1": 300,
+    "n_weak_rows": 16452,
+    "gold_weight": 10.0,
+    "summary": {
+      "C1": {
+        "mean": 0.6004,
+        "se": 0.0127
+      },
+      "C2": {
+        "mean": 0.6064,
+        "se": 0.0073
+      },
+      "C3": {
+        "mean": 0.6053,
+        "se": 0.0129
+      },
+      "current_deployed": {
+        "mean": 0.5917,
+        "se": 0.0126
+      },
+      "keyword_baseline": {
+        "mean": 0.6158,
+        "se": 0.0096
+      },
+      "zero_shot_base": {
+        "mean": 0.615,
+        "se": 0.0109
+      }
+    },
+    "best_by_mean": "C2",
+    "one_se_floor": 0.5991,
+    "chosen_by_one_se_rule": "C1",
+    "chosen_beats_current_deployed": true,
+    "selected": "C1",
+    "folds": [
+      {
+        "seed": 1,
+        "fold": 0,
+        "n_test": 61,
+        "C1": 0.5524908424908425,
+        "C2": 0.6009035409035409,
+        "C3": 0.5931096681096681,
+        "current_deployed": 0.5420866261110163,
+        "keyword_baseline": 0.5873166023166023,
+        "zero_shot_base": 0.5815359477124182
+      },
+      {
+        "seed": 1,
+        "fold": 1,
+        "n_test": 60,
+        "C1": 0.6046647555343208,
+        "C2": 0.6231618381618381,
+        "C3": 0.6564625014625014,
+        "current_deployed": 0.6295238095238096,
+        "keyword_baseline": 0.6503862803862803,
+        "zero_shot_base": 0.6321855921855921
+      },
+      {
+        "seed": 1,
+        "fold": 2,
+        "n_test": 60,
+        "C1": 0.5843662539011376,
+        "C2": 0.5942804942804942,
+        "C3": 0.5426483320600968,
+        "current_deployed": 0.6137214247740564,
+        "keyword_baseline": 0.628983268983269,
+        "zero_shot_base": 0.6592982456140352
+      },
+      {
+        "seed": 1,
+        "fold": 3,
+        "n_test": 59,
+        "C1": 0.6018879707115001,
+        "C2": 0.6212627433418509,
+        "C3": 0.6065512265512266,
+        "current_deployed": 0.5713661501896796,
+        "keyword_baseline": 0.629528902470079,
+        "zero_shot_base": 0.6123227752639517
+      },
+      {
+        "seed": 1,
+        "fold": 4,
+        "n_test": 60,
+        "C1": 0.6151112302331814,
+        "C2": 0.6008008658008658,
+        "C3": 0.6096392496392496,
+        "current_deployed": 0.6020818070818071,
+        "keyword_baseline": 0.5873015873015873,
+        "zero_shot_base": 0.597091427091427
+      },
+      {
+        "seed": 2,
+        "fold": 0,
+        "n_test": 61,
+        "C1": 0.6402651696129957,
+        "C2": 0.6053114771407453,
+        "C3": 0.6288719124013241,
+        "current_deployed": 0.6223809523809524,
+        "keyword_baseline": 0.621574390521759,
+        "zero_shot_base": 0.5623656898656899
+      },
+      {
+        "seed": 2,
+        "fold": 1,
+        "n_test": 60,
+        "C1": 0.604249723145072,
+        "C2": 0.6356926406926406,
+        "C3": 0.6526019594440646,
+        "current_deployed": 0.5635056610056609,
+        "keyword_baseline": 0.6545238095238096,
+        "zero_shot_base": 0.6328971028971029
+      },
+      {
+        "seed": 2,
+        "fold": 2,
+        "n_test": 59,
+        "C1": 0.5222438672438672,
+        "C2": 0.5579255385137739,
+        "C3": 0.5427383727383728,
+        "current_deployed": 0.5428138528138529,
+        "keyword_baseline": 0.5805305805305806,
+        "zero_shot_base": 0.6425879560035158
+      },
+      {
+        "seed": 2,
+        "fold": 3,
+        "n_test": 60,
+        "C1": 0.5521138211382113,
+        "C2": 0.549199134199134,
+        "C3": 0.5006177156177156,
+        "current_deployed": 0.5246187146187146,
+        "keyword_baseline": 0.5383936135549038,
+        "zero_shot_base": 0.6326567550096962
+      },
+      {
+        "seed": 2,
+        "fold": 4,
+        "n_test": 60,
+        "C1": 0.7195614035087721,
+        "C2": 0.6576800976800976,
+        "C3": 0.7000685425685427,
+        "current_deployed": 0.7111624649859944,
+        "keyword_baseline": 0.6574586524586524,
+        "zero_shot_base": 0.5880976430976431
+      },
+      {
+        "seed": 3,
+        "fold": 0,
+        "n_test": 60,
+        "C1": 0.600122230710466,
+        "C2": 0.6298714735556841,
+        "C3": 0.6427467604080508,
+        "current_deployed": 0.5783343083343084,
+        "keyword_baseline": 0.6045967482809589,
+        "zero_shot_base": 0.517373949579832
+      },
+      {
+        "seed": 3,
+        "fold": 1,
+        "n_test": 60,
+        "C1": 0.6048018648018647,
+        "C2": 0.5959649122807018,
+        "C3": 0.601021201021201,
+        "current_deployed": 0.5696658896658897,
+        "keyword_baseline": 0.6144011544011544,
+        "zero_shot_base": 0.6684706959706959
+      },
+      {
+        "seed": 3,
+        "fold": 2,
+        "n_test": 60,
+        "C1": 0.5391514041514042,
+        "C2": 0.5873315573315574,
+        "C3": 0.6013557642020639,
+        "current_deployed": 0.5708080808080809,
+        "keyword_baseline": 0.6070818070818071,
+        "zero_shot_base": 0.5909591936077505
+      },
+      {
+        "seed": 3,
+        "fold": 3,
+        "n_test": 60,
+        "C1": 0.6085347985347985,
+        "C2": 0.6128066378066379,
+        "C3": 0.5905447125086594,
+        "current_deployed": 0.5765399465399466,
+        "keyword_baseline": 0.6841486291486291,
+        "zero_shot_base": 0.6678508771929825
+      },
+      {
+        "seed": 3,
+        "fold": 4,
+        "n_test": 60,
+        "C1": 0.655944055944056,
+        "C2": 0.6234066471163244,
+        "C3": 0.6107072046727219,
+        "current_deployed": 0.6565873015873016,
+        "keyword_baseline": 0.5909512900892212,
+        "zero_shot_base": 0.6390673215673216
+      }
+    ],
+    "note": "Gold-2 not read. References are not retrained; scored on the same folds.",
+    "_provenance": {
+      "script": "python -m riskpulse.engine.event_round2",
+      "generated_at": "2026-10-02T15:44:01+00:00",
+      "git_commit": "1d4247a"
+    }
   }
 }

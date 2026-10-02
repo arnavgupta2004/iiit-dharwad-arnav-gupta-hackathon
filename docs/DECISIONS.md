@@ -4,6 +4,42 @@ Newest first within each date. Each entry: decision, rationale, and status (acce
 
 ## 2026-10-02 (event classification round 2, approved by Arnav)
 
+### D-054 Model-file policy: small trained artifacts are committed (Arnav)
+Large model weights (> 20 MB) are never committed; they are hosted on the Hugging Face Hub (the fine-tuned sentiment
+model, 438 MB, `arnavguptas/riskpulse-finbert-tweets`). Small trained artifacts that the reported system needs
+(< 20 MB) **are committed** under `data/trained/`, so a fresh clone runs the reported system, not the fallbacks. The
+fallbacks (keyword event classes, impact v1, base FinBERT) remain and log a warning when used. Each committed model
+file, its training data and the licence of that data are listed in `data/SOURCES.md`.
+
+### D-053 Round 2: cross-validation on gold-1 selects C1 (decided before gold-2 is read)
+`python -m riskpulse.engine.event_round2` → `reports/event_round2_cv.json`, `metrics.json → events_round2_cv`. Run
+exactly as pre-registered in D-052: StratifiedGroupKFold, 5 folds x 3 seeds = 15 folds, about 60 gold-1 items each,
+grouped by story. Training set = 16,452 weak-label rows + gold-1 training folds (weight 10).
+
+| Method | CV mean macro-F1 | SE (15 folds) |
+|---|---|---|
+| C1 | 0.6004 | 0.0127 |
+| C2 | 0.6064 | 0.0073 |
+| C3 | 0.6053 | 0.0129 |
+| current_deployed | 0.5917 | 0.0126 |
+| keyword_baseline | 0.6158 | 0.0096 |
+| zero_shot_base | 0.6150 | 0.0109 |
+
+**Rule applied.** Best mean: **C2** (0.6064); one-SE floor 0.5991. In the
+simplicity order (C1, C3, C2), C1 (0.6004) is the first candidate at or above the floor, so it is
+chosen. C1's mean is above the deployed model's (0.5917), so **C1 is selected.** The three
+candidates are within about one SE of each other.
+**Caveat, recorded now:** the keyword baseline (0.6158) and zero-shot
+(0.6150) score higher than every candidate on gold-1. Under D-052 they were references,
+not selectable. Zero-shot cannot run on the full feed on CPU. The SEs come from repeated folds that share data, so
+they understate the uncertainty.
+**Final model** (C1 recipe, weak labels + all 300 gold-1 rows, weight 10): `data/trained/event_clf_round2.pkl`,
+66,915 bytes, SHA-256 `a9b87af858ae2bdd1e51ff67ec8f240b7d63a9a5de02510851caf1cdc6ef8adf`, 16,752 training rows.
+It is committed with this entry, before `data/gold/labels_2.csv` is in the repo or has been read, so the evaluated
+model is fixed blind to gold-2.
+Side effect noted: excluding gold-2 texts from training (D-052) shifted the 1,200-headline zero-shot weak-label sample,
+so the candidates' weak set differs slightly from the deployed model's.
+
 ### D-052 PRE-REGISTERED before gold-2 is labelled: round-2 protocol
 Recorded when `data/gold/to_label_2.csv` exists with blank labels and before any candidate is trained.
 1. **Gold-2 sampling** (`scripts/make_gold2.py`, seed 20261003). The pool is replay items of 25-280 characters with

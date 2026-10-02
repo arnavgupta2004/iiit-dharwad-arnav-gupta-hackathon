@@ -117,6 +117,14 @@ No proprietary or client data is used. Synthetic records are labelled synthetic 
   training data). Hosted on the Hugging Face Hub, with a card from `scripts/make_model_card.py`. They're not in this
   repo (418 MB); `scripts/build_finetuned_sentiment.py` rebuilds them.
 
+### 12. Committed trained model files (`data/trained/`, D-054)
+| File | What it is | Trained on | Licence of training data |
+|---|---|---|---|
+| `event_clf_round2.pkl` (67 KB) | Event classifier: calibrated logistic regression on MiniLM embeddings (D-053) | Weak labels: `zeroshot/twitter-financial-news-topic` train split (MIT), taxonomy seed sentences (written for this project), keyword- and zero-shot-labelled replay headlines (GDELT GKG, source 2); plus Arnav's 300 gold-1 labels (this project) | MIT (HF topic data); GDELT open terms (source 2); own labels |
+
+The fine-tuned sentiment model (438 MB) is on the Hub (section 11). The impact-v2 model will be added here after
+the round-2 downstream rerun.
+
 ### Rejected / not used
 - **thedevastator Tweet Sentiment's Impact** (the organisers' example): the CSV is structurally broken when parsed.
   Multi-line tweets shift columns, so dates land in `STOCK` and prices in `DATE` for a large share of rows.
