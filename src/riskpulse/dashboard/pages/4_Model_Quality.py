@@ -117,18 +117,77 @@ if s:
         )
     provenance(s)
 
+sg, ft = m.get("sentiment_gold"), m.get("sentiment_finetune")
+if sg:
+    st.subheader("Live-feed check on the gold set (pre-registered, D-041)")
+    rows = []
+    for sub, r in sg["results"].items():
+        for meth, f1 in r["macro_f1"].items():
+            rows.append(
+                {"text type": sub.replace("_", " "), "n": r["n"], "model": meth, "macro-F1": f1}
+            )
+    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+    news = sg["results"]["news_headlines"]
+    st.markdown(
+        f"Fine-tuned − FinBERT on news: {news['diff_finetuned_minus_finbert']:+.3f}, 95% CI "
+        f"{news['diff_95ci']}. Decision by the pre-registered rule: {sg['decision']}. "
+        + (
+            f"In-domain test (HF split, same dataset as training): fine-tuned "
+            f"{ft['test_macro_f1']:.3f}."
+            if ft
+            else ""
+        )
+    )
+    provenance(sg)
+
+lk = m.get("entity_linking")
+if lk and lk.get("precision") is not None:
+    st.subheader("Entity linking")
+    st.markdown(
+        f"Precision on {lk['n_marked']} hand-checked headline links: "
+        f"**{lk['precision'] * 100:.1f}%** (95% Wilson CI "
+        f"{lk['precision_95ci_wilson'][0] * 100:.1f}–{lk['precision_95ci_wilson'][1] * 100:.1f}%)."
+    )
+    provenance(lk)
+
 # ---------- events ----------
 st.header("Event classification")
 e = m.get("events")
 if e:
     st.markdown(f"**Status:** {e['status']}")
     rows = []
+    gold = e["results"].get("gold")
+    if gold:
+        for sub in ("all", "news_headlines", "tweets"):
+            for meth, r in gold[sub].items():
+                if isinstance(r, dict) and "macro_f1" in r:
+                    rows.append(
+                        {
+                            "evaluation set": f"GOLD {sub.replace('_', ' ')}",
+                            "method": meth,
+                            "n": r["n"],
+                            "macro-F1": r["macro_f1"],
+                        }
+                    )
     for ds, res in e["results"].items():
+        if ds == "gold":
+            continue
         for meth, r in res.items():
             rows.append(
-                {"evaluation set": ds, "method": meth, "n": r["n"], "macro-F1": r["macro_f1"]}
+                {
+                    "evaluation set": f"reference: {ds}",
+                    "method": meth,
+                    "n": r["n"],
+                    "macro-F1": r["macro_f1"],
+                }
             )
     df = pd.DataFrame(rows)
+    if gold:
+        st.markdown(
+            f"**Gold set (Arnav's labels, n = {gold['n']}, cross-border GEOPOLITICAL):** 95% CI of "
+            f"macro-F1(primary) − macro-F1(keyword) {gold['all']['primary_minus_keyword_95ci']}, "
+            f"vs zero-shot {gold['all']['primary_minus_zero_shot_95ci']}."
+        )
     fig = go.Figure()
     for i, meth in enumerate(df["method"].unique()):
         d = df[df["method"] == meth]
@@ -163,9 +222,9 @@ if v2:
     car = v2["test_post_burn_in"]["abs_car01"]
     vol = v2["test_post_burn_in"]["abn_volume"]
     st.markdown(
-        f'<p class="rp-note">Does a higher score mean a bigger market reaction? Untouched 2021-22 test set: '
-        f"{car['n']:,} ticker-days after the burn-in; market-model CAR[0,+1] on SPY. Pre-registered rule: "
-        f"{v2['adoption_rule']}.</p>",
+        f'<p class="rp-note">Does a higher score mean a bigger market reaction? 2021-22 test set: '
+        f"{car['n']:,} ticker-days after the burn-in; market-model CAR[0,+1] on SPY. Impact v2 scores "
+        "company mentions; market-wide items keep v1.</p>",
         unsafe_allow_html=True,
     )
     st.dataframe(
@@ -204,11 +263,15 @@ if v2:
     st.plotly_chart(fig, use_container_width=True)
     st.markdown(
         f"95% bootstrap CI of the Spearman difference: v2 − v1 {car['rho_diff_v2_minus_v1_95ci']}, "
-        f"v2 − abs(sentiment) {car['rho_diff_v2_minus_abs_sent_95ci']}. "
-        f"**Adopted: {'yes' if v2['adopted'] else 'no'}.** v2 beats v1 but not the sentiment-only "
-        "baseline, so the live engine keeps v1 and this result is reported as is (D-039)."
-        if not v2["adopted"]
-        else "**Adopted.**"
+        f"v2 − abs(sentiment) {car['rho_diff_v2_minus_abs_sent_95ci']}."
+    )
+    st.markdown(
+        f"**Adoption.** Rule written before the first test ({v2.get('pre_registered_rule', '')}): "
+        f"**{'met' if v2.get('pre_registered_rule_met') else 'not met'}**. Applied rule, revised after "
+        f"the first test was seen ({v2.get('applied_rule', '')}): "
+        f"**{'met' if v2.get('adopted') else 'not met'}**, so v2 is "
+        f"{'live for company mentions' if v2.get('adopted') else 'not used'} (D-039). In short: v2 is "
+        "on par with abs(sentiment) for predicting the market reaction and adds explainable drivers."
     )
     for lim in v2.get("limitations", []):
         st.markdown(f"- {lim}")
@@ -216,6 +279,16 @@ if v2:
 elif imp:
     st.json(imp, expanded=False)
     provenance(imp)
+mc = m.get("impact_market_check")
+if mc:
+    st.subheader("Market-wide events (v1): descriptive check, D-042")
+    st.markdown(
+        f"{mc['n_days']} sessions after the burn-in: Spearman of the day's max market-wide impact vs "
+        f"|SPY return| {mc['vs_abs_spy_return']['spearman_rho']:+.3f} "
+        f"(CI {mc['vs_abs_spy_return']['ci95']}), vs |ΔVIX| {mc['vs_abs_dvix']['spearman_rho']:+.3f} "
+        f"(CI {mc['vs_abs_dvix']['ci95']}). Reported only; nothing tuned."
+    )
+    provenance(mc)
 else:
     st.info(
         "Impact validation (event study against abnormal returns) is TBD: produced in the P1 phase."
