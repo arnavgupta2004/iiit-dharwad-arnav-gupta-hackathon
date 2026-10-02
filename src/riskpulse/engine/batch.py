@@ -213,6 +213,9 @@ def fit_bins(scored: list[DocScore]) -> ImpactBins:
 
 def run_batch(limit: int | None = None) -> dict:
     """Full batch run: stage 1, bin fitting, stage 2, persistence. Returns summary stats."""
+    from riskpulse.engine.pipeline import model_origins
+
+    origins = model_origins()
     scored = run_stage1(limit=limit)
     scored, policy = apply_social_link_policy(scored)
     log.info(f"Original-ticker rule for tweets: {policy}")
@@ -239,6 +242,7 @@ def run_batch(limit: int | None = None) -> dict:
         "n_event_signals": sum(s.signal_type == "event" for s in signals),
         "impact_bins": bins.edges,
         "tweet_original_ticker_rule": policy,
+        "model_origins": origins,
     }
     log.info(f"Batch done: {summary}")
     return summary

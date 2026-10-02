@@ -42,7 +42,7 @@ from riskpulse.engine.impact import (
 )
 from riskpulse.engine.sentiment import FinBertScorer, entity_sentiment
 
-EVENT_MODEL_PATH = "data/processed/models/event_clf.pkl"
+EVENT_MODEL_PATH = "data/trained/event_clf_round2.pkl"  # committed (D-053, D-054)
 
 
 @dataclass
@@ -135,8 +135,8 @@ class NLPScorer:
             from riskpulse.common.logging import get_logger
 
             get_logger().warning(
-                "event classifier not trained here: using the keyword baseline for event classes "
-                "(train it with `riskpulse train events`)"
+                f"FALLBACK IN USE: event classifier {EVENT_MODEL_PATH} not found; event classes "
+                "come from the keyword baseline, not the reported model (`riskpulse train events`)"
             )
             return KeywordClassifier()
         return EmbeddingClassifier.load(path, embedder=self.embedder)
@@ -311,6 +311,33 @@ def model_versions(scorer: NLPScorer) -> dict[str, str]:
 
 def stamp_versions(signals: list[Signal], versions: dict[str, str]) -> list[Signal]:
     return [s.model_copy(update={"model_versions": versions}) for s in signals]
+
+
+def model_origins() -> dict[str, str]:
+    """Where each model the engine uses comes from (logged at start-up; fallbacks flagged)."""
+    from riskpulse.engine.sentiment import resolve_model
+
+    impact_cfg = load_config("impact").get("v2", {})
+    v2_path = repo_root() / impact_cfg.get("model_path", "")
+    name, origin = resolve_model()
+    out = {
+        "sentiment": f"{origin}:{name}",
+        "event_classifier": f"repo:{EVENT_MODEL_PATH}"
+        if event_model_exists()
+        else "FALLBACK:keyword-baseline",
+        "impact_company": f"repo:{impact_cfg.get('model_path')}"
+        if impact_cfg.get("enabled") and v2_path.exists()
+        else "FALLBACK:v1",
+        "embeddings": f"hub:{load_config('app')['events']['embedding_model']}",
+    }
+    from riskpulse.common.logging import get_logger
+
+    log = get_logger()
+    for k, v in out.items():
+        (log.warning if "FALLBACK" in v or v.startswith("base_fallback") else log.info)(
+            f"model origin | {k}: {v}"
+        )
+    return out
 
 
 def event_model_exists() -> bool:

@@ -50,7 +50,7 @@ PARAMS = dict(
     random_state=20261002,
     verbose=-1,
 )
-MODEL_PATH = data_path("processed", "models", "impact_v2.txt")
+MODEL_PATH = data_path("trained", "impact_v2.txt")  # committed (D-054)
 
 
 # ---------- features ----------
@@ -196,8 +196,8 @@ def compare(df: pd.DataFrame, target: str, seed: int = 0, n_boot: int = 1000) ->
 
 
 # ---------- train / evaluate ----------
-META_PATH = data_path("processed", "models", "impact_v2_meta.json")
-JSON_PATH = data_path("processed", "models", "impact_v2.json")
+META_PATH = data_path("trained", "impact_v2_meta.json")
+JSON_PATH = data_path("trained", "impact_v2.json")
 
 
 def _benzinga() -> tuple[pd.DataFrame, pd.DataFrame, int]:

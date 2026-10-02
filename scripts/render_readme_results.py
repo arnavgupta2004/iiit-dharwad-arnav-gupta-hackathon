@@ -71,22 +71,46 @@ def build(m: dict) -> str:
             "(point estimates favour FinBERT); the pre-registered rule therefore keeps the fine-tuned model.",
             "",
         ]
-    e = m.get("events")
+    e, g2, cv = m.get("events"), m.get("events_gold2"), m.get("events_round2_cv")
+    if g2:
+        r = g2["results"]
+        names = {
+            "selected_C1": "**Deployed: C1** (weak labels + gold-1)",
+            "previous_deployed": "Previous model (weak labels only)",
+            "keyword_baseline": "Keyword baseline",
+            "zero_shot_base": "Zero-shot NLI (base)",
+            "zero_shot_large_reference": "Zero-shot NLI (large, reference; too slow for the feed on CPU)",
+        }
+        out += [
+            f"**Event classification: final test on gold-2** (n = {g2['n']}, Arnav's labels, evaluated once; model "
+            "fixed before the labels were read, D-052/D-053). Macro-F1 over 10 classes:",
+            "",
+            f"| Method | All (n {r['all']['n']}) | News (n {r['news_headlines']['n']}) | Tweets (n {r['tweets']['n']}) | "
+            "C1 − method, 95% CI (all) |",
+            "|---|---|---|---|---|",
+        ]
+        for k, label in names.items():
+            ci = r["all"]["selected_minus_95ci"].get(k, "")
+            out.append(
+                f"| {label} | {r['all'][k]['macro_f1']:.3f} | {r['news_headlines'][k]['macro_f1']:.3f} | "
+                f"{r['tweets'][k]['macro_f1']:.3f} | {ci if ci else '-'} |"
+            )
+        out.append("")
+        if cv:
+            sm = cv["summary"]
+            out += [
+                f"Selection by cross-validation on gold-1 (15 folds): C1 {sm['C1']['mean']:.3f}, C2 {sm['C2']['mean']:.3f}, "
+                f"C3 {sm['C3']['mean']:.3f}; the one-SE rule chose {cv['chosen_by_one_se_rule']} (D-053). "
+                "GEOPOLITICAL is cross-border only (D-044).",
+                "",
+            ]
     if e:
         out += [
-            f"**Event classification** ({e['status']})",
+            "In-domain reference sets (not the final test):",
             "",
             "| Evaluation set | Method | n | Macro-F1 |",
             "|---|---|---|---|",
         ]
-        g = e["results"].get("gold")
-        if g:
-            for sub in ("all", "news_headlines", "tweets"):
-                for meth, v in g[sub].items():
-                    if isinstance(v, dict) and "macro_f1" in v:
-                        out.append(
-                            f"| **gold: {sub.replace('_', ' ')}** | {meth} | {v['n']:,} | {v['macro_f1']:.3f} |"
-                        )
         for ds, res in e["results"].items():
             if ds == "gold":
                 continue
@@ -95,19 +119,6 @@ def build(m: dict) -> str:
                     f"| {REF_LABELS.get(ds, ds)} | {meth} | {v['n']:,} | {v['macro_f1']:.3f} |"
                 )
         out.append("")
-        if g:
-            out += [
-                "On the gold set (live-feed text) the trained classifier is not better than the keyword or zero-shot "
-                "baselines; paired-bootstrap 95% CIs of the macro-F1 difference: "
-                + "; ".join(
-                    f"{sub.replace('_', ' ')}: vs keyword {g[sub]['primary_minus_keyword_95ci']}, vs zero-shot "
-                    f"{g[sub]['primary_minus_zero_shot_95ci']}"
-                    for sub in ("all", "news_headlines", "tweets")
-                )
-                + ". Its higher score on HF topic data is in-domain (it trains on that dataset). The deployed model stays "
-                "the trained classifier (the a-priori choice). GEOPOLITICAL is cross-border only (D-044).",
-                "",
-            ]
     lk = m.get("entity_linking")
     if lk and lk.get("precision") is not None:
         out += [

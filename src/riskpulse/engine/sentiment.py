@@ -85,7 +85,8 @@ def resolve_model(variant: str | None = None) -> tuple[str, str]:
         log.info(f"sentiment model: fine-tuned, local copy {ft['local_dir']}")
         return str(local), "local"
     log.warning(
-        "sentiment model: fine-tuned weights unavailable; FALLING BACK to base FinBERT. "
+        "FALLBACK IN USE: fine-tuned sentiment weights unavailable (Hub and local); scoring with "
+        "base FinBERT, not the reported model. "
         "Run `python scripts/build_finetuned_sentiment.py` to rebuild them."
     )
     return base, "base_fallback"

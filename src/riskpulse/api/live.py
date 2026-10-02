@@ -15,6 +15,9 @@ class LiveEngine:
     """Stateful wrapper: stage 1 (models) + stage 2 (time-ordered aggregation) under a lock."""
 
     def __init__(self, scorer: NLPScorer | None = None, engine: SignalEngine | None = None) -> None:
+        from riskpulse.engine.pipeline import model_origins
+
+        self.origins = model_origins()
         self.scorer = scorer or NLPScorer()
         self.engine = engine or SignalEngine()
         self._lock = threading.Lock()

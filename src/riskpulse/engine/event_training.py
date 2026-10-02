@@ -187,8 +187,13 @@ def training_data() -> tuple[pd.DataFrame, pd.DataFrame]:
     return train, weak_hold
 
 
+WEAK_MODEL_PATH = data_path("processed", "models", "event_clf_weak.pkl")
+
+
 def train() -> EmbeddingClassifier:
-    """Fit the primary classifier on the weak-label set and save it (no evaluation)."""
+    """Fit the round-1 recipe (weak labels only) and save it locally. Not the deployed model since
+    round 2 (D-053); the deployed recipe is `event_round2.train_final` (`riskpulse train
+    events`)."""
     seed = int(load_config("app")["event_training"]["seed"])
     rows, _ = training_data()
     rows.to_parquet(data_path("processed", "event_training_set.parquet"), index=False)
@@ -198,7 +203,7 @@ def train() -> EmbeddingClassifier:
     clf = EmbeddingClassifier(Embedder()).fit(
         rows["text"].tolist(), rows["label"].tolist(), seed=seed
     )
-    clf.save(repo_root() / EVENT_MODEL_PATH)
+    clf.save(WEAK_MODEL_PATH)
     return clf
 
 
@@ -257,14 +262,13 @@ def evaluate() -> dict:
     seed = int(cfg["seed"])
     clf = EmbeddingClassifier.load(repo_root() / EVENT_MODEL_PATH)
     rows, weak_hold = training_data()
+    # Gold-1 trains the deployed model since round 2 (D-053), so it is not scored here; the final
+    # test is gold-2 (`reports/events_gold2.json`), evaluated once.
 
     hf_va = hf_topic("valid")
     hf_labels = sorted(hf_va["label"].unique())
     kwc = KeywordClassifier()
     results: dict = {}
-    gold = gold_results(clf, seed)
-    if gold is not None:
-        results["gold"] = gold
     for name, df, labels in (
         ("hf_topic_valid", hf_va, hf_labels),
         ("weak_holdout", weak_hold, CLASSES),
@@ -295,9 +299,8 @@ def evaluate() -> dict:
         ),
     }
     payload = {
-        "status": "FINAL on Arnav's gold set (results.gold); other sets are reference only"
-        if gold is not None
-        else "PROVISIONAL - gold labels not present",
+        "status": "reference sets only; final test = gold-2 (metrics.json -> events_gold2), "
+        "selection = gold-1 cross-validation (events_round2_cv)",
         "taxonomy_note": "GEOPOLITICAL is cross-border only (D-044)",
         "training_rows": int(len(rows)),
         "training_rows_by_source": rows["source"].value_counts().to_dict(),
@@ -306,7 +309,7 @@ def evaluate() -> dict:
         "min_confidence_for_non_other": clf.min_confidence,
         "results": results,
         "notes": [
-            "Gold: 300 replay items labelled by Arnav (237 news, 63 tweets), never trained on.",
+            "Gold-1 (300) trains and selects the model (round 2); gold-2 (200) is the final test.",
             "hf_topic_valid covers 7 of 10 classes "
             "(no CREDIT_EVENT, PRODUCT_LAUNCH, OPERATIONAL_ESG).",
             "The primary model trains on hf_topic *train*, so hf_topic_valid is in-distribution "

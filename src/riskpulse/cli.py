@@ -104,10 +104,10 @@ def process(
     from riskpulse.engine.pipeline import event_model_exists
 
     if not event_model_exists():
-        typer.echo("Event model missing; training it first (riskpulse eval events).")
-        from riskpulse.engine.event_training import train_and_evaluate
+        typer.echo("Event model missing; training it first (riskpulse train events).")
+        from riskpulse.engine.event_round2 import train_final
 
-        train_and_evaluate()
+        train_final()
     typer.echo(run_batch(limit=limit))
 
 
@@ -207,10 +207,13 @@ def demo(
 def train(target: TrainTarget = typer.Argument(...)) -> None:
     """Train a model and save it (evaluation is separate: `riskpulse eval <target>`)."""
     if target == TrainTarget.events:
-        from riskpulse.engine.event_training import train as train_events
+        from riskpulse.engine.event_round2 import train_final
 
-        clf = train_events()
-        typer.echo(f"event classifier saved ({clf.version})")
+        info = train_final()  # the deployed round-2 recipe (D-053)
+        typer.echo(
+            f"event classifier saved: {info['path']} ({info['version']}, "
+            f"sha256 {info['sha256'][:12]})"
+        )
     elif target == TrainTarget.impact_v2:
         from riskpulse.eval.impact_v2 import train as train_v2
 

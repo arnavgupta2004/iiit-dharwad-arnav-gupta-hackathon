@@ -227,8 +227,8 @@ class ImpactV2:
         path = repo_root() / cfg["model_path"]
         if not path.exists():
             get_logger().warning(
-                f"impact v2 model {cfg['model_path']} not found: using v1 for all mentions "
-                "(train it with `riskpulse train impact_v2`)"
+                f"FALLBACK IN USE: impact v2 model {cfg['model_path']} not found; company "
+                "mentions use impact v1, not the reported model (`riskpulse train impact_v2`)"
             )
             return None
         try:

@@ -156,16 +156,16 @@ e = m.get("events")
 if e:
     st.markdown(f"**Status:** {e['status']}")
     rows = []
-    gold = e["results"].get("gold")
-    if gold:
+    g2, cv = m.get("events_gold2"), m.get("events_round2_cv")
+    if g2:
         for sub in ("all", "news_headlines", "tweets"):
-            for meth, r in gold[sub].items():
+            for meth, r in g2["results"][sub].items():
                 if isinstance(r, dict) and "macro_f1" in r:
                     rows.append(
                         {
-                            "evaluation set": f"GOLD {sub.replace('_', ' ')}",
+                            "evaluation set": f"GOLD-2 {sub.replace('_', ' ')} (final test)",
                             "method": meth,
-                            "n": r["n"],
+                            "n": g2["results"][sub]["n"],
                             "macro-F1": r["macro_f1"],
                         }
                     )
@@ -186,16 +186,20 @@ if e:
                 }
             )
     df = pd.DataFrame(rows)
-    if gold:
+    if g2:
+        ci = g2["results"]["all"]["selected_minus_95ci"]
         st.markdown(
-            f"**Gold set (Arnav's labels, n = {gold['n']}, cross-border GEOPOLITICAL):** paired-bootstrap "
-            "95% CIs of macro-F1(trained) − macro-F1(baseline): "
-            + "; ".join(
-                f"{sub.replace('_', ' ')} vs keyword {gold[sub]['primary_minus_keyword_95ci']}, "
-                f"vs zero-shot {gold[sub]['primary_minus_zero_shot_95ci']}"
-                for sub in ("all", "news_headlines", "tweets")
-            )
-            + ". HF-topic rows are in-domain for the trained model."
+            f"**Final test: gold-2** (n = {g2['n']}, evaluated once; the deployed model C1 was fixed "
+            "before the labels were read). 95% CI of macro-F1(C1) − macro-F1(method), all items: "
+            + "; ".join(f"{k} {v}" for k, v in ci.items())
+            + "."
+        )
+    if cv:
+        sm = cv["summary"]
+        st.markdown(
+            "**Selection on gold-1 (cross-validation, 15 folds):** "
+            + ", ".join(f"{k} {v['mean']:.3f} ± {v['se']:.3f}" for k, v in sm.items())
+            + f". Chosen by the one-SE rule: {cv['chosen_by_one_se_rule']} (D-053)."
         )
     fig = go.Figure()
     for i, meth in enumerate(df["method"].unique()):
