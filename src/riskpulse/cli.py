@@ -40,6 +40,7 @@ class EvalTarget(StrEnum):
     impact_v2 = "impact_v2"
     predicted_vs_realised = "predicted_vs_realised"
     finetune = "finetune"
+    impact_market_check = "impact_market_check"
 
 
 def _not_yet(what: str, phase: int) -> NoReturn:
