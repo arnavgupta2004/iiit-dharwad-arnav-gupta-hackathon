@@ -52,9 +52,8 @@ class DocScore:
 
 
 def outlet_of(doc: Document) -> str:
-    if doc.source.value == "gdelt":
-        return str(doc.meta.get("domain") or "gdelt")
-    return doc.source.value
+    """Distinct-outlet key for breadth and n_sources: the publishing domain when known."""
+    return str(doc.meta.get("domain") or doc.source.value)
 
 
 def social_links(

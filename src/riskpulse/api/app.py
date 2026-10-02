@@ -73,6 +73,8 @@ def create_app(
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
+        if live is not None and hasattr(live, "warm_up"):
+            live.warm_up()
         if replay and live is not None:
             threading.Thread(target=_replay_worker, args=replay, daemon=True).start()
         yield

@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 
 from riskpulse.common.schemas import Document, Signal, Source
 from riskpulse.engine.aggregate import ScoredMention
+from riskpulse.engine.entities import MKT
 from riskpulse.engine.pipeline import NLPScorer, SignalEngine, stamp_versions
 
 
@@ -18,6 +19,10 @@ class LiveEngine:
         self.engine = engine or SignalEngine()
         self._lock = threading.Lock()
 
+    def warm_up(self) -> None:
+        """Load the models before serving so the first /analyze is fast."""
+        self.scorer.score([Document.build(Source.SYNTHETIC_DEMO, "warm up", datetime.now(UTC))])
+
     def process(self, docs: list[Document]) -> tuple[list[ScoredMention], list[Signal]]:
         with self._lock:
             scored = self.scorer.score(docs)
@@ -27,10 +32,14 @@ class LiveEngine:
     def analyze(self, text: str, source: str = "synthetic_demo") -> dict:
         """Score one headline without mutating engine state (a dry run for the jury demo)."""
         doc = Document.build(Source(source), text, datetime.now(UTC), title=text)
-        with self._lock:
-            ds = self.scorer.score([doc])[0]
-            scratch = SignalEngine(bins=self.engine.bins)
-            mentions, _ = scratch.process([ds])
+        # Stateless dry run: models are read-only, so no engine lock (replay keeps streaming).
+        ds = self.scorer.score([doc])[0]
+        note = "Dry run: velocity/breadth computed for this item alone (no stream context)."
+        if not ds.links:  # no universe company or market keyword: score as market-wide
+            ds.links = {MKT: 1.0}
+            ds.entity_sentiment = {MKT: ds.doc_sentiment}
+            note += " No universe company or market keyword matched; scored as market-wide (MKT)."
+        mentions, _ = SignalEngine(bins=self.engine.bins).process([ds])
         return {
             "text": text,
             "source": source,
@@ -52,7 +61,7 @@ class LiveEngine:
                 }
                 for m in mentions
             ],
-            "note": "Dry run: velocity/breadth computed for this item alone (no stream context).",
+            "note": note,
             "model_versions": self.scorer.versions,
         }
 
@@ -60,11 +69,13 @@ class LiveEngine:
         self, text: str, published_at: datetime | None = None, outlet: str = "demo"
     ) -> list[Signal]:
         """Push a clearly labelled synthetic headline into the live stream."""
+        ts = published_at or datetime.now(UTC)
         doc = Document.build(
             Source.SYNTHETIC_DEMO,
             text,
-            published_at or datetime.now(UTC),
+            ts,
             title=text,
+            url=f"synthetic://{outlet}/{ts.isoformat()}",
             meta={
                 "domain": f"synthetic:{outlet}",
                 "label": "SYNTHETIC DEMO HEADLINE - not real news",

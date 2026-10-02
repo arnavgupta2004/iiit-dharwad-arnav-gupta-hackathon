@@ -45,7 +45,8 @@ def synthetic_stage1(n: int = 1000, seed: int = 7) -> list[DocScore]:
             f"doc {i} cluster {c}",
             ts,
             title=None if social else f"doc {i}",
-            meta={"domain": f"outlet{int(rng.integers(0, 12))}.com"},
+            # tweets carry no publishing domain (as in the real feed); news items do
+            meta={} if social else {"domain": f"outlet{int(rng.integers(0, 12))}.com"},
         )
         s = float(rng.uniform(-1, 1))
         cls = CLASSES[c % len(CLASSES)]
