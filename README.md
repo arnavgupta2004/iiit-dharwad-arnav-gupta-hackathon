@@ -1,6 +1,6 @@
 # RiskPulse: AI/NLP Risk Engine with Index Rebalancer and Stress Tester - S&P Global & Crisil Campus Hackathon
 **Candidate Name:** Arnav Gupta
-**College Email ID:** [college email: to be filled by Arnav]
+**College Email ID:** 23bds009@iiitdwd.ac.in
 **College / Campus:** IIIT Dharwad
 **Demo Video Link:** [YouTube unlisted link: to be added]
 **Slide Deck Link (if hosted externally):** [`docs/presentation.pdf`](docs/presentation.pdf)
