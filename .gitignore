@@ -62,3 +62,6 @@ data/processed/gold2_sampling_meta.parquet
 # Local symlinks to external storage (D-056)
 data/processed/cache
 data/processed/models
+
+# macOS AppleDouble files (created on exFAT volumes)
+._*

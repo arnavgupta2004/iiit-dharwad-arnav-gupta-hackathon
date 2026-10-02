@@ -18,3 +18,16 @@ def test_dotenv_parsing(tmp_path) -> None:
         "RISKPULSE_EXTERNAL_ROOT": "/Volumes/Some Drive/x",
         "EMPTY": "",
     }
+
+
+def test_unset_root_changes_nothing(monkeypatch, tmp_path) -> None:
+    """A fresh clone (no .env, variable unset): default cache paths, no error, no redirection."""
+    monkeypatch.setattr(_storage, "REPO_ROOT", tmp_path)  # a repo root with no .env
+    monkeypatch.delenv("RISKPULSE_EXTERNAL_ROOT", raising=False)
+    monkeypatch.delenv("HF_HUB_CACHE", raising=False)
+    (tmp_path / "data" / "processed").mkdir(parents=True)
+    _storage.configure()  # must not raise
+    import os
+
+    assert "RISKPULSE_EXTERNAL_ROOT" not in os.environ
+    assert "HF_HUB_CACHE" not in os.environ

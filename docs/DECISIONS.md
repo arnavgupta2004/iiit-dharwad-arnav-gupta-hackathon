@@ -6,7 +6,7 @@ Newest first within each date. Each entry: decision, rationale, and status (acce
 
 ### D-056 Large local caches on an external drive (Arnav, disk space)
 The internal disk fell to 315 MB free (floor: 3 GB). Deleted: the large zero-shot model (879 MB, a one-off reference),
-the pip cache and the superseded combined stage-1 cache. Moved to the external drive `/Volumes/Arnav Drive` (exFAT,
+the pip cache and the superseded combined stage-1 cache. Moved to a local external drive (exFAT,
 668 GB free): the Hugging Face hub cache (copied with symlinks dereferenced, since exFAT has none) and
 `data/processed/cache` and `data/processed/models` (now symlinks into the drive). Setting it up: a gitignored `.env`
 sets `RISKPULSE_EXTERNAL_ROOT`, and `riskpulse/_storage.py`, run on `import riskpulse` before any Hugging Face import,
