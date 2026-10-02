@@ -47,8 +47,13 @@ Status legend: DONE · IN PROGRESS · NEXT · OPEN
 ## Waiting on Arnav
 - Codespace fresh-clone test (`docs/drafts/codespace_fresh_clone_test.md`).
 
-## Remaining (no model or logic changes)
-- README "results at a glance" with trust framing; deck; video script; prep notes.
+## Done after the freeze (presentation only)
+- Module B ranked stress-run view; 2022-check timing fields (D-061); README "Results at a glance"; deck and video
+  script v3 (`docs/drafts/`); prep notes.
+
+## Remaining (Arnav)
+- Codespace fresh-clone test; college email in the README header; record the video; export the deck to
+  `docs/presentation.pdf`; check every link in an incognito window; submit (GATE D).
 
 ## Next
 - Phase 9 hardening: DONE for the fresh-clone test (README install, `pytest -q`, `demo --fast`) and the idle benchmark
