@@ -25,9 +25,12 @@ Items marked (proposed) await confirmation at a gate.
 - **A-09 Tweet coverage and the original-ticker rule.** Each tweet links only to its original ticker (D-033). The
   dataset's PG and MSFT sets are copies of the AMZN set, so PG and MSFT have no tweets of their own; AMZN tweets never
   move PG or MSFT. Original tweets per universe name range from TSLA 35,565 to KO 173 (before quality filters); JPM,
-  BAC, GS, XOM, CVX, JNJ, PG and MSFT have news only. PG's news coverage is also thin (297 feed items in the year),
-  so its decayed sentiment usually sits inside the ±0.10 deadband and its weight stays near the 5% baseline. This is
-  intended behaviour: no signal means no tilt.
+  BAC, GS, XOM, CVX, JNJ, PG and MSFT have news only. PG's news coverage is also thin (294 mentions in the year).
+  Its weight stays near the 5% baseline mainly through **confidence decay**, not the deadband: the decayed sentiment
+  keeps its last value between sparse items (inside ±0.10 on only 22.6% of days), but the confidence c, which
+  multiplies the tilt, decays toward zero (PG mean 0.06 vs TSLA 0.99). PG's own tilt exp(κ·s·c) − 1 has a median of
+  0.18% (95th percentile ±10% on days with genuine P&G news). The rest of PG's weight variation (3.9%-6.3%) comes from
+  renormalisation as other names tilt. Intended behaviour: weak or stale evidence means little or no tilt.
 - **A-06 GDELT GKG sampling** (proposed): about 25% of US-session news (one 15-min file per hour). Signal velocity and
   breadth computed from sampled news are therefore relative measures, not absolute article counts.
 - **A-07 Sentiment labels.** HF label map: 0 = bearish → negative, 1 = bullish → positive, 2 = neutral.

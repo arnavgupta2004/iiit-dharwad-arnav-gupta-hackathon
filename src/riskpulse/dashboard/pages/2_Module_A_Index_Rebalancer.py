@@ -24,8 +24,9 @@ st.markdown(
 st.markdown(
     '<p class="rp-note"><b>Signal coverage.</b> Each tweet links only to its original ticker: the tweet dataset\'s '
     "PG and MSFT sets are copies of the AMZN set, so AMZN posts never move PG or MSFT. PG has thin news coverage "
-    "and no tweets of its own; its sentiment usually stays inside the ±0.10 deadband, so it holds close to its 5% "
-    "baseline weight. That is intended: no signal, no tilt.</p>",
+    "and no tweets of its own. Between sparse items its confidence c decays toward zero, so its own tilt exp(κ·s·c) "
+    "is usually negligible (the ±0.10 deadband removes weak scores too); remaining weight changes come from "
+    "renormalisation as other names tilt. Intended: weak or stale evidence, little or no tilt.</p>",
     unsafe_allow_html=True,
 )
 

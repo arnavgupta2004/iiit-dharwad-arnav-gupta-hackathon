@@ -30,8 +30,9 @@ original tweets. Among genuine labels, the first-mentioned cashtag decides; a tw
 universe (e.g. TSM) links to nothing. The rule is applied in the tweet loader (future feed builds), in the live
 linker, and between stage 1 and stage 2 for the cached batch (no model re-run), using the committed map
 `data/replay/tweet_original_ticker.csv` (63,686 distinct texts). News never links PG unless the headline names P&G
-(context rules, D-020). PG stays in the universe; with a sparse signal its sentiment is mostly inside the ±0.10
-deadband, so it stays near its baseline weight.
+(context rules, D-020). PG stays in the universe. Correction to the pre-GATE C note: PG stays near baseline mainly
+through confidence decay (mean c = 0.06), not the deadband (|s| < 0.10 on only 22.6% of days); its own tilt has a median
+of 0.18% (ASSUMPTIONS A-09).
 
 ### D-034 Entity signals on a stream-time cadence
 Batch mode called the engine once, so entity signals were emitted only at the end (20 for the whole year). Entity
