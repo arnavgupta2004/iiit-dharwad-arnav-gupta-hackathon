@@ -157,3 +157,17 @@ def test_gkg_latest_steps_back_past_files_not_yet_downloadable() -> None:
     docs = src()
     assert [d.url for d in docs] == ["u1"] and src.lag_files == 2
     assert src() == []  # already read; newer files still missing
+
+
+def test_doc_source_counts_as_failed_when_every_query_gives_up(tmp_path) -> None:
+    class Throttled:
+        failures = 0
+
+        def search(self, query, timespan="1h"):
+            self.failures += 1
+            return []
+
+    src = {"gdelt_doc": DocQueries(CFG, client=Throttled())}
+    p = LivePoller(fake_process, lambda s: None, sources=src, cfg=CFG, out_dir=tmp_path)
+    p.poll_once()
+    assert p.stats["source_errors"]["gdelt_doc"] == 1

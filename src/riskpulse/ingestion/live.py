@@ -119,8 +119,11 @@ class DocQueries:
 
     def __call__(self) -> list[Document]:
         docs: list[Document] = []
-        for q in self.cfg["gdelt"]["queries"]:
+        queries, before = self.cfg["gdelt"]["queries"], getattr(self.client, "failures", 0)
+        for q in queries:
             docs += to_documents(self.client.search(q, timespan=self.cfg["timespan"]))
+        if queries and getattr(self.client, "failures", 0) - before == len(queries):
+            raise RuntimeError("every GDELT DOC query failed (throttled or disconnected)")
         for d in docs:
             d.meta["live_source"] = "gdelt_doc"
         return docs

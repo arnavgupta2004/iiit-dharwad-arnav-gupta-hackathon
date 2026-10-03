@@ -28,6 +28,7 @@ class GdeltDocClient:
         self.session = session or requests.Session()
         self._last = 0.0
         self._lock = threading.Lock()
+        self.failures = 0  # queries given up after retries (throttling or connection errors)
 
     def _wait_turn(self) -> None:
         with self._lock:
@@ -61,6 +62,7 @@ class GdeltDocClient:
             except ValueError:
                 return []  # GDELT returns an empty body when nothing matches
         log.error(f"GDELT DOC gave up after retries for query {query!r}")
+        self.failures += 1
         return []
 
 
