@@ -7,6 +7,8 @@
 
 Built with AI-assisted coding tools; system design, data labelling and evaluation were reviewed and validated by the author.
 
+![RiskPulse in 60 seconds: the dashboard landing page, showing the 22 Feb 2022 stress-test trigger](docs/riskpulse_60s.gif)
+
 <!-- GLANCE:START -->
 ### Results at a glance
 
