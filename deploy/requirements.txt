@@ -1,0 +1,12 @@
+# Hosted dashboard on Streamlit Community Cloud: demo --fast mode only (precomputed outputs, no models).
+# Community Cloud reads this file first because it sits next to the entrypoint (deploy/streamlit_app.py).
+# Versions match the root requirements.txt.
+streamlit==1.64.0
+plotly==7.1.0
+pandas==3.0.6
+numpy==2.4.6
+scipy==1.17.1
+pyarrow==25.0.1
+pyyaml==6.0.3
+pydantic==2.13.5
+httpx==0.28.1

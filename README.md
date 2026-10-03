@@ -4,6 +4,7 @@
 **College / Campus:** IIIT Dharwad
 **Demo Video Link:** [YouTube unlisted link: to be added]
 **Slide Deck Link (if hosted externally):** [`docs/presentation.pdf`](docs/presentation.pdf)
+**Live demo (optional; may take ~1 min to wake):** [Streamlit link: to be added after deployment] (dashboard on the committed snapshot; no live `/analyze`)
 
 Built with AI-assisted coding tools; system design, data labelling and evaluation were reviewed and validated by the author.
 
