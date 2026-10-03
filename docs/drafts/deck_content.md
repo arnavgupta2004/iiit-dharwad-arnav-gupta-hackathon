@@ -101,7 +101,8 @@ Visual: Module B page (ranked stress runs, top 3 per month). All counterparties 
 2. Market-wide impact does not predict SPY or VIX moves (ρ ≈ 0).
 3. Oil shock underestimated in 2022: +6.5% predicted vs +18.0% realised (analogues mix risk-off with supply shocks).
 4. June 2022 FOMC missed: no adverse trigger, and the reaction was a relief rally (no surprise-vs-consensus measure).
-5. Trigger precision against VIX/SPY event days was never measured.
+5. Trigger timing is no better than random against SPY/VIX stress days: precision 26.4% vs 26.6% random
+   (pre-registered, D-062/D-063); it fires on 71% of sessions.
 
 Next: supply-shock vs risk-off scenarios; surprise-vs-consensus for scheduled releases; labelled news for events.
 

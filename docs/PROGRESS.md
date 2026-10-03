@@ -51,6 +51,12 @@ Status legend: DONE · IN PROGRESS · NEXT · OPEN
 - Module B ranked stress-run view; 2022-check timing fields (D-061); README "Results at a glance"; deck and video
   script v3 (`docs/drafts/`); prep notes.
 
+## Limited exception to the freeze (Arnav, 2026-10-03), tag v1.0-submit-ready before it
+- Trigger validation pre-registered and computed (D-062/D-063): no better than random timing; in metrics, README, Module B page.
+- Landing page "RiskPulse in 60 seconds"; README hero GIF; README AI-assisted note.
+- Hosted demo: blocked: Docker/Gradio Spaces need HF PRO (account is free); options given to Arnav.
+- Fresh-clone CI re-run: passed.
+
 ## Remaining (Arnav)
 - Codespace fresh-clone test; college email in the README header; record the video; export the deck to
   `docs/presentation.pdf`; check every link in an incognito window; submit (GATE D).
