@@ -4,6 +4,25 @@ Newest first within each date. Each entry: decision, rationale, and status (acce
 
 ## 2026-10-02 (event classification round 2, approved by Arnav)
 
+### D-062 PRE-REGISTERED before computing: trigger validation against market stress days (spec §7.5; Arnav)
+A limited exception to the feature freeze (D-060): this adds an evaluation only. No model, scoring or trigger logic
+changes. Recorded and committed before any statistic is computed.
+- **Sessions:** NYSE sessions (from the cached SPY history) from 2021-09-30 to 2022-09-29, the replay window.
+- **Stress day:** a session with an SPY adjusted-close return <= −2.0% against the previous session, **or** a ^VIX close
+  >= 15% above the previous close.
+- **Trigger sessions:** every stress run of the final system (`data/processed/moduleB/stress_runs.jsonl`), mapped to a
+  session with the 16:00 ET rule (after-close triggers count for the next session). Several runs in one session count
+  once.
+- **Hit:** a trigger session s is a hit if a stress day falls on s, s+1 or s+2 (trading sessions).
+- **Precision** = hits / trigger sessions. **Recall** = stress days d with a trigger session in {d−2, d−1, d} / stress
+  days.
+- **Random baseline:** the same number of distinct sessions drawn uniformly without replacement from the window's
+  sessions; 1,000 draws, seed 20261003. Report the mean and the 2.5–97.5% interval of precision and recall, and the share
+  of draws with precision >= the observed (a one-sided p-value).
+- **Secondary, reported only:** the same metrics by event class.
+- **Reporting:** whatever comes out goes into `metrics.json → trigger_validation`, the README and the Module B page,
+  via `riskpulse eval trigger_validation`. Nothing is tuned on it.
+
 ### D-061 Presentation-only changes under the feature freeze (Arnav)
 - **Module B page:** stress runs are shown ranked by impact (then outlets), with the top 3 per month highlighted. The
   full list is behind a toggle and the totals stay visible. No change to trigger logic or any model.
