@@ -25,7 +25,7 @@ from riskpulse.api.hub import SignalHub
 from riskpulse.common.config import load_config
 from riskpulse.common.logging import get_logger
 from riskpulse.common.schemas import Signal
-from riskpulse.store.signal_store import default_paths, serving_signals_path
+from riskpulse.store.signal_store import serving_signals_path, session_signals_path
 
 log = get_logger()
 
@@ -49,7 +49,10 @@ def create_app(
 ) -> FastAPI:
     """Build the app. ``live`` is a LiveEngine (full mode); ``replay`` = (start, end, sec/day);
     ``poller`` is a LivePoller (live mode) whose thread starts with the app."""
-    hub = hub or SignalHub(default_paths()[0], load_existing=True, load_from=serving_signals_path())
+    # Serve the batch (or snapshot) signals; append new ones to the session file only.
+    hub = hub or SignalHub(
+        session_signals_path(), load_existing=True, load_from=serving_signals_path()
+    )
     state: dict = {
         "mode": mode,
         "live": live,

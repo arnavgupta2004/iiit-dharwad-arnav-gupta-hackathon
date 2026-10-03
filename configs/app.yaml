@@ -3,7 +3,8 @@
 paths:
   replay_feed: data/replay/feed.jsonl.gz
   feed_stats: reports/feed_stats.json
-  signals_jsonl: data/signals/signals.jsonl
+  signals_jsonl: data/signals/signals.jsonl     # batch output only (read by Module B and evaluation)
+  session_signals: data/session/signals.jsonl   # API demo replay and /inject (gitignored, never evaluated)
   duckdb: data/processed/riskpulse.duckdb
   prices_dir: data/prices
   reports_dir: reports

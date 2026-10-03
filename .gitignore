@@ -57,6 +57,8 @@ data/processed/models/
 data/signals/signals.jsonl
 # live mode output (current news, unvalidated; never used for metrics)
 data/live/
+# API session output (demo replay, /inject); never read by evaluation
+data/session/
 
 # Round-2 gold sampling metadata holds model predictions; kept local to avoid anchoring (D-052).
 data/processed/gold2_sampling_meta.parquet

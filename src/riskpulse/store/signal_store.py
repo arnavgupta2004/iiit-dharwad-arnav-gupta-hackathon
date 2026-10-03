@@ -54,6 +54,12 @@ def read_signals_jsonl(path: Path | None = None) -> list[Signal]:
         return [Signal.model_validate_json(line) for line in fh if line.strip()]
 
 
+def session_signals_path() -> Path:
+    """Where the API appends signals it produces (demo replay, /inject): never the batch file,
+    which Module B and evaluation read."""
+    return repo_root() / load_config("app")["paths"]["session_signals"]
+
+
 def serving_signals_path() -> Path:
     """Signals to serve: the batch output if present, else the committed demo snapshot.
 
