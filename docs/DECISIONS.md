@@ -2,6 +2,31 @@
 
 Newest first within each date. Each entry: decision, rationale, and status (accepted, or proposed pending Arnav's OK at a gate).
 
+## 2026-10-03 (live-mode check, Arnav item 6)
+
+### D-065 Live mode wired; GKG latest file as the main live source; outputs labelled "live, unvalidated"
+`live` mode was specified (spec §5.1) but only the GDELT DOC client existed; no poller ran. Added
+`riskpulse/ingestion/live.py` and `serve --live` / `demo --live`: each poll fetches current news, passes new items
+through the unchanged engine (same models, impact scoring and aggregation), and publishes the signals. No model,
+scoring or trigger change.
+- **Sources.** The DOC API refused or throttled every request during the check (HTTP 429, dropped connections), even
+  after long pauses, so the newest **GKG 15-minute file** is now the main live source: it is not rate-limited and
+  goes through the same gates as the replay feed (`filter_records`, `relink`, no org-only items, market items need
+  an economic theme). DOC queries stay as a best-effort second source with fewer retries, so a poll cannot stall.
+- **GDELT lag.** `lastupdate.txt` can name a GKG file that is not yet downloadable (HTTP 404 for an hour or more
+  during the check). The GKG source steps back 15 minutes at a time to the newest file that exists.
+- **Stream time.** The engine assumes time moves forward, so items older than the newest processed item are counted
+  as late and dropped; exact duplicates (URL or canonical headline) are dropped as in the batch feed.
+- **Isolation.** Live signals are never written to `data/signals/` (the batch output read by evaluation). The hub
+  starts empty in live mode; the poller keeps a labelled log under `data/live/` (gitignored). The Signal Monitor
+  shows a "LIVE, UNVALIDATED" panel only when the API runs in live mode; the hosted snapshot app never shows it.
+- **Not used for any metric.** Live outputs have no labels or market outcome attached; nothing in `reports/` reads them.
+- **Observed in the check (qualitative):** headlines arrived with entity, sentiment, event class and impact; most
+  were company items from investing sites or global macro items. Weaknesses seen: market-wide items are not limited
+  to US-relevant news; an equity-rating downgrade of a non-universe company scored as a high-impact market-wide
+  credit event; some GDELT titles carry upstream double-encoded characters (also present in a few replay-feed
+  titles); no social source (no free live one).
+
 ## 2026-10-02 (event classification round 2, approved by Arnav)
 
 ### D-064 Hosted demo on Streamlit Community Cloud (Arnav: option C), dashboard only

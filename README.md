@@ -112,6 +112,7 @@ Open http://localhost:8501 (dashboard) and http://127.0.0.1:8000/docs (API).
 
 ```bash
 python -m riskpulse demo             # loads models; replays Feb-Mar 2022 live through the engine
+python -m riskpulse demo --live      # current GDELT news (news only), labelled "live, unvalidated" (D-065)
 python -m riskpulse eval all         # regenerates every metric in reports/
 pytest -q                            # tests
 ```

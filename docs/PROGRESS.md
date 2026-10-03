@@ -56,10 +56,16 @@ Status legend: DONE · IN PROGRESS · NEXT · OPEN
 - Landing page "RiskPulse in 60 seconds"; README hero GIF; README AI-assisted note.
 - Hosted demo: Streamlit Community Cloud entrypoint ready (`deploy/`, D-064); Arnav deploys it and sends the URL.
 - Fresh-clone CI re-run: passed.
+- Live mode wired and checked for 30 minutes on current GDELT news (D-065); outputs labelled live, unvalidated.
 
 ## Remaining (Arnav)
-- Codespace fresh-clone test; college email in the README header; record the video; export the deck to
-  `docs/presentation.pdf`; check every link in an incognito window; submit (GATE D).
+- Deploy the Streamlit app (repo stays private until submission; Streamlit gets private-repo access) and send the URL.
+- Record the video and send the YouTube Unlisted link.
+- Submission day, in this order (GATE D):
+  1. **Make the GitHub repo public** (Settings → Danger Zone → Change visibility). Required: a private or
+     inaccessible repo fails the submission.
+  2. In an incognito window, open the repo, README, deck PDF, video link and Streamlit app.
+  3. Submit.
 
 ## Next
 - Phase 9 hardening: DONE for the fresh-clone test (README install, `pytest -q`, `demo --fast`) and the idle benchmark
