@@ -4,6 +4,19 @@ Newest first within each date. Each entry: decision, rationale, and status (acce
 
 ## 2026-10-03 (live-mode check, Arnav item 6)
 
+### D-066 Demo replay and /inject no longer write to the batch signals file (Arnav)
+The API hub appended every signal it produced (demo replay, `/inject`) to `data/signals/signals.jsonl`, the batch
+output that the Module B backtest (`stress --replay`), `impact_market_check` and the demo-snapshot builder read.
+**Audit before the fix:** no `synthetic_demo` rows, no `synthetic://` URLs, no duplicate signal IDs and no backward
+step in time (an appended replay would restart in February 2022) in the batch file, the stress runs, the mentions or
+the committed demo snapshot; the batch file was last written by the final batch run (D-060). So no reported metric
+was affected. **Fix:** the hub still serves the batch (or snapshot) signals but appends new ones only to
+`data/session/signals.jsonl` (gitignored, config `paths.session_signals`); live mode was already isolated (D-065).
+A test runs the full-mode app with the demo replay and `/inject` and asserts the batch file is byte-identical; it
+fails under the old behaviour. **Re-run check:** `eval impact_market_check`, `moduleB`, `predicted_vs_realised` and
+`trigger_validation` reproduced every value in `reports/metrics.json` and a byte-identical `stress_runs.jsonl`; only
+the provenance stamps changed, so the committed metrics file was kept.
+
 ### D-065 Live mode wired; GKG latest file as the main live source; outputs labelled "live, unvalidated"
 `live` mode was specified (spec §5.1) but only the GDELT DOC client existed; no poller ran. Added
 `riskpulse/ingestion/live.py` and `serve --live` / `demo --live`: each poll fetches current news, passes new items

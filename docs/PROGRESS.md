@@ -57,6 +57,7 @@ Status legend: DONE · IN PROGRESS · NEXT · OPEN
 - Hosted demo: Streamlit Community Cloud entrypoint ready (`deploy/`, D-064); Arnav deploys it and sends the URL.
 - Fresh-clone CI re-run: passed.
 - Live mode wired and checked for 30 minutes on current GDELT news (D-065); outputs labelled live, unvalidated.
+- Demo replay and /inject write to `data/session/`, never the batch signals file; metrics re-checked unchanged (D-066).
 
 ## Remaining (Arnav)
 - Deploy the Streamlit app (repo stays private until submission; Streamlit gets private-repo access) and send the URL.
