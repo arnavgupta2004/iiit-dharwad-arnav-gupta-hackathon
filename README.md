@@ -5,6 +5,8 @@
 **Demo Video Link:** [YouTube unlisted link: to be added]
 **Slide Deck Link (if hosted externally):** [`docs/presentation.pdf`](docs/presentation.pdf)
 
+Built with AI-assisted coding tools; system design, data labelling and evaluation were reviewed and validated by the author.
+
 <!-- GLANCE:START -->
 ### Results at a glance
 
