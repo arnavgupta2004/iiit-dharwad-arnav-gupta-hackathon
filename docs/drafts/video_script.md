@@ -13,14 +13,15 @@ Before recording:
 
 ---
 
-## 0:00–0:35 · Hook and intro (Module B page, Feb 2022 zoomed in)
+## 0:00–0:45 · Hook and intro (landing page, then Module B, Feb 2022)
 
-On screen: Module B page, trigger timeline zoomed to 20-25 Feb 2022, then the ranked stress-run table (February).
+On screen: the dashboard landing page "RiskPulse in 60 seconds" (timeline of the 22 Feb triggers; hover the first diamond), then the Module B ranked stress-run table (February).
 
 Voice-over:
 > "At midnight UTC on the 22nd of February 2022, this system triggered a geopolitical stress test: Russia had
 > recognised two separatist regions of Ukraine. Six hours later it fired again on the troop order. The full-scale
-> invasion began two days after that. I'm Arnav Gupta from IIIT Dharwad, and this is RiskPulse: it reads a year of
+> invasion began two days after that. That's one episode, not proof of skill: across the year, trigger timing was no
+> better than random, and I'll show you why. I'm Arnav Gupta from IIIT Dharwad, and this is RiskPulse: it reads a year of
 > real news and tweets in time order, turns each item into a risk signal, and acts on it, here with a stress test on a
 > ten-billion-dollar synthetic banking book."
 
@@ -28,7 +29,7 @@ Wording rule: "flagged the escalation", never "predicted the invasion".
 
 ---
 
-## 0:35–1:05 · Setup and run (terminal)
+## 0:45–1:10 · Setup and run (terminal)
 
 On screen: README Quickstart, then the terminal.
 
@@ -46,7 +47,7 @@ Show briefly: the `model origin` log lines (repo / hub, no FALLBACK), then `127.
 
 ---
 
-## 1:05–2:00 · Input to signal (Signal Monitor page)
+## 1:10–2:00 · Input to signal (Signal Monitor page)
 
 Actions:
 1. Document feed: headlines arriving with entity, sentiment, event class and impact.
@@ -57,8 +58,7 @@ Actions:
 Voice-over:
 > "Each item is linked to companies or to the market, scored for sentiment with FinBERT for news and a tweet-tuned
 > FinBERT for tweets, classified into one of ten event types, and grouped into stories. Impact comes from a model
-> trained on about ten years of headlines against abnormal stock returns, and every score shows its drivers. Entity linking
-> is 82% precise on 100 hand-checked links."
+> trained on about ten years of headlines against abnormal stock returns, and every score shows its drivers."
 
 ---
 
@@ -91,19 +91,21 @@ Voice-over:
 
 ---
 
-## 3:35–4:30 · Results and honesty (Model Quality page, then deck slide 5 or the README glance)
+## 3:35–4:35 · Results and honesty (Model Quality page, Module B "Trigger validation" tiles, README glance)
 
 Voice-over:
 > "Every number comes from one command, `riskpulse eval all`. The learned impact score beats the hand-set formula,
 > 0.111 against 0.055 Spearman with abnormal returns, and is on par with sentiment strength alone. On hand-labelled
-> live news, FinBERT scores 0.59 macro-F1 against 0.47 for a lexicon. The pipeline handles 87 documents a second on a
-> laptop CPU. And what didn't work: two rounds of event classification, including 500 hand labels and a blind test,
-> didn't beat a keyword baseline; market-wide impact doesn't predict market moves; and we missed the June 2022 Fed
-> hike, where the market rallied in relief. All of that is in the README, with the decision log."
+> live news, FinBERT scores 0.59 macro-F1 against 0.47 for a lexicon, and entity linking is 82% precise. Now the
+> promised why: I tested trigger timing against real market stress days, with the definition fixed in advance. Precision
+> is 26.4%, against 26.6% for random days, because the triggers fire on 71% of sessions. So the value of Module B
+> today is the explainable stress computation once an event is flagged, not the timing. Also didn't work: two rounds
+> of event classification, with 500 hand labels and a blind test, didn't beat a keyword baseline; market-wide impact
+> doesn't predict market moves; and we missed the June 2022 Fed hike. All of it is in the README and the decision log."
 
 ---
 
-## 4:30–4:50 · Close
+## 4:35–4:55 · Close
 
 On screen: deck slide 7 or the README Limitations.
 
@@ -118,6 +120,6 @@ Checklist after recording:
   the "a fresh clone runs the reported system" line.
 - [ ] Length 4:30–5:00.
 - [ ] Every spoken number matches `reports/metrics.json` (and the README glance).
-- [ ] The 2022 claim says "flagged the escalation", with the 22 Feb 00:00 UTC timestamp.
+- [ ] The 2022 claim says "flagged the escalation", with the 22 Feb 00:00 UTC timestamp, followed by the "one episode, not proof of skill" line.
 - [ ] Nothing synthetic is presented as real (the book and injected events are labelled synthetic).
 - [ ] The Unlisted link plays in an incognito window and is added to the README.
