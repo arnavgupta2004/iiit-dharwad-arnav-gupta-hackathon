@@ -13,11 +13,22 @@ replay:
 
 live:
   poll_minutes: 15
+  timespan: 1h                      # look-back of each poll; repeats are dropped by URL / headline
+  keep_recent: 500                  # scored mentions kept in memory for the dashboard
+  # GKG first: same filter as the replay feed and not rate-limited; DOC API is best-effort (D-065).
+  sources: [gdelt_gkg, gdelt_doc]
+  gkg:
+    lastupdate_url: http://data.gdeltproject.org/gdeltv2/lastupdate.txt
   gdelt:
+    # One request per query per poll. Company names of the universe, then market-wide topics.
+    queries:
+      - '(Apple OR Microsoft OR Intel OR Google OR Alphabet OR Netflix OR Disney OR Amazon OR Tesla OR Boeing)'
+      - '(JPMorgan OR "Bank of America" OR "Goldman Sachs" OR Exxon OR Chevron OR "Johnson & Johnson" OR Costco OR "Coca-Cola" OR "Procter & Gamble" OR "Meta Platforms")'
+      - '("Federal Reserve" OR inflation OR recession OR sanctions OR tariffs OR "interest rates" OR "credit rating" OR default)'
     base_url: https://api.gdeltproject.org/api/v2/doc/doc
     min_seconds_between_requests: 6   # API asks for <= 1 request / 5 s (verified 2026-10-01)
     backoff_seconds_on_429: 15
-    max_retries: 5
+    max_retries: 2                  # live polls must not stall on a throttled API
     maxrecords: 250
   newsapi:
     enabled_if_key: true              # reads NEWSAPI_KEY from .env; 100 req/day on free plan

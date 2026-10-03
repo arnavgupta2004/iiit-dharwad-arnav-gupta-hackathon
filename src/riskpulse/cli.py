@@ -129,20 +129,37 @@ def serve(
     replay_start: str = typer.Option(None, help="With --full: replay the feed from this date."),
     replay_end: str = typer.Option(None, help="With --full: replay end date (exclusive)."),
     seconds_per_day: float = typer.Option(None, help="Replay pace (default from config)."),
+    live_mode: bool = typer.Option(
+        False, "--live", help="Poll current GDELT news (implies --full; news only, unvalidated)."
+    ),
+    poll_minutes: float = typer.Option(None, help="With --live: minutes between polls."),
 ) -> None:
     """Start the FastAPI signal server (REST + SSE)."""
     import uvicorn
 
     from riskpulse.api.app import create_app
 
-    live, replay = None, None
-    if full:
+    live, replay, poller, hub = None, None, None, None
+    if full or live_mode:
         from riskpulse.api.live import LiveEngine
 
         live = LiveEngine()
-        if replay_start and replay_end:
+        if live_mode:
+            from riskpulse.api.hub import SignalHub
+            from riskpulse.common.config import load_config
+            from riskpulse.ingestion.live import LivePoller
+
+            # Live signals never mix with the batch outputs: empty hub, nothing persisted to
+            # data/signals/ (the poller keeps its own labelled log under data/live/).
+            hub = SignalHub(None, load_existing=False)
+            cfg = load_config("app")["live"]
+            if poll_minutes:
+                cfg["poll_minutes"] = poll_minutes
+            poller = LivePoller(live.process, hub.publish, cfg=cfg)
+        elif replay_start and replay_end:
             replay = (replay_start, replay_end, seconds_per_day or 60.0)
-    application = create_app("full" if full else "fast", live=live, replay=replay)
+    mode = "live" if live_mode else "full" if full else "fast"
+    application = create_app(mode, hub=hub, live=live, replay=replay, poller=poller)
     uvicorn.run(application, host=host, port=port, log_level="info")
 
 
@@ -154,6 +171,10 @@ def demo(
     seconds_per_day: float = typer.Option(60.0, help="Full mode: wall seconds per market day."),
     api_port: int = typer.Option(8000),
     dashboard_port: int = typer.Option(8501),
+    live_mode: bool = typer.Option(
+        False, "--live", help="Poll current GDELT news instead of the 2022 replay (unvalidated)."
+    ),
+    poll_minutes: float = typer.Option(None, help="With --live: minutes between polls."),
 ) -> None:
     """One-command demo: signal API + Streamlit dashboard (Ctrl+C stops both)."""
     import os
@@ -165,7 +186,9 @@ def demo(
 
     env = {**os.environ, "RISKPULSE_API": f"http://127.0.0.1:{api_port}"}
     api_cmd = [sys.executable, "-m", "riskpulse", "serve", "--port", str(api_port)]
-    if not fast:
+    if live_mode:
+        api_cmd += ["--live"] + (["--poll-minutes", str(poll_minutes)] if poll_minutes else [])
+    elif not fast:
         api_cmd += [
             "--full",
             "--replay-start",
@@ -189,9 +212,16 @@ def demo(
         "--theme.base",
         "light",
     ]
+    kind = (
+        "live: current GDELT news, unvalidated"
+        if live_mode
+        else "fast: cached outputs"
+        if fast
+        else "full: live models + replay"
+    )
     procs = [subprocess.Popen(api_cmd, env=env), subprocess.Popen(dash_cmd, env=env)]
     typer.secho(
-        f"RiskPulse demo ({'fast: cached outputs' if fast else 'full: live models + replay'})\n"
+        f"RiskPulse demo ({kind})\n"
         f"  Dashboard: http://localhost:{dashboard_port}\n  API:       http://127.0.0.1:{api_port}/docs",
         fg="green",
     )

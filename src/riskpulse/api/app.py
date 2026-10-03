@@ -4,6 +4,8 @@ Modes:
 - ``fast``: serves precomputed signals only (no models loaded); /analyze and /inject return 503.
 - ``full``: loads the models; /analyze scores text instantly, /inject pushes a labelled synthetic
   headline through the live engine, and an optional paced replay publishes new signals.
+- ``live`` (full mode + a poller): polls the GDELT DOC API for current news; outputs are
+  labelled "live, unvalidated" and served by ``GET /live``.
 """
 
 from __future__ import annotations
@@ -43,13 +45,16 @@ def create_app(
     hub: SignalHub | None = None,
     live=None,
     replay: tuple[str, str, float] | None = None,
+    poller=None,
 ) -> FastAPI:
-    """Build the app. ``live`` is a LiveEngine (full mode); ``replay`` = (start, end, sec/day)."""
+    """Build the app. ``live`` is a LiveEngine (full mode); ``replay`` = (start, end, sec/day);
+    ``poller`` is a LivePoller (live mode) whose thread starts with the app."""
     hub = hub or SignalHub(default_paths()[0], load_existing=True, load_from=serving_signals_path())
     state: dict = {
         "mode": mode,
         "live": live,
         "replay_status": "idle",
+        "poller": poller,
         "started": datetime.now(UTC),
     }
 
@@ -77,7 +82,11 @@ def create_app(
             live.warm_up()
         if replay and live is not None:
             threading.Thread(target=_replay_worker, args=replay, daemon=True).start()
+        stop = threading.Event()
+        if poller is not None:
+            threading.Thread(target=poller.run, args=(stop,), daemon=True).start()
         yield
+        stop.set()
 
     app = FastAPI(title="RiskPulse Signal API", version=__version__, lifespan=lifespan)
     app.state.hub = hub
@@ -89,6 +98,7 @@ def create_app(
             "mode": state["mode"],
             "n_signals": len(hub.signals),
             "replay": state["replay_status"],
+            "live": poller.stats if poller is not None else None,
             "version": __version__,
         }
 
@@ -156,6 +166,14 @@ def create_app(
                 hub.unsubscribe(q)
 
         return EventSourceResponse(gen())
+
+    @app.get("/live")
+    def live_feed(limit: int = Query(200, ge=1, le=500)) -> dict:
+        """Live mode: poller status and the latest scored headlines (live, unvalidated)."""
+        if poller is None:
+            raise HTTPException(503, "Live mode is off. Start with: riskpulse serve --live")
+        rows = list(poller.recent)[-limit:][::-1]
+        return {"status": poller.stats, "mentions": rows}
 
     @app.post("/analyze")
     def analyze(req: AnalyzeRequest) -> dict:

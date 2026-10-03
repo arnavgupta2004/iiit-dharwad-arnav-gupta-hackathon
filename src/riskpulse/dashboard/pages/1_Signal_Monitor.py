@@ -13,6 +13,62 @@ from riskpulse.dashboard.theme import NAVY, SEQ_BLUE, event_color, kpi, setup_pa
 setup_page("Signal Monitor")
 st.title("Signal Monitor")
 
+
+@st.fragment(run_every=60)
+def live_panel() -> None:
+    """Current GDELT news scored by the engine; shown only when the API runs in live mode."""
+    health = data.api_health()
+    if not health or not health.get("live"):
+        return
+    res = data.api_get("/live", {"limit": 300}) or {}
+    stt, rows = res.get("status", {}), res.get("mentions", [])
+    st.subheader("Live feed: current news (live, unvalidated)")
+    st.markdown(
+        '<p class="rp-synth"><b>LIVE, UNVALIDATED.</b> Current GDELT news headlines scored by the same '
+        "engine. News only (no free live social source). These outputs are not used for any metric; "
+        "every reported number comes from the 2021-22 replay.</p>",
+        unsafe_allow_html=True,
+    )
+    k = st.columns(4)
+    k[0].markdown(
+        kpi("Polls", f"{stt.get('polls', 0)}", f"last {str(stt.get('last_poll'))[:19]} UTC"),
+        unsafe_allow_html=True,
+    )
+    k[1].markdown(
+        kpi(
+            "Headlines scored", f"{stt.get('processed', 0):,}", f"{stt.get('fetched', 0):,} fetched"
+        ),
+        unsafe_allow_html=True,
+    )
+    k[2].markdown(kpi("Mentions", f"{stt.get('mentions', 0):,}"), unsafe_allow_html=True)
+    k[3].markdown(kpi("Signals emitted", f"{stt.get('signals', 0):,}"), unsafe_allow_html=True)
+    if not rows:
+        st.info("Waiting for the first poll (GDELT allows one request every 5 seconds).")
+        return
+    live = pd.DataFrame(rows)
+    live["label"] = "live, unvalidated"
+    st.dataframe(
+        live[
+            [
+                "label",
+                "published_at",
+                "outlet",
+                "ticker",
+                "title",
+                "sentiment",
+                "event_class",
+                "impact_score",
+            ]
+        ].style.format({"sentiment": "{:+.2f}"}),
+        use_container_width=True,
+        hide_index=True,
+        height=320,
+    )
+    st.divider()
+
+
+live_panel()
+
 sig = data.signals_df()
 men = data.mentions_df()
 if sig.empty or men.empty:
