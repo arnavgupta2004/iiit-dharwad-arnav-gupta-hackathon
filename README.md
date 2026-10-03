@@ -18,7 +18,7 @@
 | **Entity linking precision 82.0%** (95% CI 73.3%–88.3%). | Human-checked: 100 random headline links. |
 | **Pipeline:** 86.6 documents/s batch; 21.3 ms p95 per document. | Measured on a 10-core laptop CPU, no GPU, with both sentiment models loaded. |
 
-Not everything worked; see [Limitations](#limitations-measured-not-assumed): event classification is no better than a keyword baseline, market-wide impact does not predict SPY or VIX moves, and the June 2022 FOMC hike was missed (no adverse trigger on the day; the reaction was a relief rally that the scenarios, lacking a surprise-vs-consensus measure, can't represent).
+Not everything worked; see [Limitations](#limitations-measured-not-assumed): event classification is no better than a keyword baseline, market-wide impact does not predict SPY or VIX moves, stress-trigger timing is no better than random against market stress days (it fires on most sessions), and the June 2022 FOMC hike was missed (no adverse trigger on the day; the reaction was a relief rally that the scenarios, lacking a surprise-vs-consensus measure, can't represent).
 <!-- GLANCE:END -->
 
 ## 1. Project Overview / Problem Statement & Approach
@@ -231,6 +231,8 @@ Turnover cap 5% one-way per day, set by policy for operational realism (D-045), 
 
 **Market-wide impact (v1), descriptive check (D-042):** over 188 sessions the day's maximum market-wide impact has Spearman -0.025 with abs(SPY return) (CI [-0.1606, 0.1143]) and -0.145 with abs(ΔVIX) (CI [-0.2866, 0.0119]): no measurable relation.
 
+**Trigger validation (pre-registered, D-062/D-063):** against 25 market stress days (SPY ≤ −2% or VIX ≥ +15%), trigger precision is 26.4% vs 26.6% for random sessions at the same rate (95% 23.0%–29.8%); recall 92.0% vs 97.6%. Triggers fall on 70.6% of sessions, so their timing has no measurable skill.
+
 **Module B out-of-sample check (2022 episodes; scenarios calibrated before Sep 2021 only)**
 
 | Episode | Status | Sign agreement | Book impact predicted | Book impact realised |
@@ -261,7 +263,8 @@ to a named historical episode.
   adverse macro story reached the trigger on the day, and the market's actual reaction was a relief rally, which a
   stress scenario can't represent. An earlier version did trigger, on the relief-rally headline itself; that flaw led
   to the adverse-sentiment rule (D-059).
-- Trigger timing was never validated against VIX spikes or SPY drawdown days, so trigger precision is unmeasured.
+- Trigger timing has no measurable skill: against SPY ≤ −2% / VIX ≥ +15% stress days, precision is 26.4% vs 26.6% for random
+  sessions at the same rate, because triggers fall on 71% of sessions (pre-registered, D-062/D-063).
 - Data: one year of replay, 20 names, a 1-in-4 sample of GDELT files, tweets for 12 of 20 names, rule-based linking,
   and a synthetic book with credit-risk RWA only.
 

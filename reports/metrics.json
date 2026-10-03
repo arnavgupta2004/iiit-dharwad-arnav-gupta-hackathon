@@ -7910,5 +7910,91 @@
       "generated_at": "2026-10-02T17:20:23+00:00",
       "git_commit": "251a8e7"
     }
+  },
+  "trigger_validation": {
+    "protocol": "pre-registered in DECISIONS.md D-062 before computing",
+    "definition": "stress day: SPY adj-close return <= -2.0% or ^VIX close >= +15% vs previous close; hit: stress day on the trigger session or the next 2 sessions (16:00 ET rule)",
+    "window": [
+      "2021-09-30",
+      "2022-09-29"
+    ],
+    "n_sessions": 252,
+    "n_stress_days": 25,
+    "n_stress_days_spy": 19,
+    "n_stress_days_vix": 16,
+    "n_stress_runs": 345,
+    "n_trigger_sessions": 178,
+    "share_of_sessions_with_trigger": 0.7063,
+    "precision": 0.264,
+    "recall": 0.92,
+    "random_baseline": {
+      "draws": 1000,
+      "precision_mean": 0.2662,
+      "precision_95": [
+        0.2303,
+        0.2979
+      ],
+      "recall_mean": 0.9759,
+      "recall_95": [
+        0.88,
+        1.0
+      ],
+      "share_of_draws_precision_ge_observed": 0.609
+    },
+    "by_class_reported_only": {
+      "CREDIT_EVENT": {
+        "trigger_sessions": 61,
+        "precision": 0.2623,
+        "recall": 0.52
+      },
+      "GEOPOLITICAL": {
+        "trigger_sessions": 130,
+        "precision": 0.2538,
+        "recall": 0.88
+      },
+      "MACROECONOMIC": {
+        "trigger_sessions": 53,
+        "precision": 0.283,
+        "recall": 0.56
+      },
+      "OPERATIONAL_ESG": {
+        "trigger_sessions": 15,
+        "precision": 0.1333,
+        "recall": 0.08
+      }
+    },
+    "stress_days": [
+      "2021-11-26",
+      "2021-11-30",
+      "2022-01-05",
+      "2022-01-13",
+      "2022-01-18",
+      "2022-02-03",
+      "2022-02-10",
+      "2022-02-17",
+      "2022-03-07",
+      "2022-04-11",
+      "2022-04-22",
+      "2022-04-26",
+      "2022-04-29",
+      "2022-05-05",
+      "2022-05-09",
+      "2022-05-18",
+      "2022-06-09",
+      "2022-06-10",
+      "2022-06-13",
+      "2022-06-16",
+      "2022-06-28",
+      "2022-08-22",
+      "2022-08-26",
+      "2022-09-13",
+      "2022-09-29"
+    ],
+    "note": "Evaluation only (D-062); trigger logic unchanged.",
+    "_provenance": {
+      "script": "riskpulse eval trigger_validation",
+      "generated_at": "2026-10-03T09:25:34+00:00",
+      "git_commit": "d5fce42"
+    }
   }
 }

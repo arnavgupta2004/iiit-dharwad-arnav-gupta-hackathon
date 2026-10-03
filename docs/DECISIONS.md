@@ -4,6 +4,19 @@ Newest first within each date. Each entry: decision, rationale, and status (acce
 
 ## 2026-10-02 (event classification round 2, approved by Arnav)
 
+### D-063 Trigger validation result: no better than random timing (D-062, computed once)
+`metrics.json → trigger_validation`. Window 2021-09-30 to 2022-09-29: 252 sessions, 25 stress days
+(19 SPY ≤ −2%, 16 VIX ≥ +15%; some days are both). 345 stress runs fall on 178 sessions
+(**70.6% of all sessions**).
+- **Precision 26.4%** vs random 26.6% (95% 23.0–29.8%); 61% of random
+  draws do at least as well.
+- **Recall 92.0%** vs random 97.6% (95% 88.0–100.0%).
+- By class (reported only), none beats the baseline precision materially: CREDIT_EVENT 26.2%, GEOPOLITICAL 25.4%, MACROECONOMIC 28.3%, OPERATIONAL_ESG 13.3%.
+**Reading:** at this firing rate, trigger timing carries no measurable information about market stress days. The
+trigger is a news-driven alert, not a market-stress predictor, and it fires on most sessions. The 2022-02-22 escalation
+is one episode, not evidence of systematic skill. Nothing is tuned on this (feature freeze); the next step is a much
+more selective trigger, validated on a different window.
+
 ### D-062 PRE-REGISTERED before computing: trigger validation against market stress days (spec §7.5; Arnav)
 A limited exception to the feature freeze (D-060): this adds an evaluation only. No model, scoring or trigger logic
 changes. Recorded and committed before any statistic is computed.
@@ -282,6 +295,7 @@ attached are listed separately at the end.
 | 12 | Round 2 downstream (D-055) | v2 retrained (validation check), impact evals, triggers, Module B and 2022 check rerun with C1 | abnormal returns, trigger counts, realised factor moves | No parameter changed from them |
 | 13 | D-057/D-058 | Pooled gold-1 + gold-2 news sentiment check (rule pre-registered, computed once) | gold labels | Yes: news switched to FinBERT (post-hoc revision, disclosed) |
 | 14 | Final rerun (D-060) | v2 retrained (validation rule), Module A, triggers (D-059), 2022 check, all evals once | all | No parameter changed from them; feature freeze |
+| 15 | D-062/D-063 | Trigger validation vs SPY/VIX stress days (pre-registered, computed once) | SPY and VIX closes | No; reported as a limitation |
 
 Not outcome looks (recorded for completeness): GKG pilot and linking rules (D-017, D-020) inspected texts and links;
 D-035 fitted bins on burn-in raw-impact distributions; the FOMC-day investigation in D-040 read impact values of

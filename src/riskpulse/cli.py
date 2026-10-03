@@ -43,6 +43,7 @@ class EvalTarget(StrEnum):
     impact_market_check = "impact_market_check"
     sentiment_gold = "sentiment_gold"
     sentiment_news_pooled = "sentiment_news_pooled"
+    trigger_validation = "trigger_validation"
 
 
 class TrainTarget(StrEnum):

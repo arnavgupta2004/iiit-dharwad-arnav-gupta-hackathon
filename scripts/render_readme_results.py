@@ -240,6 +240,16 @@ def build(m: dict) -> str:
         )
     else:
         out.append("**Impact score validation:** TBD (event study, P1).")
+    tv = m.get("trigger_validation")
+    if tv:
+        bl = tv["random_baseline"]
+        out += [
+            f"**Trigger validation (pre-registered, D-062/D-063):** against {tv['n_stress_days']} market stress days (SPY ≤ −2% or "
+            f"VIX ≥ +15%), trigger precision is {pct(tv['precision'])} vs {pct(bl['precision_mean'])} for random sessions at the same "
+            f"rate (95% {pct(bl['precision_95'][0])}–{pct(bl['precision_95'][1])}); recall {pct(tv['recall'])} vs {pct(bl['recall_mean'])}. "
+            f"Triggers fall on {pct(tv['share_of_sessions_with_trigger'])} of sessions, so their timing has no measurable skill.",
+            "",
+        ]
     val = m.get("moduleB_validation")
     if val:
         out += [
@@ -332,7 +342,8 @@ def build_glance(m: dict, fs: dict) -> str:
     out += [
         "",
         "Not everything worked; see [Limitations](#limitations-measured-not-assumed): event classification is no better "
-        "than a keyword baseline, market-wide impact does not predict SPY or VIX moves, and the June 2022 FOMC hike was "
+        "than a keyword baseline, market-wide impact does not predict SPY or VIX moves, stress-trigger timing is no better "
+        "than random against market stress days (it fires on most sessions), and the June 2022 FOMC hike was "
         "missed (no adverse trigger on the day; the reaction was a relief rally that the scenarios, lacking a "
         "surprise-vs-consensus measure, can't represent).",
     ]

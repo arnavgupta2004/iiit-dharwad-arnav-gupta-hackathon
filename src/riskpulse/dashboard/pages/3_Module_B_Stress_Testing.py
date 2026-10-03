@@ -345,6 +345,37 @@ if trig.get("stress_runs_per_month"):
         + ". Sep 2021 holds one replay day. Source: reports/metrics.json → moduleB_triggers."
     )
 
+# ---------- trigger validation (D-062/D-063) ----------
+tv = data.metrics().get("trigger_validation")
+if tv:
+    st.subheader("Trigger validation against market stress days")
+    bl = tv["random_baseline"]
+    c = st.columns(3)
+    c[0].markdown(
+        kpi("Precision", pct(tv["precision"]), f"random: {pct(bl['precision_mean'])}"),
+        unsafe_allow_html=True,
+    )
+    c[1].markdown(
+        kpi("Recall", pct(tv["recall"]), f"random: {pct(bl['recall_mean'])}"),
+        unsafe_allow_html=True,
+    )
+    c[2].markdown(
+        kpi(
+            "Sessions with a trigger",
+            pct(tv["share_of_sessions_with_trigger"]),
+            f"{tv['n_trigger_sessions']} of {tv['n_sessions']}",
+        ),
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f'<p class="rp-note">Stress day: SPY return ≤ −2.0% or VIX close ≥ +15% vs the previous close '
+        f"({tv['n_stress_days']} days). A trigger hits if a stress day falls on its session or the next 2. "
+        f"Random baseline: same number of sessions, 1,000 draws (precision 95% interval "
+        f"{pct(bl['precision_95'][0])}–{pct(bl['precision_95'][1])}). Pre-registered (D-062). "
+        "Result: trigger timing is no better than random; the trigger fires on most sessions.</p>",
+        unsafe_allow_html=True,
+    )
+
 # ---------- out-of-sample validation ----------
 FACTOR_UNITS = {
     "rates_10y_bp": "bp",

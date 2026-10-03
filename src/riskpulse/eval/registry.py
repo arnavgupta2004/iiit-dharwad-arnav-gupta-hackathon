@@ -81,6 +81,12 @@ def _sentiment_news_pooled() -> None:
     run_news_pooled()
 
 
+def _trigger_validation() -> None:
+    from riskpulse.eval.trigger_validation import run
+
+    run()
+
+
 def _finetune() -> None:
     from riskpulse.eval.finetune_sentiment import run
 
@@ -90,6 +96,7 @@ def _finetune() -> None:
 EVALS: dict[str, Callable[[], None]] = {
     "predicted_vs_realised": _pvr,
     "finetune": _finetune,
+    "trigger_validation": _trigger_validation,
     "sentiment_gold": _sentiment_gold,
     "sentiment_news_pooled": _sentiment_news_pooled,
     "impact_market_check": _impact_market,
@@ -117,6 +124,7 @@ ALL_ORDER = [
     "moduleA",
     "moduleB",
     "predicted_vs_realised",
+    "trigger_validation",
     "pipeline",
 ]
 
