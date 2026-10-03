@@ -4,6 +4,16 @@ Newest first within each date. Each entry: decision, rationale, and status (acce
 
 ## 2026-10-02 (event classification round 2, approved by Arnav)
 
+### D-064 Hosted demo on Streamlit Community Cloud (Arnav: option C), dashboard only
+Hugging Face now requires a paid plan to create Docker or Gradio Spaces, and Arnav's account is on the free plan, so
+the HF Space was dropped. Streamlit Community Cloud free tier (docs checked 2026-10-03): up to 2.7 GB memory, 2 cores;
+apps sleep after 12 h without traffic and any visitor can wake them; private-repo apps start private and can be made
+public; one private app at a time. Our footprint, measured: rendering all five pages in snapshot mode loads no model
+libraries and peaks at 673 MB, in a clean Python 3.11 environment with only `deploy/requirements.txt` (412 MB
+installed). Entrypoint `deploy/streamlit_app.py` registers the existing pages via `st.navigation`, forces the committed
+snapshot, and has no API, so there is no `/analyze` in the hosted demo. No secrets are needed. Presentation and
+deployment only; no model or logic change.
+
 ### D-063 Trigger validation result: no better than random timing (D-062, computed once)
 `metrics.json → trigger_validation`. Window 2021-09-30 to 2022-09-29: 252 sessions, 25 stress days
 (19 SPY ≤ −2%, 16 VIX ≥ +15%; some days are both). 345 stress runs fall on 178 sessions

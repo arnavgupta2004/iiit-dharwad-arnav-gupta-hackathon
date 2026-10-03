@@ -54,7 +54,7 @@ Status legend: DONE · IN PROGRESS · NEXT · OPEN
 ## Limited exception to the freeze (Arnav, 2026-10-03), tag v1.0-submit-ready before it
 - Trigger validation pre-registered and computed (D-062/D-063): no better than random timing; in metrics, README, Module B page.
 - Landing page "RiskPulse in 60 seconds"; README hero GIF; README AI-assisted note.
-- Hosted demo: blocked: Docker/Gradio Spaces need HF PRO (account is free); options given to Arnav.
+- Hosted demo: Streamlit Community Cloud entrypoint ready (`deploy/`, D-064); Arnav deploys it and sends the URL.
 - Fresh-clone CI re-run: passed.
 
 ## Remaining (Arnav)
