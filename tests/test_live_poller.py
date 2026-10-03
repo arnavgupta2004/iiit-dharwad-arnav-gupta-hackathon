@@ -128,3 +128,32 @@ def test_gkg_documents_apply_the_replay_feed_gates() -> None:
     assert set(docs) == {"u1", "u2"}
     assert docs["u1"].meta["tickers"] == ["BA"] and docs["u2"].meta["tickers"] == ["MKT"]
     assert docs["u1"].published_at == datetime(2026, 10, 3, 11, tzinfo=UTC)
+
+
+class _R:
+    def __init__(self, status: int, body: bytes = b"") -> None:
+        self.status_code, self.content, self.text = status, body, body.decode("latin-1")
+
+    def raise_for_status(self) -> None:
+        if self.status_code >= 400:
+            raise RuntimeError(self.status_code)
+
+
+def test_gkg_latest_steps_back_past_files_not_yet_downloadable() -> None:
+    from riskpulse.ingestion.live import GkgLatest
+
+    base = "http://data.example/gdeltv2/"
+    zipped = _zip([_row("20261003113000", "u1", "TAX_FNCACT", "", "Boeing shares fall")])
+    files = {f"{base}20261003113000.gkg.csv.zip": zipped}  # 12:00 and 11:45 are still 404
+    lastupdate = f"1 abc {base}20261003120000.gkg.csv.zip\n".encode()
+
+    class S:
+        def get(self, url, timeout=None):
+            if url.endswith("lastupdate.txt"):
+                return _R(200, lastupdate)
+            return _R(200, files[url]) if url in files else _R(404)
+
+    src = GkgLatest({"lastupdate_url": base + "lastupdate.txt"}, session=S())
+    docs = src()
+    assert [d.url for d in docs] == ["u1"] and src.lag_files == 2
+    assert src() == []  # already read; newer files still missing

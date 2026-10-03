@@ -20,7 +20,7 @@ import json
 import threading
 from collections import deque
 from collections.abc import Callable
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import requests
@@ -73,13 +73,20 @@ def gkg_documents(raw_zip: bytes, linker: EntityLinker, app: dict | None = None)
 
 
 class GkgLatest:
-    """The newest GKG 15-minute file (from lastupdate.txt); each file is read once."""
+    """The newest available GKG 15-minute file; each file is read once.
+
+    ``lastupdate.txt`` can name a GKG file before it is downloadable (HTTP 404 while GDELT lags),
+    so we step back 15 minutes at a time, up to ``max_lookback_files``, to the newest file that
+    exists and has not been read. Files newer than the one read are skipped for good: their items
+    would be older than the engine's stream time.
+    """
 
     def __init__(self, cfg: dict, session: requests.Session | None = None) -> None:
         self.cfg = cfg
         self.session = session or requests.Session()
         self.linker = EntityLinker()
-        self.last_url: str | None = None
+        self.last_ts: datetime | None = None
+        self.lag_files = 0  # how far behind lastupdate.txt the last file read was
 
     def __call__(self) -> list[Document]:
         r = self.session.get(self.cfg["lastupdate_url"], timeout=60)
@@ -87,12 +94,21 @@ class GkgLatest:
         url = next(
             (ln.split()[-1] for ln in r.text.splitlines() if ln.endswith(".gkg.csv.zip")), None
         )
-        if url is None or url == self.last_url:
+        if url is None:
             return []
-        z = self.session.get(url, timeout=120)
-        z.raise_for_status()
-        self.last_url = url
-        return gkg_documents(z.content, self.linker)
+        stamp = url.rsplit("/", 1)[-1].split(".")[0]
+        newest = datetime.strptime(stamp, "%Y%m%d%H%M%S").replace(tzinfo=UTC)
+        for k in range(int(self.cfg.get("max_lookback_files", 8)) + 1):
+            ts = newest - timedelta(minutes=15 * k)
+            if self.last_ts is not None and ts <= self.last_ts:
+                return []
+            z = self.session.get(url.replace(stamp, f"{ts:%Y%m%d%H%M%S}"), timeout=120)
+            if z.status_code == 404:
+                continue
+            z.raise_for_status()
+            self.last_ts, self.lag_files = ts, k
+            return gkg_documents(z.content, self.linker)
+        return []
 
 
 class DocQueries:

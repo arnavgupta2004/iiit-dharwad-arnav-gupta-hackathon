@@ -47,17 +47,20 @@ def live_panel() -> None:
         return
     live = pd.DataFrame(rows)
     live["label"] = "live, unvalidated"
+    live["published_at"] = pd.to_datetime(live["published_at"], utc=True).dt.strftime(
+        "%d %b %H:%M UTC"
+    )
     st.dataframe(
         live[
             [
                 "label",
                 "published_at",
-                "outlet",
                 "ticker",
-                "title",
                 "sentiment",
                 "event_class",
                 "impact_score",
+                "title",
+                "outlet",
             ]
         ].style.format({"sentiment": "{:+.2f}"}),
         use_container_width=True,

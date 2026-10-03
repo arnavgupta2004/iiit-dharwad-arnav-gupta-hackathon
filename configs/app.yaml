@@ -19,6 +19,7 @@ live:
   sources: [gdelt_gkg, gdelt_doc]
   gkg:
     lastupdate_url: http://data.gdeltproject.org/gdeltv2/lastupdate.txt
+    max_lookback_files: 8             # GDELT can list a file before it is downloadable
   gdelt:
     # One request per query per poll. Company names of the universe, then market-wide topics.
     queries:
