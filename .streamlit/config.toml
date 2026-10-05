@@ -1,0 +1,4 @@
+# Dashboard theme for every way it is launched (local `demo`, Streamlit Community Cloud):
+# the consulting-style light look; without this, Streamlit follows the viewer's dark-mode setting.
+[theme]
+base = "light"

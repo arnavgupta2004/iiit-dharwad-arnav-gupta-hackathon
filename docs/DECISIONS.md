@@ -50,7 +50,9 @@ public; one private app at a time. Our footprint, measured: rendering all five p
 libraries and peaks at 673 MB, in a clean Python 3.11 environment with only `deploy/requirements.txt` (412 MB
 installed). Entrypoint `deploy/streamlit_app.py` registers the existing pages via `st.navigation`, forces the committed
 snapshot, and has no API, so there is no `/analyze` in the hosted demo. No secrets are needed. Presentation and
-deployment only; no model or logic change.
+deployment only; no model or logic change. Deployed at https://riskpulseai.streamlit.app (2026-10-05). Cloud ignores the
+`--theme.base light` flag that `demo` passes, so the app followed viewers' dark mode; `.streamlit/config.toml` now
+pins the light theme for every launch.
 
 ### D-063 Trigger validation result: no better than random timing (D-062, computed once)
 `metrics.json → trigger_validation`. Window 2021-09-30 to 2022-09-29: 252 sessions, 25 stress days
