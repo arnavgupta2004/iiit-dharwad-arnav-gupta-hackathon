@@ -86,7 +86,8 @@ All data is public or synthetic; no proprietary or client data. Full details, li
 - **Module B seed:** Kaggle "Financial Transactions Dataset" (Apache 2.0), merchant fields only, aggregated to
   synthetic obligors `CP_0001…`. Credit inputs: S&P long-run one-year default rates by rating (2024 study, Table 24)
   and spread levels anchored to Moody's Baa minus the 10-year Treasury (FRED) and scaled by ICE BofA OAS ratios.
-- **Human gold set:** 300 stratified items labelled by the author (`data/gold/`), used only for testing.
+- **Human gold set:** 500 stratified items labelled by the author for event class and sentiment (300 in gold-1, 200
+  in the blind gold-2 test) and 100 checked entity links (`data/gold/`), used only for testing.
 - **Synthetic content:** the Module B book and any headline injected in the demo are labelled `synthetic_demo`.
 
 Key assumptions: universe of 20 current S&P 100 names chosen for overlap with the tweet data (tech-heavy by
